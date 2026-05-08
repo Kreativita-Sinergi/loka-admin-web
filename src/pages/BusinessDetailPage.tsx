@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { getBusinessById, toggleBusinessActive, createMembership } from '../api/admin'
+import { getBusinessById, toggleBusinessActive, createMembership, deleteBusiness } from '../api/admin'
 import type { AdminBusiness } from '../types'
 import Badge from '../components/ui/Badge'
 import Modal from '../components/ui/Modal'
+import DeleteConfirmModal from '../components/ui/DeleteConfirmModal'
 import { format } from 'date-fns'
 import { id as localeId } from 'date-fns/locale'
 
@@ -15,6 +16,7 @@ export default function BusinessDetailPage() {
   const [membershipModal, setMembershipModal] = useState(false)
   const [form, setForm] = useState({ type: 'lite', days: 30 })
   const [submitting, setSubmitting] = useState(false)
+  const [deleteModal, setDeleteModal] = useState(false)
   const [fetchTick, setFetchTick] = useState(0)
 
   const refetch = () => setFetchTick((n) => n + 1)
@@ -61,12 +63,28 @@ export default function BusinessDetailPage() {
 
   return (
     <div className="space-y-6 max-w-4xl">
-      <div className="flex items-center gap-3">
-        <button onClick={() => navigate('/businesses')} className="text-slate-400 hover:text-slate-600">←</button>
-        <div>
-          <h2 className="text-xl font-bold text-slate-800">{business.business_name}</h2>
-          <p className="text-sm text-slate-500">{business.id}</p>
+      <DeleteConfirmModal
+        open={deleteModal}
+        businessName={business.business_name}
+        onClose={() => setDeleteModal(false)}
+        onConfirm={async () => {
+          await deleteBusiness(business.id)
+          navigate('/businesses')
+        }}
+      />
+
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <button onClick={() => navigate('/businesses')} className="text-slate-400 hover:text-slate-600">←</button>
+          <div>
+            <h2 className="text-xl font-bold text-slate-800">{business.business_name}</h2>
+            <p className="text-sm text-slate-500">{business.id}</p>
+          </div>
         </div>
+        <button onClick={() => setDeleteModal(true)}
+          className="flex items-center gap-1.5 px-3 py-2 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors">
+          🗑️ Hapus Bisnis
+        </button>
       </div>
 
       {/* Business info */}

@@ -20,6 +20,9 @@ export const getBusinessById = (id: string): Promise<SingleResponse<AdminBusines
 export const toggleBusinessActive = (id: string): Promise<SingleResponse<AdminBusiness>> =>
   axios.patch(`/admin/businesses/${id}/toggle`).then((r) => r.data)
 
+export const deleteBusiness = (id: string): Promise<SingleResponse<null>> =>
+  axios.delete(`/admin/businesses/${id}`).then((r) => r.data)
+
 export const getMemberships = (params: BusinessParams = {}): Promise<PaginatedResponse<AdminMembership>> =>
   axios.get('/admin/memberships', { params }).then((r) => r.data)
 

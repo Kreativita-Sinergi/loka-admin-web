@@ -1,9 +1,10 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getBusinesses, toggleBusinessActive } from '../api/admin'
+import { getBusinesses, toggleBusinessActive, deleteBusiness } from '../api/admin'
 import type { AdminBusiness } from '../types'
 import Badge from '../components/ui/Badge'
 import Pagination from '../components/ui/Pagination'
+import DeleteConfirmModal from '../components/ui/DeleteConfirmModal'
 import { format } from 'date-fns'
 import { id as localeId } from 'date-fns/locale'
 
@@ -37,6 +38,7 @@ export default function BusinessesPage() {
   const [status, setStatus] = useState('')
   const [loading, setLoading] = useState(true)
   const [toggling, setToggling] = useState<string | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<AdminBusiness | null>(null)
   const navigate = useNavigate()
 
   const limit = 15
@@ -75,8 +77,22 @@ export default function BusinessesPage() {
     }
   }
 
+  const handleDelete = async () => {
+    if (!deleteTarget) return
+    await deleteBusiness(deleteTarget.id)
+    setDeleteTarget(null)
+    load()
+  }
+
   return (
     <div className="space-y-4">
+      <DeleteConfirmModal
+        open={!!deleteTarget}
+        businessName={deleteTarget?.business_name ?? ''}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleDelete}
+      />
+
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold text-slate-800">Bisnis</h2>
@@ -199,6 +215,12 @@ export default function BusinessesPage() {
                           } disabled:opacity-50`}
                         >
                           {toggling === b.id ? '...' : b.is_active ? 'Nonaktifkan' : 'Aktifkan'}
+                        </button>
+                        <button
+                          onClick={() => setDeleteTarget(b)}
+                          className="px-3 py-1 text-xs bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors border border-red-200"
+                        >
+                          Hapus
                         </button>
                       </div>
                     </td>
