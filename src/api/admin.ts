@@ -45,6 +45,7 @@ export const verifyApiKey = (key: string): Promise<SingleResponse<AdminStats>> =
 export interface NotifyPayload {
   phone?: string
   business_name?: string
+  template?: string
   message?: string
   bulk?: boolean
 }
@@ -65,3 +66,29 @@ export interface NotifyResponse {
 
 export const sendWhatsApp = (payload: NotifyPayload): Promise<SingleResponse<NotifyResponse>> =>
   axios.post('/admin/notify/whatsapp', payload).then((r) => r.data)
+
+export interface NotificationLog {
+  id: string
+  template: string
+  is_bulk: boolean
+  phone: string
+  recipient_name: string
+  business_name: string
+  message_preview: string
+  total: number
+  sent: number
+  failed: number
+  created_at: string
+}
+
+export interface NotificationStats {
+  total_sent: number
+  total_failed: number
+  success_rate: number
+}
+
+export const getNotificationLogs = (): Promise<SingleResponse<NotificationLog[]>> =>
+  axios.get('/admin/notify/logs').then((r) => r.data)
+
+export const getNotificationStats = (): Promise<SingleResponse<NotificationStats>> =>
+  axios.get('/admin/notify/stats').then((r) => r.data)
