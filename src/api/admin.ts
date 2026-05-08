@@ -41,3 +41,27 @@ export const deactivateMembership = (id: string): Promise<SingleResponse<null>> 
 
 export const verifyApiKey = (key: string): Promise<SingleResponse<AdminStats>> =>
   axios.get('/admin/stats', { headers: { 'X-Admin-Key': key } }).then((r) => r.data)
+
+export interface NotifyPayload {
+  phone?: string
+  business_name?: string
+  message?: string
+  bulk?: boolean
+}
+
+export interface NotifyResult {
+  phone: string
+  name: string
+  success: boolean
+  error?: string
+}
+
+export interface NotifyResponse {
+  total: number
+  sent: number
+  failed: number
+  results: NotifyResult[]
+}
+
+export const sendWhatsApp = (payload: NotifyPayload): Promise<SingleResponse<NotifyResponse>> =>
+  axios.post('/admin/notify/whatsapp', payload).then((r) => r.data)
