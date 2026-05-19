@@ -42,6 +42,9 @@ export const updateMembership = (
 export const deactivateMembership = (id: string): Promise<SingleResponse<null>> =>
   axios.delete(`/admin/memberships/${id}`).then((r) => r.data)
 
+export const processDowngrades = (): Promise<SingleResponse<null>> =>
+  axios.post('/admin/memberships/process-downgrades').then((r) => r.data)
+
 export const verifyApiKey = (key: string): Promise<SingleResponse<AdminStats>> =>
   axios.get('/admin/stats', { headers: { 'X-Admin-Key': key } }).then((r) => r.data)
 

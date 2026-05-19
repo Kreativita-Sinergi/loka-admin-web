@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
-import { getMemberships, updateMembership, deactivateMembership } from '../api/admin'
+import { getMemberships, updateMembership, deactivateMembership, processDowngrades } from '../api/admin'
 import type { AdminMembership } from '../types'
 import Badge from '../components/ui/Badge'
 import Pagination from '../components/ui/Pagination'
@@ -12,6 +12,7 @@ const STATUS_OPTIONS = [
   { value: 'active', label: 'Aktif' },
   { value: 'expired', label: 'Expired' },
   { value: 'trial', label: 'Trial' },
+  { value: 'free', label: 'Gratis' },
   { value: 'lite', label: 'Lite' },
   { value: 'pro', label: 'Pro' },
 ]
@@ -21,7 +22,13 @@ function membershipVariant(m: AdminMembership): 'success' | 'info' | 'warning' |
   if (expired || !m.is_active) return 'danger'
   if (m.type === 'pro') return 'success'
   if (m.type === 'lite') return 'info'
+  if (m.type === 'free') return 'warning'
   return 'warning'
+}
+
+function membershipLabel(type: string): string {
+  if (type === 'free') return 'GRATIS'
+  return type.toUpperCase()
 }
 
 export default function MembershipsPage() {
@@ -35,6 +42,7 @@ export default function MembershipsPage() {
   const [editModal, setEditModal] = useState<AdminMembership | null>(null)
   const [editForm, setEditForm] = useState({ type: '', extend_days: 0, end_date: '' })
   const [submitting, setSubmitting] = useState(false)
+  const [processingDowngrade, setProcessingDowngrade] = useState(false)
 
   const limit = 15
 
@@ -87,6 +95,19 @@ export default function MembershipsPage() {
     }
   }
 
+  const handleProcessDowngrades = async () => {
+    if (!confirm('Jalankan downgrade massal semua trial/pro/lite yang expired ke paket Gratis?')) return
+    setProcessingDowngrade(true)
+    try {
+      await processDowngrades()
+      await load()
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setProcessingDowngrade(false)
+    }
+  }
+
   const handleDeactivate = async (m: AdminMembership) => {
     if (!confirm(`Nonaktifkan membership ini?`)) return
     try {
@@ -99,9 +120,18 @@ export default function MembershipsPage() {
 
   return (
     <div className="space-y-4">
-      <div>
-        <h2 className="text-xl font-bold text-slate-800">Membership</h2>
-        <p className="text-sm text-slate-500 mt-0.5">{total} total membership</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-bold text-slate-800">Membership</h2>
+          <p className="text-sm text-slate-500 mt-0.5">{total} total membership</p>
+        </div>
+        <button
+          onClick={handleProcessDowngrades}
+          disabled={processingDowngrade}
+          className="px-4 py-2 bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition"
+        >
+          {processingDowngrade ? 'Memproses...' : 'Proses Downgrade ke Gratis'}
+        </button>
       </div>
 
       {/* Filters */}
@@ -169,7 +199,7 @@ export default function MembershipsPage() {
                         )}
                       </td>
                       <td className="px-4 py-3">
-                        <Badge variant={membershipVariant(m)}>{m.type.toUpperCase()}</Badge>
+                        <Badge variant={membershipVariant(m)}>{membershipLabel(m.type)}</Badge>
                       </td>
                       <td className="px-4 py-3 text-slate-600 text-xs">
                         {format(new Date(m.start_date), 'd MMM yyyy', { locale: localeId })}
@@ -231,6 +261,7 @@ export default function MembershipsPage() {
               onChange={(e) => setEditForm((f) => ({ ...f, type: e.target.value }))}
               className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
+              <option value="free">Gratis</option>
               <option value="trial">Trial</option>
               <option value="lite">Lite</option>
               <option value="pro">Pro</option>
