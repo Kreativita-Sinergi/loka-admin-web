@@ -8,7 +8,7 @@ export interface AdminBusinessType {
 
 export interface AdminMembership {
   id: string
-  type: 'trial' | 'lite' | 'pro'
+  type: 'free' | 'trial' | 'lite' | 'pro'
   start_date: string
   end_date: string
   is_active: boolean

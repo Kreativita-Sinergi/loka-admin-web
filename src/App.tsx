@@ -4,7 +4,6 @@ import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
 import BusinessesPage from './pages/BusinessesPage'
 import BusinessDetailPage from './pages/BusinessDetailPage'
-import MembershipsPage from './pages/MembershipsPage'
 import NotificationsPage from './pages/NotificationsPage'
 
 export default function App() {
@@ -16,7 +15,6 @@ export default function App() {
           <Route path="/" element={<DashboardPage />} />
           <Route path="/businesses" element={<BusinessesPage />} />
           <Route path="/businesses/:id" element={<BusinessDetailPage />} />
-          <Route path="/memberships" element={<MembershipsPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
