@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import {
-  sendWhatsApp, getNotificationLogs, getNotificationStats,
+  sendEmail, getNotificationLogs, getNotificationStats,
   type NotifyResult, type NotificationLog, type NotificationStats,
 } from '../api/admin'
 import RecipientPicker from '../components/ui/RecipientPicker'
@@ -17,7 +17,7 @@ const TEMPLATES = [
     color: 'bg-indigo-50 border-indigo-300 text-indigo-700',
     activeColor: 'bg-indigo-600 text-white border-indigo-600',
     message: (name: string) =>
-      `Halo *${name || 'Pengguna'}*! 👋\n\nKami mengundang kamu untuk mencoba *aplikasi Loka Kasir* di smartphone.\n\n📱 *Download sekarang di Google Play:*\n${APP_LINK}\n\nDengan aplikasi Loka Kasir kamu bisa:\n✅ Transaksi POS langsung dari HP\n✅ Pantau stok & produk kapan saja\n✅ Lihat laporan penjualan real-time\n✅ Kelola karyawan & shift\n\nLogin menggunakan nomor HP dan password yang sama seperti di web. 🔐\n\nAda pertanyaan? Balas pesan ini, kami siap membantu! 😊\n\n_Tim Loka Kasir_`,
+      `Halo ${name || 'Pengguna'},\n\nKami mengundang Anda untuk mencoba aplikasi Loka Kasir di smartphone.\n\nDownload sekarang:\n${APP_LINK}\n\nDengan aplikasi Loka Kasir Anda bisa:\n- Transaksi POS langsung dari HP\n- Pantau stok & produk kapan saja\n- Lihat laporan penjualan real-time\n- Kelola karyawan & shift\n\nLogin menggunakan email dan password yang sama seperti di web.\n\nAda pertanyaan? Balas email ini, kami siap membantu!\n\nSalam,\nTim Loka Kasir`,
   },
   {
     id: 'promo',
@@ -26,7 +26,7 @@ const TEMPLATES = [
     color: 'bg-orange-50 border-orange-300 text-orange-700',
     activeColor: 'bg-orange-500 text-white border-orange-500',
     message: (name: string) =>
-      `Halo *${name || 'Pengguna'}*! 👋\n\nAda kabar baik dari Loka Kasir! 🚀\n\nKami terus mengembangkan fitur-fitur baru untuk membantu bisnis kamu tumbuh lebih cepat.\n\nCek update terbaru di aplikasi:\n${APP_LINK}\n\n_Tim Loka Kasir_`,
+      `Halo ${name || 'Pengguna'},\n\nAda kabar baik dari Loka Kasir!\n\nKami terus mengembangkan fitur-fitur baru untuk membantu bisnis Anda tumbuh lebih cepat.\n\nCek update terbaru di aplikasi:\n${APP_LINK}\n\nSalam,\nTim Loka Kasir`,
   },
   {
     id: 'custom',
@@ -50,7 +50,7 @@ const TEMPLATE_LABELS: Record<string, string> = {
 export default function NotificationsPage() {
   const [tab, setTab] = useState<Tab>('single')
   const [templateId, setTemplateId] = useState('app_download')
-  const [phone, setPhone] = useState('')
+  const [email, setEmail] = useState('')
   const [businessName, setBusinessName] = useState('')
   const [customMessage, setCustomMessage] = useState('')
   const [sendState, setSendState] = useState<SendState>('idle')
@@ -78,13 +78,13 @@ export default function NotificationsPage() {
   const previewMessage = templateId === 'custom' ? customMessage : selectedTemplate.message(previewName)
 
   const handleSend = async () => {
-    if (tab === 'single' && !phone.trim()) { setError('Nomor WhatsApp wajib diisi'); return }
+    if (tab === 'single' && !email.trim()) { setError('Email penerima wajib diisi'); return }
     if (!previewMessage.trim()) { setError('Pesan tidak boleh kosong'); return }
     setError('')
     setSendState('sending')
     try {
-      const res = await sendWhatsApp({
-        phone: tab === 'single' ? phone.trim() : undefined,
+      const res = await sendEmail({
+        email: tab === 'single' ? email.trim() : undefined,
         business_name: businessName || undefined,
         template: templateId,
         message: templateId === 'custom' ? customMessage : undefined,
@@ -106,8 +106,8 @@ export default function NotificationsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold text-slate-800">Notifikasi WhatsApp</h2>
-          <p className="text-sm text-slate-500 mt-0.5">Kirim pesan WhatsApp ke pengguna Loka Kasir</p>
+          <h2 className="text-xl font-bold text-slate-800">Notifikasi Email</h2>
+          <p className="text-sm text-slate-500 mt-0.5">Kirim email notifikasi ke pengguna Loka Kasir</p>
         </div>
         {stats && (
           <div className="flex gap-3">
@@ -157,15 +157,15 @@ export default function NotificationsPage() {
                   <h3 className="text-sm font-semibold text-slate-700">Penerima</h3>
                 </div>
                 {tab === 'single' ? (
-                  <RecipientPicker phone={phone} businessName={businessName}
-                    onChange={(p, b) => { setPhone(p); setBusinessName(b) }} />
+                  <RecipientPicker email={email} businessName={businessName}
+                    onChange={(e, b) => { setEmail(e); setBusinessName(b) }} />
                 ) : (
                   <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl p-4">
                     <span className="text-2xl">⚠️</span>
                     <div>
                       <p className="text-sm font-semibold text-amber-800">Kirim ke semua owner aktif</p>
                       <p className="text-xs text-amber-600 mt-1 leading-relaxed">
-                        Pesan akan dikirim ke seluruh pemilik bisnis yang akun-nya aktif. Nama bisnis masing-masing akan otomatis digunakan di template pesan.
+                        Email akan dikirim ke seluruh pemilik bisnis yang akun-nya aktif. Nama bisnis masing-masing akan otomatis digunakan di template pesan.
                       </p>
                     </div>
                   </div>
@@ -209,22 +209,30 @@ export default function NotificationsPage() {
                   <span className="w-6 h-6 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xs font-bold">3</span>
                   <h3 className="text-sm font-semibold text-slate-700">Preview & Kirim</h3>
                 </div>
-                <div className="bg-[#e5ddd5] rounded-xl p-4 mb-4 min-h-28">
-                  <div className="bg-white rounded-xl rounded-tl-none shadow-sm px-4 py-3 max-w-xs">
+                {/* Email preview */}
+                <div className="border border-slate-200 rounded-xl overflow-hidden mb-4">
+                  <div className="bg-slate-50 border-b border-slate-200 px-4 py-2.5 flex items-center gap-2">
+                    <span className="text-xs text-slate-400 w-8">Dari:</span>
+                    <span className="text-xs text-slate-600">noreply@lokakasir.id</span>
+                  </div>
+                  <div className="bg-slate-50 border-b border-slate-200 px-4 py-2.5 flex items-center gap-2">
+                    <span className="text-xs text-slate-400 w-8">Ke:</span>
+                    <span className="text-xs text-slate-600 italic">
+                      {tab === 'bulk' ? 'semua owner aktif' : (email || 'email penerima')}
+                    </span>
+                  </div>
+                  <div className="px-4 py-4 min-h-28 bg-white">
                     <p className="text-sm text-slate-800 whitespace-pre-wrap leading-relaxed">
                       {previewMessage || <span className="text-slate-400 italic text-xs">Pilih template untuk melihat preview...</span>}
-                    </p>
-                    <p className="text-xs text-slate-400 mt-2 text-right">
-                      {format(new Date(), 'HH:mm')}
                     </p>
                   </div>
                 </div>
                 <button onClick={handleSend} disabled={sendState === 'sending'}
-                  className="w-full py-3.5 bg-green-600 hover:bg-green-700 active:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-xl text-sm transition-colors flex items-center justify-center gap-2 shadow-sm">
+                  className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-xl text-sm transition-colors flex items-center justify-center gap-2 shadow-sm">
                   {sendState === 'sending' ? (
                     <><span className="animate-spin inline-block">⏳</span> Mengirim...</>
                   ) : (
-                    <><span>📤</span> {tab === 'bulk' ? 'Kirim ke Semua Pengguna' : 'Kirim WhatsApp'}</>
+                    <><span>📧</span> {tab === 'bulk' ? 'Kirim ke Semua Pengguna' : 'Kirim Email'}</>
                   )}
                 </button>
               </div>
@@ -291,7 +299,7 @@ function LogItem({ log }: { log: NotificationLog }) {
             </div>
             {!log.is_bulk && log.recipient_name && (
               <p className="text-xs text-slate-500 mt-0.5 truncate">{log.recipient_name}
-                {log.phone && <span className="text-slate-400"> · {log.phone}</span>}
+                {log.email && <span className="text-slate-400"> · {log.email}</span>}
               </p>
             )}
             <p className="text-xs text-slate-400 mt-1 truncate">{log.message_preview}</p>
@@ -367,7 +375,7 @@ function SendResultCard({
           <span className="text-3xl">{allSuccess ? '🎉' : '⚠️'}</span>
           <div>
             <p className={`font-semibold text-base ${allSuccess ? 'text-emerald-800' : 'text-amber-800'}`}>
-              {allSuccess ? 'Semua pesan terkirim!' : 'Beberapa pesan gagal dikirim'}
+              {allSuccess ? 'Semua email terkirim!' : 'Beberapa email gagal dikirim'}
             </p>
             <p className={`text-sm mt-0.5 ${allSuccess ? 'text-emerald-600' : 'text-amber-600'}`}>
               {result.sent} berhasil · {result.failed} gagal dari {result.total} total
@@ -417,7 +425,7 @@ function SendResultCard({
                   </div>
                   <div>
                     <p className="text-sm font-medium text-slate-700">{r.name}</p>
-                    <p className="text-xs text-slate-400">{r.phone}</p>
+                    <p className="text-xs text-slate-400">{r.email}</p>
                     {r.error && <p className="text-xs text-red-500 mt-0.5">{r.error}</p>}
                   </div>
                 </div>

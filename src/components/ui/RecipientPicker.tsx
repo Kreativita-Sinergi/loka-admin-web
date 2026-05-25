@@ -3,12 +3,12 @@ import { getBusinesses } from '../../api/admin'
 import type { AdminBusiness } from '../../types'
 
 interface RecipientPickerProps {
-  phone: string
+  email: string
   businessName: string
-  onChange: (phone: string, businessName: string) => void
+  onChange: (email: string, businessName: string) => void
 }
 
-export default function RecipientPicker({ phone, businessName, onChange }: RecipientPickerProps) {
+export default function RecipientPicker({ email, businessName, onChange }: RecipientPickerProps) {
   const [query, setQuery] = useState('')
   const [options, setOptions] = useState<AdminBusiness[]>([])
   const [open, setOpen] = useState(false)
@@ -57,10 +57,10 @@ export default function RecipientPicker({ phone, businessName, onChange }: Recip
   }
 
   const handleSelect = (b: AdminBusiness) => {
-    const ownerPhone = b.owner?.phone_number ?? ''
+    const ownerEmail = b.owner?.email ?? ''
     setSelected(b)
     setQuery(b.business_name)
-    onChange(ownerPhone, b.business_name)
+    onChange(ownerEmail, b.business_name)
     setOpen(false)
   }
 
@@ -118,8 +118,8 @@ export default function RecipientPicker({ phone, businessName, onChange }: Recip
                       <p className="text-xs text-slate-400 truncate">{b.owner_name}</p>
                     </div>
                   </div>
-                  <span className="text-xs text-slate-400 shrink-0">
-                    {b.owner?.phone_number ?? '—'}
+                  <span className="text-xs text-slate-400 shrink-0 truncate max-w-[140px]">
+                    {b.owner?.email ?? '—'}
                   </span>
                 </button>
               ))}
@@ -140,21 +140,21 @@ export default function RecipientPicker({ phone, businessName, onChange }: Recip
           <p className="text-xs font-semibold text-indigo-700">Penerima dipilih:</p>
           <p className="text-sm text-slate-800 font-medium">{selected.business_name}</p>
           <p className="text-xs text-slate-500">{selected.owner_name}</p>
-          <p className="text-xs font-mono text-indigo-600">
-            📱 {selected.owner?.phone_number ?? '—'}
+          <p className="text-xs font-mono text-indigo-600 break-all">
+            ✉️ {selected.owner?.email ?? '—'}
           </p>
         </div>
       )}
 
-      {/* Manual phone override */}
+      {/* Manual email override */}
       <div>
         <label className="block text-xs font-medium text-slate-600 mb-1">
-          Nomor WhatsApp <span className="text-red-500">*</span>
+          Email Penerima <span className="text-red-500">*</span>
         </label>
         <input
-          type="text"
-          placeholder="628123456789"
-          value={phone}
+          type="email"
+          placeholder="owner@bisnis.com"
+          value={email}
           onChange={(e) => onChange(e.target.value, businessName)}
           className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
