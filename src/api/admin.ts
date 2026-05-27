@@ -131,3 +131,38 @@ export const updateRegistrationRequestStatus = (
   notes?: string
 ): Promise<SingleResponse<null>> =>
   axios.patch(`/admin/registration-requests/${id}/status`, { status, notes }).then((r) => r.data)
+
+// ── Security logs ─────────────────────────────────────────────────────────────
+
+export interface SecurityEventLog {
+  id: string
+  action: string
+  identifier: string
+  ip_address: string
+  country: string | null
+  region: string | null
+  city: string | null
+  isp: string | null
+  user_agent: string
+  status: 'success' | 'failed'
+  created_at: string
+}
+
+export interface SecurityLogsParams {
+  page?: number
+  limit?: number
+  action?: string
+  status?: string
+}
+
+export interface SecurityLogsData {
+  data: SecurityEventLog[]
+  total: number
+  page: number
+  limit: number
+}
+
+export const getSecurityLogs = (
+  params: SecurityLogsParams = {}
+): Promise<SingleResponse<SecurityLogsData>> =>
+  axios.get('/admin/security-logs', { params }).then((r) => r.data)

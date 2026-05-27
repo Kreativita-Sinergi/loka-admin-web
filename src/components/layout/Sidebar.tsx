@@ -6,6 +6,7 @@ const navItems = [
   { to: '/businesses', label: 'Bisnis', icon: '🏪' },
   { to: '/registration-requests', label: 'Permintaan Akses', icon: '📋' },
   { to: '/notifications', label: 'Notifikasi', icon: '📤' },
+  { to: '/security-logs', label: 'Security Log', icon: '🛡️' },
 ]
 
 export default function Sidebar() {
