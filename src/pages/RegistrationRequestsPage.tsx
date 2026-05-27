@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import { format } from 'date-fns'
 import { id as localeId } from 'date-fns/locale'
 import { getRegistrationRequests, updateRegistrationRequestStatus } from '../api/admin'
@@ -32,31 +32,32 @@ export default function RegistrationRequestsPage() {
   const [total, setTotal]         = useState(0)
   const [page, setPage]           = useState(1)
   const [statusFilter, setStatus] = useState('')
-  const [loading, setLoading]     = useState(false)
+  const [loading, setLoading]     = useState(true)
   const [updating, setUpdating]   = useState<number | null>(null)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   const limit = 20
 
-  const fetchData = useCallback(async () => {
-    setLoading(true)
-    try {
-      const res = await getRegistrationRequests({ page, limit, status: statusFilter || undefined })
-      setRequests(res.data ?? [])
-      setTotal(res.pagination?.total ?? 0)
-    } catch {
-      // silent
-    } finally {
-      setLoading(false)
-    }
-  }, [page, statusFilter])
-
-  useEffect(() => { fetchData() }, [fetchData])
+  useEffect(() => {
+    let cancelled = false
+    getRegistrationRequests({ page, limit, status: statusFilter || undefined })
+      .then((res) => {
+        if (!cancelled) {
+          setRequests(res.data ?? [])
+          setTotal(res.pagination?.total ?? 0)
+          setLoading(false)
+        }
+      })
+      .catch(() => { if (!cancelled) setLoading(false) })
+    return () => { cancelled = true }
+  }, [page, limit, statusFilter, refreshKey])
 
   const handleStatusChange = async (id: number, newStatus: string) => {
     setUpdating(id)
     try {
       await updateRegistrationRequestStatus(id, newStatus)
-      await fetchData()
+      setLoading(true)
+      setRefreshKey((k) => k + 1)
     } catch {
       // silent
     } finally {
@@ -171,10 +172,10 @@ export default function RegistrationRequestsPage() {
 
       {total > limit && (
         <Pagination
-          currentPage={page}
-          totalItems={total}
-          itemsPerPage={limit}
-          onPageChange={setPage}
+          page={page}
+          total={total}
+          limit={limit}
+          onChange={setPage}
         />
       )}
     </div>
