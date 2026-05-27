@@ -5,6 +5,7 @@ import DashboardPage from './pages/DashboardPage'
 import BusinessesPage from './pages/BusinessesPage'
 import BusinessDetailPage from './pages/BusinessDetailPage'
 import NotificationsPage from './pages/NotificationsPage'
+import RegistrationRequestsPage from './pages/RegistrationRequestsPage'
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
           <Route path="/businesses" element={<BusinessesPage />} />
           <Route path="/businesses/:id" element={<BusinessDetailPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
+          <Route path="/registration-requests" element={<RegistrationRequestsPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

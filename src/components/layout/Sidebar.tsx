@@ -4,6 +4,7 @@ import { useAuthStore } from '../../store/authStore'
 const navItems = [
   { to: '/', label: 'Dashboard', icon: '📊' },
   { to: '/businesses', label: 'Bisnis', icon: '🏪' },
+  { to: '/registration-requests', label: 'Permintaan Akses', icon: '📋' },
   { to: '/notifications', label: 'Notifikasi', icon: '📤' },
 ]
 
