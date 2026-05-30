@@ -108,7 +108,7 @@ export interface RegistrationRequest {
   business_name: string
   city: string
   email: string
-  status: 'pending' | 'contacted' | 'registered' | 'rejected'
+  status: 'pending' | 'contacted' | 'approved' | 'registered' | 'rejected'
   notes: string
   created_at: string
   updated_at: string

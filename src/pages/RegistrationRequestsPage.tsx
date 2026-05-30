@@ -10,6 +10,7 @@ const STATUS_OPTIONS = [
   { value: '',           label: 'Semua' },
   { value: 'pending',    label: 'Pending' },
   { value: 'contacted',  label: 'Dihubungi' },
+  { value: 'approved',   label: 'Disetujui' },
   { value: 'registered', label: 'Sudah Daftar' },
   { value: 'rejected',   label: 'Ditolak' },
 ]
@@ -18,14 +19,13 @@ function statusBadge(status: RegistrationRequest['status']) {
   const map: Record<string, { variant: 'warning' | 'info' | 'success' | 'danger' | 'neutral'; label: string }> = {
     pending:    { variant: 'warning', label: 'Pending' },
     contacted:  { variant: 'info',    label: 'Dihubungi' },
+    approved:   { variant: 'success', label: 'Disetujui' },
     registered: { variant: 'success', label: 'Sudah Daftar' },
     rejected:   { variant: 'danger',  label: 'Ditolak' },
   }
   const s = map[status] ?? { variant: 'neutral', label: status }
   return <Badge variant={s.variant}>{s.label}</Badge>
 }
-
-const WHATSAPP_BASE = 'https://wa.me/'
 
 export default function RegistrationRequestsPage() {
   const [requests, setRequests]   = useState<RegistrationRequest[]>([])
@@ -65,12 +65,9 @@ export default function RegistrationRequestsPage() {
     }
   }
 
-  const waLink = (phone: string, name: string, business: string) => {
-    const clean = phone.replace(/\D/g, '').replace(/^0/, '62')
-    const msg = encodeURIComponent(
-      `Halo ${name}, kami dari tim Loka Kasir. Kami menerima permintaan akses untuk bisnis "${business}". Apakah Anda masih tertarik untuk bergabung? 😊`
-    )
-    return `${WHATSAPP_BASE}${clean}?text=${msg}`
+  const handleApprove = async (id: number) => {
+    if (!confirm('Setujui permintaan ini? Email & WhatsApp berisi link download akan dikirim otomatis ke pengguna.')) return
+    await handleStatusChange(id, 'approved')
   }
 
   return (
@@ -131,17 +128,7 @@ export default function RegistrationRequestsPage() {
                 {requests.map((req) => (
                   <tr key={req.id} className="hover:bg-gray-50 transition">
                     <td className="px-4 py-3 font-medium text-gray-900">{req.name}</td>
-                    <td className="px-4 py-3">
-                      <a
-                        href={waLink(req.phone, req.name, req.business_name)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-green-600 hover:underline font-medium flex items-center gap-1"
-                      >
-                        {req.phone}
-                        <span className="text-xs bg-green-100 text-green-700 px-1 py-0.5 rounded">WA</span>
-                      </a>
-                    </td>
+                    <td className="px-4 py-3 text-gray-700">{req.phone}</td>
                     <td className="px-4 py-3 text-gray-700">{req.business_name}</td>
                     <td className="px-4 py-3 text-gray-500">{req.city || '—'}</td>
                     <td className="px-4 py-3 text-gray-500">{req.email || '—'}</td>
@@ -150,17 +137,29 @@ export default function RegistrationRequestsPage() {
                       {format(new Date(req.created_at), 'd MMM yyyy HH:mm', { locale: localeId })}
                     </td>
                     <td className="px-4 py-3">
-                      <select
-                        value={req.status}
-                        disabled={updating === req.id}
-                        onChange={(e) => handleStatusChange(req.id, e.target.value)}
-                        className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
-                      >
-                        <option value="pending">Pending</option>
-                        <option value="contacted">Dihubungi</option>
-                        <option value="registered">Sudah Daftar</option>
-                        <option value="rejected">Ditolak</option>
-                      </select>
+                      <div className="flex items-center gap-2">
+                        {req.status !== 'approved' && req.status !== 'registered' && req.status !== 'rejected' && (
+                          <button
+                            disabled={updating === req.id}
+                            onClick={() => handleApprove(req.id)}
+                            className="text-xs bg-green-600 hover:bg-green-700 text-white font-semibold px-2.5 py-1.5 rounded-lg transition disabled:opacity-50 whitespace-nowrap"
+                          >
+                            ✓ Setujui & Kirim Link
+                          </button>
+                        )}
+                        <select
+                          value={req.status}
+                          disabled={updating === req.id}
+                          onChange={(e) => handleStatusChange(req.id, e.target.value)}
+                          className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+                        >
+                          <option value="pending">Pending</option>
+                          <option value="contacted">Dihubungi</option>
+                          <option value="approved">Disetujui</option>
+                          <option value="registered">Sudah Daftar</option>
+                          <option value="rejected">Ditolak</option>
+                        </select>
+                      </div>
                     </td>
                   </tr>
                 ))}
