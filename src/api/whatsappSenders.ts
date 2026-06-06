@@ -66,6 +66,18 @@ export function checkAllSendersStatus() {
     .then((r) => r.data.data)
 }
 
+export function reconnectSender(id: string) {
+  return api
+    .post<{ status: boolean; message: string }>(`/admin/whatsapp-senders/${id}/reconnect`)
+    .then((r) => r.data)
+}
+
+export function reloadPool() {
+  return api
+    .post<{ status: boolean; message: string }>('/admin/whatsapp-senders/reload-pool')
+    .then((r) => r.data)
+}
+
 export function startPairing(id: string) {
   return api
     .post<{ status: boolean; message: string; data: { qr: string } }>(`/admin/whatsapp-senders/${id}/pair`)

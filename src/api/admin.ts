@@ -99,39 +99,6 @@ export const getNotificationLogs = (): Promise<SingleResponse<NotificationLog[]>
 export const getNotificationStats = (): Promise<SingleResponse<NotificationStats>> =>
   axios.get('/admin/notify/stats').then((r) => r.data)
 
-// ── Registration requests ─────────────────────────────────────────────────────
-
-export interface RegistrationRequest {
-  id: number
-  name: string
-  phone: string
-  business_name: string
-  city: string
-  email: string
-  status: 'pending' | 'contacted' | 'approved' | 'registered' | 'rejected'
-  notes: string
-  created_at: string
-  updated_at: string
-}
-
-export interface RegistrationRequestsParams {
-  page?: number
-  limit?: number
-  status?: string
-}
-
-export const getRegistrationRequests = (
-  params: RegistrationRequestsParams = {}
-): Promise<{ data: RegistrationRequest[]; pagination: { total: number; page: number; limit: number } }> =>
-  axios.get('/admin/registration-requests', { params }).then((r) => r.data)
-
-export const updateRegistrationRequestStatus = (
-  id: number,
-  status: string,
-  notes?: string
-): Promise<SingleResponse<null>> =>
-  axios.patch(`/admin/registration-requests/${id}/status`, { status, notes }).then((r) => r.data)
-
 // ── Security logs ─────────────────────────────────────────────────────────────
 
 export interface SecurityEventLog {

@@ -6,6 +6,8 @@ import {
   deleteWhatsAppSender,
   checkSenderStatus,
   checkAllSendersStatus,
+  reloadPool,
+  reconnectSender,
   startPairing,
   getPairingStatus,
   type WhatsAppSender,
@@ -25,6 +27,35 @@ export default function WhatsAppSendersPage() {
   const [pairingId, setPairingId] = useState<string | null>(null)
   const [statusMap, setStatusMap] = useState<StatusMap>({})
   const [checkingAll, setCheckingAll] = useState(false)
+  const [reloading, setReloading] = useState(false)
+  const [reconnecting, setReconnecting] = useState<string | null>(null)
+
+  const handleReconnect = async (s: WhatsAppSender) => {
+    setReconnecting(s.id)
+    try {
+      await reconnectSender(s.id)
+      // Refresh status after reconnect
+      const status = await checkSenderStatus(s.id)
+      setStatusMap((m) => ({ ...m, [s.id]: { ...status, checking: false } }))
+    } catch (e: unknown) {
+      const msg = (e as { response?: { data?: { error?: { details?: string } } } })?.response?.data?.error?.details ?? 'Gagal reconnect'
+      alert(msg)
+    } finally {
+      setReconnecting(null)
+    }
+  }
+
+  const handleReloadPool = async () => {
+    setReloading(true)
+    try {
+      await reloadPool()
+      alert('Pool berhasil di-reload. Cek status koneksi untuk memverifikasi.')
+    } catch {
+      alert('Gagal reload pool')
+    } finally {
+      setReloading(false)
+    }
+  }
 
   const load = useCallback(() => {
     setLoading(true)
@@ -114,6 +145,14 @@ export default function WhatsAppSendersPage() {
             <p className="text-lg font-bold text-slate-700">{total}</p>
             <p className="text-xs text-slate-500">Total</p>
           </div>
+          <button
+            onClick={handleReloadPool}
+            disabled={reloading}
+            title="Reconnect semua sesi WA dari database tanpa restart server"
+            className="flex items-center gap-2 px-4 py-2 border border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100 text-sm font-medium rounded-xl transition-colors disabled:opacity-50"
+          >
+            {reloading ? <><span className="animate-spin">⏳</span> Reloading...</> : <><span>🔄</span> Reload Pool</>}
+          </button>
           <button
             onClick={handleCheckAll}
             disabled={checkingAll || senders.length === 0}
@@ -227,6 +266,15 @@ export default function WhatsAppSendersPage() {
 
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-2 justify-end">
+                        {isPaired && st && !st.connected && (
+                          <button
+                            onClick={() => handleReconnect(s)}
+                            disabled={reconnecting === s.id}
+                            className="px-3 py-1.5 text-xs border border-amber-300 rounded-lg hover:bg-amber-50 text-amber-700 disabled:opacity-40"
+                          >
+                            {reconnecting === s.id ? '⏳' : '🔌'} Reconnect
+                          </button>
+                        )}
                         {isPaired && (
                           <button
                             onClick={() => handleCheckOne(s.id)}
