@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
-import { verifyApiKey } from '../api/admin'
+import { loginAdmin } from '../api/admin'
 
 export default function LoginPage() {
-  const [key, setKey] = useState('')
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const login = useAuthStore((s) => s.login)
@@ -12,15 +13,15 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!key.trim()) return
+    if (!username.trim() || !password.trim()) return
     setLoading(true)
     setError('')
     try {
-      await verifyApiKey(key.trim())
-      login(key.trim())
+      const { token } = await loginAdmin(username.trim(), password.trim())
+      login(token)
       navigate('/')
     } catch {
-      setError('API Key salah atau tidak valid.')
+      setError('Username atau password salah.')
     } finally {
       setLoading(false)
     }
@@ -38,15 +39,30 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
-              Admin API Key
+              Username
+            </label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Username admin"
+              className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              autoFocus
+              autoComplete="username"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Password
             </label>
             <input
               type="password"
-              value={key}
-              onChange={(e) => setKey(e.target.value)}
-              placeholder="Masukkan API key..."
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
               className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              autoFocus
+              autoComplete="current-password"
             />
           </div>
 
@@ -56,7 +72,7 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            disabled={loading || !key.trim()}
+            disabled={loading || !username.trim() || !password.trim()}
             className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium py-2.5 rounded-lg text-sm transition-colors"
           >
             {loading ? 'Memverifikasi...' : 'Masuk'}

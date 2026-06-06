@@ -45,8 +45,8 @@ export const deactivateMembership = (id: string): Promise<SingleResponse<null>> 
 export const processDowngrades = (): Promise<SingleResponse<null>> =>
   axios.post('/admin/memberships/process-downgrades').then((r) => r.data)
 
-export const verifyApiKey = (key: string): Promise<SingleResponse<AdminStats>> =>
-  axios.get('/admin/stats', { headers: { 'X-Admin-Key': key } }).then((r) => r.data)
+export const loginAdmin = (username: string, password: string): Promise<{ token: string }> =>
+  axios.post('/admin/login', { username, password }).then((r) => r.data.data)
 
 export interface NotifyPayload {
   email?: string

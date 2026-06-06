@@ -7,6 +7,8 @@ import BusinessDetailPage from './pages/BusinessDetailPage'
 import NotificationsPage from './pages/NotificationsPage'
 import RegistrationRequestsPage from './pages/RegistrationRequestsPage'
 import SecurityLogsPage from './pages/SecurityLogsPage'
+import LeadsPage from './pages/LeadsPage'
+import WhatsAppSendersPage from './pages/WhatsAppSendersPage'
 
 export default function App() {
   return (
@@ -20,6 +22,8 @@ export default function App() {
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/registration-requests" element={<RegistrationRequestsPage />} />
           <Route path="/security-logs" element={<SecurityLogsPage />} />
+          <Route path="/leads" element={<LeadsPage />} />
+          <Route path="/whatsapp-senders" element={<WhatsAppSendersPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
