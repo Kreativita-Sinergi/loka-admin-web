@@ -51,7 +51,9 @@ export default function RegistrationRequestsPage() {
     setContactMsg(
       `Halo ${req.name}, kami dari tim Loka Kasir.\n\n` +
       `Kami ingin menindaklanjuti permintaan akses aplikasi untuk bisnis "${req.business_name}" Anda.\n\n` +
-      `Apakah Anda masih berminat? Kami siap membantu proses aktivasi. 😊`
+      `Silakan download aplikasinya melalui link berikut:\n` +
+      `https://play.google.com/store/apps/details?id=com.loka.kasir\n\n` +
+      `Setelah download, hubungi kami kembali untuk proses aktivasi akun. Kami siap membantu! 😊`
     )
     setTimeout(() => textareaRef.current?.focus(), 50)
   }
