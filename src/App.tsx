@@ -7,6 +7,7 @@ import BusinessDetailPage from './pages/BusinessDetailPage'
 import NotificationsPage from './pages/NotificationsPage'
 import SecurityLogsPage from './pages/SecurityLogsPage'
 import LeadsPage from './pages/LeadsPage'
+import AccessRequestsPage from './pages/AccessRequestsPage'
 import WhatsAppSendersPage from './pages/WhatsAppSendersPage'
 
 export default function App() {
@@ -21,6 +22,7 @@ export default function App() {
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/security-logs" element={<SecurityLogsPage />} />
           <Route path="/leads" element={<LeadsPage />} />
+          <Route path="/access-requests" element={<AccessRequestsPage />} />
           <Route path="/whatsapp-senders" element={<WhatsAppSendersPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
