@@ -5,6 +5,7 @@ const navItems = [
   { to: '/', label: 'Dashboard', icon: '📊' },
   { to: '/businesses', label: 'Bisnis', icon: '🏪' },
   { to: '/access-requests', label: 'Permintaan Akses', icon: '📥' },
+  { to: '/prospects', label: 'Prospek', icon: '🎯' },
   { to: '/notifications', label: 'Notifikasi', icon: '📤' },
   { to: '/security-logs', label: 'Security Log', icon: '🛡️' },
 ]

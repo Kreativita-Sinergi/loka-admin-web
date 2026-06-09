@@ -10,6 +10,7 @@ const BusinessDetailPage = lazy(() => import('./pages/BusinessDetailPage'))
 const NotificationsPage = lazy(() => import('./pages/NotificationsPage'))
 const SecurityLogsPage = lazy(() => import('./pages/SecurityLogsPage'))
 const AccessRequestsPage = lazy(() => import('./pages/AccessRequestsPage'))
+const ProspectsPage = lazy(() => import('./pages/ProspectsPage'))
 
 function PageFallback() {
   return (
@@ -38,6 +39,7 @@ export default function App() {
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/security-logs" element={<SecurityLogsPage />} />
             <Route path="/access-requests" element={<AccessRequestsPage />} />
+            <Route path="/prospects" element={<ProspectsPage />} />
           </Route>
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
