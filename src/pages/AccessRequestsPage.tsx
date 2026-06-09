@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { format } from 'date-fns'
 import { id as localeId } from 'date-fns/locale'
-import { buildWhatsAppUrl } from '../api/googlePlaces'
 import {
   getRegistrationRequests,
   updateRegistrationRequest,
@@ -29,11 +28,6 @@ const FILTER_TABS: { value: string; label: string }[] = [
   { value: 'registered', label: 'Sudah Daftar' },
   { value: 'rejected', label: 'Ditolak' },
 ]
-
-const APP_LINK = 'https://play.google.com/store/apps/details?id=com.loka.kasir'
-
-const waTemplate = (name: string) =>
-  `Halo ${name}! 👋\n\nTerima kasih telah meminta akses ke *Loka Kasir* — aplikasi POS untuk memudahkan pengelolaan bisnis Anda.\n\nSilakan unduh aplikasinya di sini dan mulai *GRATIS*:\n🔗 ${APP_LINK}\n\nTim kami siap membantu proses setup Anda 😊\n\n_Tim Loka Kasir_`
 
 const LIMIT = 20
 
@@ -71,12 +65,6 @@ export default function AccessRequestsPage() {
     await updateRegistrationRequest(id, { status: row?.status, notes })
     setNotesModal(null)
     load()
-  }
-
-  const handleSendWa = (row: RegistrationRequest) => {
-    if (!row.phone) return
-    window.open(buildWhatsAppUrl(row.phone, waTemplate(row.name)), '_blank')
-    if (row.status === 'pending') handleStatusChange(row, 'contacted')
   }
 
   const handleDelete = async (id: number) => {
@@ -150,7 +138,6 @@ export default function AccessRequestsPage() {
                 key={row.id}
                 row={row}
                 onStatusChange={(s) => handleStatusChange(row, s)}
-                onSendWa={() => handleSendWa(row)}
                 onEditNotes={() => setNotesModal(row)}
                 onDelete={() => handleDelete(row.id)}
               />
@@ -191,11 +178,10 @@ export default function AccessRequestsPage() {
 }
 
 function RequestRow({
-  row, onStatusChange, onSendWa, onEditNotes, onDelete,
+  row, onStatusChange, onEditNotes, onDelete,
 }: {
   row: RegistrationRequest
   onStatusChange: (s: string) => void
-  onSendWa: () => void
   onEditNotes: () => void
   onDelete: () => void
 }) {
@@ -239,8 +225,6 @@ function RequestRow({
             ))}
           </select>
           <div className="flex gap-1.5">
-            <button onClick={onSendWa} disabled={!row.phone} title="Kirim WhatsApp"
-              className="p-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 rounded-xl text-sm disabled:opacity-40">💬</button>
             <button onClick={onEditNotes} title="Catatan"
               className="p-2 bg-amber-100 hover:bg-amber-200 text-amber-700 rounded-xl text-sm">📝</button>
             <button onClick={onDelete} title="Hapus"
