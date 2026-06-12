@@ -9,8 +9,8 @@ const BusinessesPage = lazy(() => import('./pages/BusinessesPage'))
 const BusinessDetailPage = lazy(() => import('./pages/BusinessDetailPage'))
 const NotificationsPage = lazy(() => import('./pages/NotificationsPage'))
 const SecurityLogsPage = lazy(() => import('./pages/SecurityLogsPage'))
-const AccessRequestsPage = lazy(() => import('./pages/AccessRequestsPage'))
 const ProspectsPage = lazy(() => import('./pages/ProspectsPage'))
+const ThreadsBotPage = lazy(() => import('./pages/ThreadsBotPage'))
 
 function PageFallback() {
   return (
@@ -38,8 +38,8 @@ export default function App() {
             <Route path="/businesses/:id" element={<BusinessDetailPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/security-logs" element={<SecurityLogsPage />} />
-            <Route path="/access-requests" element={<AccessRequestsPage />} />
             <Route path="/prospects" element={<ProspectsPage />} />
+            <Route path="/threads-bot" element={<ThreadsBotPage />} />
           </Route>
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
