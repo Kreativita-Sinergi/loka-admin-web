@@ -8,14 +8,13 @@ import {
   deleteProspect,
   sendOutreach,
   getEmailTemplate,
-  searchGoogle,
   importGoogle,
   markContacted,
   type Prospect,
   type ProspectStatus,
   type CreateProspectPayload,
-  type GooglePlacePreview,
 } from '../api/prospects'
+import { searchGooglePlaces, type GooglePlaceResult } from '../lib/googlePlaces'
 
 // Pesan WhatsApp default — dikirim saat admin klik "Chat WA". {nama} otomatis diisi.
 const waMessage = (name: string) =>
@@ -44,6 +43,33 @@ const FILTER_TABS = [
 ]
 
 const LIMIT = 20
+
+// Kategori usaha umum (kata kunci ramah Google Places) — untuk pilih cepat saat impor.
+const BUSINESS_CATEGORIES: { emoji: string; label: string; q: string }[] = [
+  { emoji: '☕', label: 'Kafe', q: 'kafe' },
+  { emoji: '🍜', label: 'Rumah Makan', q: 'rumah makan' },
+  { emoji: '🍱', label: 'Restoran', q: 'restoran' },
+  { emoji: '🛒', label: 'Toko Kelontong', q: 'toko kelontong' },
+  { emoji: '🏪', label: 'Minimarket', q: 'minimarket' },
+  { emoji: '🥖', label: 'Toko Roti', q: 'toko roti' },
+  { emoji: '🍰', label: 'Toko Kue', q: 'toko kue' },
+  { emoji: '👕', label: 'Toko Baju', q: 'toko pakaian' },
+  { emoji: '💈', label: 'Barbershop', q: 'barbershop' },
+  { emoji: '💇', label: 'Salon', q: 'salon kecantikan' },
+  { emoji: '🧺', label: 'Laundry', q: 'laundry' },
+  { emoji: '💊', label: 'Apotek', q: 'apotek' },
+  { emoji: '🔧', label: 'Bengkel', q: 'bengkel motor' },
+  { emoji: '📱', label: 'Konter HP', q: 'konter hp' },
+  { emoji: '🐠', label: 'Pet Shop', q: 'pet shop' },
+  { emoji: '🌸', label: 'Toko Bunga', q: 'toko bunga' },
+  { emoji: '🧊', label: 'Frozen Food', q: 'frozen food' },
+  { emoji: '🏬', label: 'Toko Bangunan', q: 'toko bangunan' },
+]
+
+const COMMON_CITIES = [
+  'Jakarta', 'Surabaya', 'Bandung', 'Medan', 'Semarang', 'Makassar',
+  'Yogyakarta', 'Bekasi', 'Depok', 'Tangerang', 'Malang', 'Denpasar',
+]
 
 type SendTarget = { mode: 'single'; prospect: Prospect } | { mode: 'selected'; ids: string[] } | { mode: 'all' }
 
@@ -185,8 +211,26 @@ export default function ProspectsPage() {
       {loading ? (
         <div className="bg-white rounded-2xl border border-slate-200 py-20 text-center text-slate-400 text-sm">Memuat data...</div>
       ) : rows.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-slate-200 py-24 text-center">
-          <p className="text-sm text-slate-400">Belum ada prospek. Klik “Tambah Prospek”.</p>
+        <div className="bg-white rounded-2xl border border-slate-200 py-20 px-6 text-center">
+          <div className="text-4xl mb-3">🗺️</div>
+          <h3 className="text-base font-semibold text-slate-800">Mulai cari calon pelanggan</h3>
+          <p className="text-sm text-slate-500 mt-1 max-w-md mx-auto">
+            Pilih jenis usaha (kafe, toko, laundry…) &amp; kota, lalu impor bisnis dari Google Maps. Tinggal klik <b>Chat WA</b> untuk promosikan aplikasi kasirmu.
+          </p>
+          <div className="flex items-center justify-center gap-2 mt-5">
+            <button
+              onClick={() => setImportOpen(true)}
+              className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl"
+            >
+              🗺️ Impor dari Google
+            </button>
+            <button
+              onClick={() => setFormModal('new')}
+              className="px-5 py-2.5 border border-slate-200 text-slate-600 hover:bg-slate-50 text-sm font-medium rounded-xl"
+            >
+              + Tambah manual
+            </button>
+          </div>
         </div>
       ) : (
         <>
@@ -455,7 +499,7 @@ function ImportGoogleModal({ onClose, onImported }: { onClose: () => void; onImp
   const [businessType, setBusinessType] = useState('')
   const [location, setLocation] = useState('')
   const [maxResults, setMaxResults] = useState(20)
-  const [results, setResults] = useState<GooglePlacePreview[]>([])
+  const [results, setResults] = useState<GooglePlaceResult[]>([])
   const [picked, setPicked] = useState<Set<string>>(new Set())
   const [searching, setSearching] = useState(false)
   const [importing, setImporting] = useState(false)
@@ -466,15 +510,13 @@ function ImportGoogleModal({ onClose, onImported }: { onClose: () => void; onImp
     if (!businessType.trim() || !location.trim()) { setError('Jenis usaha & lokasi wajib diisi'); return }
     setSearching(true); setError(''); setInfo(''); setResults([]); setPicked(new Set())
     try {
-      const r = await searchGoogle({ business_type: businessType, location, max_results: maxResults })
-      const data = r.data ?? []
+      const data = await searchGooglePlaces(`${businessType.trim()} di ${location.trim()}`, maxResults)
       setResults(data)
-      // Auto-pilih yang belum diimpor.
-      setPicked(new Set(data.filter((d) => !d.already_imported).map((d) => d.place_id)))
+      // Auto-pilih semua yang punya nomor (bisa di-WA).
+      setPicked(new Set(data.filter((d) => d.phone).map((d) => d.place_id)))
       if (data.length === 0) setInfo('Tidak ada hasil. Coba kata kunci atau lokasi lain.')
     } catch (e) {
-      const err = e as { response?: { data?: { error?: { details?: string }; message?: string } } }
-      setError(err.response?.data?.error?.details ?? err.response?.data?.message ?? 'Gagal mencari di Google')
+      setError(e instanceof Error ? e.message : 'Gagal mencari di Google')
     } finally {
       setSearching(false)
     }
@@ -487,8 +529,8 @@ function ImportGoogleModal({ onClose, onImported }: { onClose: () => void; onImp
   })
 
   const handleImport = async () => {
-    const items = results.filter((r) => picked.has(r.place_id) && !r.already_imported)
-    if (items.length === 0) { setError('Pilih minimal satu toko yang belum diimpor'); return }
+    const items = results.filter((r) => picked.has(r.place_id))
+    if (items.length === 0) { setError('Pilih minimal satu bisnis'); return }
     setImporting(true); setError('')
     try {
       const r = await importGoogle({
@@ -499,7 +541,7 @@ function ImportGoogleModal({ onClose, onImported }: { onClose: () => void; onImp
           phone: it.phone, website: it.website, rating: it.rating,
         })),
       })
-      setInfo(`✅ Diimpor ${r.data.imported}, dilewati ${r.data.skipped}.`)
+      setInfo(`✅ Diimpor ${r.data.imported}, dilewati ${r.data.skipped} (sudah ada).`)
       setTimeout(onImported, 1000)
     } catch (e) {
       const err = e as { response?: { data?: { message?: string } } }
@@ -510,26 +552,66 @@ function ImportGoogleModal({ onClose, onImported }: { onClose: () => void; onImp
   }
 
   const input = 'px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500'
-  const pickedCount = results.filter((r) => picked.has(r.place_id) && !r.already_imported).length
+  const pickedCount = results.filter((r) => picked.has(r.place_id)).length
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="bg-white rounded-2xl w-full max-w-2xl shadow-xl flex flex-col max-h-[88vh]" onClick={(e) => e.stopPropagation()}>
         <div className="p-5 border-b border-slate-100">
-          <h3 className="text-sm font-bold text-slate-800 mb-0.5">Impor Prospek dari Google</h3>
-          <p className="text-xs text-slate-500 mb-3">Cari bisnis di Google Maps berdasarkan jenis usaha & lokasi, lalu impor yang punya nomor WhatsApp.</p>
-          <div className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-2">
-            <input className={input} placeholder="Jenis usaha (mis. kafe, toko kelontong)" value={businessType} onChange={(e) => setBusinessType(e.target.value)} autoFocus />
-            <input className={input} placeholder="Lokasi (mis. Surabaya, Bandung)" value={location} onChange={(e) => setLocation(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSearch()} />
+          <h3 className="text-sm font-bold text-slate-800 mb-0.5">Cari Bisnis untuk Diprospek</h3>
+          <p className="text-xs text-slate-500 mb-3">Pilih jenis usaha &amp; kota, klik Cari — daftar bisnis dari Google Maps langsung muncul, tinggal impor &amp; hubungi via WhatsApp.</p>
+
+          {/* Langkah 1: jenis usaha (chip) */}
+          <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide mb-1.5">1. Jenis usaha</p>
+          <div className="flex flex-wrap gap-1.5">
+            {BUSINESS_CATEGORIES.map((c) => {
+              const active = businessType.trim().toLowerCase() === c.q
+              return (
+                <button
+                  key={c.q}
+                  onClick={() => setBusinessType(c.q)}
+                  className={`px-2.5 py-1.5 rounded-lg text-xs font-medium border transition ${
+                    active ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-700 border-slate-200 hover:border-emerald-300 hover:bg-emerald-50'
+                  }`}
+                >
+                  {c.emoji} {c.label}
+                </button>
+              )
+            })}
+          </div>
+          <input className={`${input} mt-2 w-full`} placeholder="…atau ketik jenis usaha sendiri" value={businessType} onChange={(e) => setBusinessType(e.target.value)} />
+
+          {/* Langkah 2: kota (chip) */}
+          <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide mt-4 mb-1.5">2. Lokasi (kota)</p>
+          <div className="flex flex-wrap gap-1.5">
+            {COMMON_CITIES.map((city) => {
+              const active = location.trim().toLowerCase() === city.toLowerCase()
+              return (
+                <button
+                  key={city}
+                  onClick={() => setLocation(city)}
+                  className={`px-2.5 py-1.5 rounded-lg text-xs font-medium border transition ${
+                    active ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-700 border-slate-200 hover:border-slate-400 hover:bg-slate-50'
+                  }`}
+                >
+                  {city}
+                </button>
+              )
+            })}
+          </div>
+          <input className={`${input} mt-2 w-full`} placeholder="…atau ketik kota / area lain" value={location} onChange={(e) => setLocation(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSearch()} />
+
+          {/* Langkah 3: jumlah + cari */}
+          <div className="flex gap-2 mt-4">
             <select className={input} value={maxResults} onChange={(e) => setMaxResults(Number(e.target.value))}>
               <option value={20}>20 hasil</option>
               <option value={40}>40 hasil</option>
               <option value={60}>60 hasil</option>
             </select>
+            <button onClick={handleSearch} disabled={searching} className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl disabled:opacity-50">
+              {searching ? 'Mencari di Google…' : '🔍 Cari Bisnis'}
+            </button>
           </div>
-          <button onClick={handleSearch} disabled={searching} className="mt-2 w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl disabled:opacity-50">
-            {searching ? 'Mencari di Google…' : '🔍 Cari'}
-          </button>
           {error && <p className="text-xs text-red-500 mt-2">{error}</p>}
           {info && <p className="text-xs text-slate-600 mt-2">{info}</p>}
         </div>
@@ -539,16 +621,15 @@ function ImportGoogleModal({ onClose, onImported }: { onClose: () => void; onImp
             <p className="text-sm text-slate-400 text-center py-10">{searching ? 'Memuat…' : 'Belum ada hasil pencarian.'}</p>
           ) : (
             results.map((r) => {
-              const isChecked = picked.has(r.place_id) && !r.already_imported
+              const isChecked = picked.has(r.place_id)
               return (
-                <label key={r.place_id} className={`flex items-start gap-3 p-3 rounded-xl border ${r.already_imported ? 'border-slate-100 bg-slate-50 opacity-60' : 'border-slate-200 hover:bg-slate-50 cursor-pointer'}`}>
-                  <input type="checkbox" disabled={r.already_imported} checked={isChecked} onChange={() => toggle(r.place_id)} className="mt-1 w-4 h-4 accent-emerald-600" />
+                <label key={r.place_id} className="flex items-start gap-3 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                  <input type="checkbox" checked={isChecked} onChange={() => toggle(r.place_id)} className="mt-1 w-4 h-4 accent-emerald-600" />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-sm font-semibold text-slate-800">{r.name}</span>
                       {typeof r.rating === 'number' && <span className="text-xs text-amber-600">⭐ {r.rating}</span>}
-                      {r.already_imported && <span className="text-xs text-slate-400 bg-slate-200 px-1.5 py-0.5 rounded">sudah ada</span>}
-                      {!r.phone && !r.already_imported && <span className="text-xs text-red-400">tanpa nomor</span>}
+                      {!r.phone && <span className="text-xs text-red-400">tanpa nomor</span>}
                     </div>
                     {r.address && <p className="text-xs text-slate-500 mt-0.5">📍 {r.address}</p>}
                     <div className="flex gap-3 flex-wrap text-xs text-slate-500 mt-0.5">
