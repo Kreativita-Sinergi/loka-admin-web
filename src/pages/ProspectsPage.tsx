@@ -8,10 +8,25 @@ import {
   deleteProspect,
   sendOutreach,
   getEmailTemplate,
+  searchGoogle,
+  importGoogle,
+  markContacted,
   type Prospect,
   type ProspectStatus,
   type CreateProspectPayload,
+  type GooglePlacePreview,
 } from '../api/prospects'
+
+// Pesan WhatsApp default — dikirim saat admin klik "Chat WA". {nama} otomatis diisi.
+const waMessage = (name: string) =>
+  `Halo ${name} 👋\n\nPerkenalkan, saya dari *Loka Kasir* — aplikasi kasir (POS) untuk UMKM: kelola produk, stok, dan laporan penjualan dengan mudah.\n\nBolehkah saya bagikan info & demo gratisnya? Terima kasih 🙏`
+
+function openWhatsApp(prospect: Prospect) {
+  const phone = (prospect.phone ?? '').replace(/\D/g, '')
+  if (!phone) return
+  const text = encodeURIComponent(waMessage(prospect.company || prospect.name))
+  window.open(`https://wa.me/${phone}?text=${text}`, '_blank', 'noopener')
+}
 
 const STATUS_CONFIG: Record<ProspectStatus, { label: string; color: string; bg: string; border: string }> = {
   new: { label: 'Baru', color: 'text-amber-700', bg: 'bg-amber-50', border: 'border-amber-200' },
@@ -43,6 +58,7 @@ export default function ProspectsPage() {
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [formModal, setFormModal] = useState<'new' | Prospect | null>(null)
   const [sendTarget, setSendTarget] = useState<SendTarget | null>(null)
+  const [importOpen, setImportOpen] = useState(false)
 
   const load = useCallback(() => {
     setLoading(true)
@@ -77,6 +93,14 @@ export default function ProspectsPage() {
     load()
   }
 
+  const handleWhatsApp = async (row: Prospect) => {
+    openWhatsApp(row)
+    try {
+      await markContacted(row.id)
+    } catch { /* tetap lanjut walau gagal menandai */ }
+    load()
+  }
+
   const totalPages = Math.ceil(total / LIMIT)
   const selectedIds = [...selected]
 
@@ -85,9 +109,15 @@ export default function ProspectsPage() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h2 className="text-2xl font-bold text-slate-900">Prospek Pelanggan</h2>
-          <p className="text-sm text-slate-500 mt-0.5">Calon pengguna Loka Kasir & pemasaran via email</p>
+          <p className="text-sm text-slate-500 mt-0.5">Calon pengguna Loka Kasir — impor dari Google, hubungi via WhatsApp</p>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => setImportOpen(true)}
+            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl"
+          >
+            🗺️ Impor dari Google
+          </button>
           <button
             onClick={() => setSendTarget({ mode: 'all' })}
             className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl"
@@ -171,6 +201,7 @@ export default function ProspectsPage() {
                 onEdit={() => setFormModal(row)}
                 onDelete={() => handleDelete(row.id)}
                 onSend={() => setSendTarget({ mode: 'single', prospect: row })}
+                onWhatsApp={() => handleWhatsApp(row)}
               />
             ))}
           </div>
@@ -206,12 +237,19 @@ export default function ProspectsPage() {
           onSent={() => { setSendTarget(null); setSelected(new Set()); load() }}
         />
       )}
+
+      {importOpen && (
+        <ImportGoogleModal
+          onClose={() => setImportOpen(false)}
+          onImported={() => { setImportOpen(false); setPage(1); load() }}
+        />
+      )}
     </div>
   )
 }
 
 function ProspectRow({
-  row, checked, onToggle, onStatusChange, onEdit, onDelete, onSend,
+  row, checked, onToggle, onStatusChange, onEdit, onDelete, onSend, onWhatsApp,
 }: {
   row: Prospect
   checked: boolean
@@ -220,6 +258,7 @@ function ProspectRow({
   onEdit: () => void
   onDelete: () => void
   onSend: () => void
+  onWhatsApp: () => void
 }) {
   const cfg = STATUS_CONFIG[row.status] ?? STATUS_CONFIG.new
   return (
@@ -229,21 +268,25 @@ function ProspectRow({
         <div className="flex-1 min-w-0 space-y-1">
           <div className="flex items-center gap-2 flex-wrap">
             <h4 className="text-sm font-semibold text-slate-800">{row.name}</h4>
+            {row.business_type && <span className="text-xs bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full border border-emerald-100">{row.business_type}</span>}
             {row.company && <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">🏢 {row.company}</span>}
+            {typeof row.rating === 'number' && <span className="text-xs bg-amber-50 text-amber-600 px-2 py-0.5 rounded-full">⭐ {row.rating}</span>}
             {row.unsubscribed && <span className="text-xs bg-red-50 text-red-500 px-2 py-0.5 rounded-full border border-red-100">unsubscribed</span>}
           </div>
           <div className="flex items-center gap-3 flex-wrap text-xs text-slate-600">
-            <span className="font-medium flex items-center gap-1">📧 {row.email}</span>
-            {row.phone && <span className="flex items-center gap-1">📱 {row.phone}</span>}
+            {row.phone && <span className="font-medium flex items-center gap-1 text-emerald-700">📱 {row.phone}</span>}
+            {row.email && <span className="flex items-center gap-1">📧 {row.email}</span>}
+            {row.website && <a href={row.website} target="_blank" rel="noopener" className="flex items-center gap-1 text-blue-500 hover:underline truncate max-w-[200px]">🌐 {row.website}</a>}
             {row.source && <span className="flex items-center gap-1">🔖 {row.source}</span>}
           </div>
+          {row.address && <p className="text-xs text-slate-400 flex items-start gap-1">📍 {row.address}</p>}
           {row.notes && (
             <p className="text-xs text-slate-500 italic bg-amber-50 border border-amber-100 rounded-lg px-2 py-1">📝 {row.notes}</p>
           )}
           <div className="flex items-center gap-2 pt-0.5 text-xs text-slate-400 flex-wrap">
             <span>Dibuat {format(new Date(row.created_at), 'dd MMM yyyy', { locale: localeId })}</span>
             {row.last_contacted_at && (
-              <span className="text-blue-400">· Email terakhir {format(new Date(row.last_contacted_at), 'dd MMM yyyy', { locale: localeId })}</span>
+              <span className="text-blue-400">· Dihubungi {format(new Date(row.last_contacted_at), 'dd MMM yyyy', { locale: localeId })}</span>
             )}
           </div>
         </div>
@@ -259,7 +302,9 @@ function ProspectRow({
             ))}
           </select>
           <div className="flex gap-1.5">
-            <button onClick={onSend} disabled={row.unsubscribed} title="Kirim email"
+            <button onClick={onWhatsApp} disabled={!row.phone} title="Chat WhatsApp"
+              className="p-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 rounded-xl text-sm disabled:opacity-40">💬</button>
+            <button onClick={onSend} disabled={row.unsubscribed || !row.email} title="Kirim email"
               className="p-2 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-xl text-sm disabled:opacity-40">📧</button>
             <button onClick={onEdit} title="Edit" className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-sm">✏️</button>
             <button onClick={onDelete} title="Hapus" className="p-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-xl text-sm">🗑️</button>
@@ -400,6 +445,129 @@ function SendEmailModal({ target, onClose, onSent }: { target: SendTarget; onClo
             {sending ? 'Mengirim…' : 'Kirim Email'}
           </button>
           <button onClick={onClose} className="flex-1 py-2.5 border border-slate-200 text-slate-600 hover:bg-slate-50 text-sm rounded-xl">Tutup</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ImportGoogleModal({ onClose, onImported }: { onClose: () => void; onImported: () => void }) {
+  const [businessType, setBusinessType] = useState('')
+  const [location, setLocation] = useState('')
+  const [maxResults, setMaxResults] = useState(20)
+  const [results, setResults] = useState<GooglePlacePreview[]>([])
+  const [picked, setPicked] = useState<Set<string>>(new Set())
+  const [searching, setSearching] = useState(false)
+  const [importing, setImporting] = useState(false)
+  const [error, setError] = useState('')
+  const [info, setInfo] = useState('')
+
+  const handleSearch = async () => {
+    if (!businessType.trim() || !location.trim()) { setError('Jenis usaha & lokasi wajib diisi'); return }
+    setSearching(true); setError(''); setInfo(''); setResults([]); setPicked(new Set())
+    try {
+      const r = await searchGoogle({ business_type: businessType, location, max_results: maxResults })
+      const data = r.data ?? []
+      setResults(data)
+      // Auto-pilih yang belum diimpor.
+      setPicked(new Set(data.filter((d) => !d.already_imported).map((d) => d.place_id)))
+      if (data.length === 0) setInfo('Tidak ada hasil. Coba kata kunci atau lokasi lain.')
+    } catch (e) {
+      const err = e as { response?: { data?: { error?: { details?: string }; message?: string } } }
+      setError(err.response?.data?.error?.details ?? err.response?.data?.message ?? 'Gagal mencari di Google')
+    } finally {
+      setSearching(false)
+    }
+  }
+
+  const toggle = (id: string) => setPicked((s) => {
+    const next = new Set(s)
+    if (next.has(id)) next.delete(id); else next.add(id)
+    return next
+  })
+
+  const handleImport = async () => {
+    const items = results.filter((r) => picked.has(r.place_id) && !r.already_imported)
+    if (items.length === 0) { setError('Pilih minimal satu toko yang belum diimpor'); return }
+    setImporting(true); setError('')
+    try {
+      const r = await importGoogle({
+        business_type: businessType,
+        location,
+        items: items.map((it) => ({
+          place_id: it.place_id, name: it.name, address: it.address,
+          phone: it.phone, website: it.website, rating: it.rating,
+        })),
+      })
+      setInfo(`✅ Diimpor ${r.data.imported}, dilewati ${r.data.skipped}.`)
+      setTimeout(onImported, 1000)
+    } catch (e) {
+      const err = e as { response?: { data?: { message?: string } } }
+      setError(err.response?.data?.message ?? 'Gagal mengimpor')
+    } finally {
+      setImporting(false)
+    }
+  }
+
+  const input = 'px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500'
+  const pickedCount = results.filter((r) => picked.has(r.place_id) && !r.already_imported).length
+
+  return (
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="bg-white rounded-2xl w-full max-w-2xl shadow-xl flex flex-col max-h-[88vh]" onClick={(e) => e.stopPropagation()}>
+        <div className="p-5 border-b border-slate-100">
+          <h3 className="text-sm font-bold text-slate-800 mb-0.5">Impor Prospek dari Google</h3>
+          <p className="text-xs text-slate-500 mb-3">Cari bisnis di Google Maps berdasarkan jenis usaha & lokasi, lalu impor yang punya nomor WhatsApp.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-2">
+            <input className={input} placeholder="Jenis usaha (mis. kafe, toko kelontong)" value={businessType} onChange={(e) => setBusinessType(e.target.value)} autoFocus />
+            <input className={input} placeholder="Lokasi (mis. Surabaya, Bandung)" value={location} onChange={(e) => setLocation(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSearch()} />
+            <select className={input} value={maxResults} onChange={(e) => setMaxResults(Number(e.target.value))}>
+              <option value={20}>20 hasil</option>
+              <option value={40}>40 hasil</option>
+              <option value={60}>60 hasil</option>
+            </select>
+          </div>
+          <button onClick={handleSearch} disabled={searching} className="mt-2 w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl disabled:opacity-50">
+            {searching ? 'Mencari di Google…' : '🔍 Cari'}
+          </button>
+          {error && <p className="text-xs text-red-500 mt-2">{error}</p>}
+          {info && <p className="text-xs text-slate-600 mt-2">{info}</p>}
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-5 space-y-2">
+          {results.length === 0 ? (
+            <p className="text-sm text-slate-400 text-center py-10">{searching ? 'Memuat…' : 'Belum ada hasil pencarian.'}</p>
+          ) : (
+            results.map((r) => {
+              const isChecked = picked.has(r.place_id) && !r.already_imported
+              return (
+                <label key={r.place_id} className={`flex items-start gap-3 p-3 rounded-xl border ${r.already_imported ? 'border-slate-100 bg-slate-50 opacity-60' : 'border-slate-200 hover:bg-slate-50 cursor-pointer'}`}>
+                  <input type="checkbox" disabled={r.already_imported} checked={isChecked} onChange={() => toggle(r.place_id)} className="mt-1 w-4 h-4 accent-emerald-600" />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm font-semibold text-slate-800">{r.name}</span>
+                      {typeof r.rating === 'number' && <span className="text-xs text-amber-600">⭐ {r.rating}</span>}
+                      {r.already_imported && <span className="text-xs text-slate-400 bg-slate-200 px-1.5 py-0.5 rounded">sudah ada</span>}
+                      {!r.phone && !r.already_imported && <span className="text-xs text-red-400">tanpa nomor</span>}
+                    </div>
+                    {r.address && <p className="text-xs text-slate-500 mt-0.5">📍 {r.address}</p>}
+                    <div className="flex gap-3 flex-wrap text-xs text-slate-500 mt-0.5">
+                      {r.phone && <span className="text-emerald-700">📱 {r.phone}</span>}
+                      {r.website && <span className="truncate max-w-[220px]">🌐 {r.website}</span>}
+                    </div>
+                  </div>
+                </label>
+              )
+            })
+          )}
+        </div>
+
+        <div className="p-5 border-t border-slate-100 flex gap-2 items-center">
+          <span className="text-xs text-slate-500 mr-auto">{pickedCount} dipilih untuk diimpor</span>
+          <button onClick={onClose} className="px-4 py-2.5 border border-slate-200 text-slate-600 hover:bg-slate-50 text-sm rounded-xl">Tutup</button>
+          <button onClick={handleImport} disabled={importing || pickedCount === 0} className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl disabled:opacity-50">
+            {importing ? 'Mengimpor…' : `Impor ${pickedCount} prospek`}
+          </button>
         </div>
       </div>
     </div>

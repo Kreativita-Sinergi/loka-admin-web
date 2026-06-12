@@ -14,8 +14,48 @@ export interface Prospect {
   notes: string | null
   unsubscribed: boolean
   last_contacted_at: string | null
+  place_id: string | null
+  address: string | null
+  website: string | null
+  business_type: string | null
+  city: string | null
+  rating: number | null
   created_at: string
   updated_at: string
+}
+
+export interface GooglePlacePreview {
+  place_id: string
+  name: string
+  address: string
+  phone: string
+  website: string
+  rating: number | null
+  already_imported: boolean
+}
+
+export interface SearchGooglePayload {
+  business_type: string
+  location: string
+  max_results?: number
+}
+
+export interface ImportGooglePayload {
+  business_type: string
+  location: string
+  items: Array<{
+    place_id: string
+    name: string
+    address: string
+    phone: string
+    website: string
+    rating: number | null
+  }>
+}
+
+export interface ImportSummary {
+  imported: number
+  skipped: number
 }
 
 export interface OutreachResult {
@@ -84,3 +124,12 @@ export const sendOutreach = (data: SendOutreachPayload): Promise<SingleResponse<
 
 export const getEmailTemplate = (): Promise<SingleResponse<{ subject: string; body_html: string }>> =>
   axios.get('/admin/prospects/email-template').then((r) => r.data)
+
+export const searchGoogle = (data: SearchGooglePayload): Promise<SingleResponse<GooglePlacePreview[]>> =>
+  axios.post('/admin/prospects/search-google', data).then((r) => r.data)
+
+export const importGoogle = (data: ImportGooglePayload): Promise<SingleResponse<ImportSummary>> =>
+  axios.post('/admin/prospects/import', data).then((r) => r.data)
+
+export const markContacted = (id: string): Promise<SingleResponse<Prospect>> =>
+  axios.post(`/admin/prospects/${id}/contacted`, {}).then((r) => r.data)
