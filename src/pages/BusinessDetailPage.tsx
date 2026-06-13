@@ -19,17 +19,22 @@ export default function BusinessDetailPage() {
   const [editMembershipModal, setEditMembershipModal] = useState(false)
   const [editForm, setEditForm] = useState({ type: '', extend_days: 0, end_date: '' })
   const [deleteModal, setDeleteModal] = useState(false)
+  const [upgrading, setUpgrading] = useState<string | null>(null)
   const [fetchTick, setFetchTick] = useState(0)
 
-  const refetch = () => setFetchTick((n) => n + 1)
+  const refetch = () => {
+    setLoading(true)
+    setFetchTick((n) => n + 1)
+  }
 
   useEffect(() => {
     if (!id) return
-    setLoading(true)
+    let cancelled = false
     getBusinessById(id)
-      .then((res) => setBusiness(res.data))
-      .catch(() => navigate('/businesses'))
-      .finally(() => setLoading(false))
+      .then((res) => { if (!cancelled) setBusiness(res.data) })
+      .catch(() => { if (!cancelled) navigate('/businesses') })
+      .finally(() => { if (!cancelled) setLoading(false) })
+    return () => { cancelled = true }
   }, [id, navigate, fetchTick])
 
   const handleToggle = async () => {
@@ -80,6 +85,21 @@ export default function BusinessDetailPage() {
       console.error(err)
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  const handleChangePlan = async (type: string) => {
+    if (!business?.membership) return
+    const label = type === 'pro' ? 'Pro' : type === 'lite' ? 'Lite' : 'Gratis'
+    if (!confirm(`Ubah paket bisnis ini ke ${label}?`)) return
+    setUpgrading(type)
+    try {
+      await updateMembership(business.membership.id, { type })
+      refetch()
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setUpgrading(null)
     }
   }
 
@@ -293,6 +313,29 @@ export default function BusinessDetailPage() {
                 <p className="text-amber-600 mt-0.5">→ {membership.scheduled_downgrade_to.toUpperCase()}</p>
               </div>
             )}
+            <div className="col-span-2 pt-3 mt-1 border-t border-slate-100">
+              <p className="text-slate-400 text-xs mb-2">Ubah Paket Cepat</p>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { type: 'pro', label: 'Pro', cls: 'bg-emerald-600 hover:bg-emerald-700 text-white' },
+                  { type: 'lite', label: 'Lite', cls: 'bg-indigo-600 hover:bg-indigo-700 text-white' },
+                  { type: 'free', label: 'Gratis', cls: 'bg-slate-200 hover:bg-slate-300 text-slate-700' },
+                ].map((p) => (
+                  <button
+                    key={p.type}
+                    onClick={() => handleChangePlan(p.type)}
+                    disabled={membership.type === p.type || upgrading !== null}
+                    className={`px-3 py-1.5 text-xs rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${p.cls}`}
+                  >
+                    {upgrading === p.type
+                      ? 'Memproses...'
+                      : membership.type === p.type
+                        ? `${p.label} (aktif)`
+                        : `Naikkan ke ${p.label}`}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         ) : (
           <p className="text-sm text-slate-400">Tidak ada membership aktif</p>
