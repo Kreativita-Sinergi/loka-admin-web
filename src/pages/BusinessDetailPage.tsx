@@ -88,13 +88,17 @@ export default function BusinessDetailPage() {
     }
   }
 
-  const handleChangePlan = async (type: string) => {
+  // days: durasi paket berbayar dari sekarang (30 = bulanan, 365 = tahunan).
+  // Untuk paket Gratis pakai durasi sangat panjang agar tidak pernah expired.
+  const handleChangePlan = async (type: string, days: number, actionKey: string) => {
     if (!business?.membership) return
-    const label = type === 'pro' ? 'Pro' : type === 'lite' ? 'Lite' : 'Gratis'
-    if (!confirm(`Ubah paket bisnis ini ke ${label}?`)) return
-    setUpgrading(type)
+    const typeLabel = type === 'pro' ? 'Pro' : type === 'lite' ? 'Lite' : 'Gratis'
+    const durationLabel =
+      type === 'free' ? '' : days === 30 ? ' bulanan' : days === 365 ? ' tahunan' : ` ${days} hari`
+    if (!confirm(`Ubah paket bisnis ini ke ${typeLabel}${durationLabel}?`)) return
+    setUpgrading(actionKey)
     try {
-      await updateMembership(business.membership.id, { type })
+      await updateMembership(business.membership.id, { type, extend_days: days })
       refetch()
     } catch (err) {
       console.error(err)
@@ -317,21 +321,26 @@ export default function BusinessDetailPage() {
               <p className="text-slate-400 text-xs mb-2">Ubah Paket Cepat</p>
               <div className="flex flex-wrap gap-2">
                 {[
-                  { type: 'pro', label: 'Pro', cls: 'bg-emerald-600 hover:bg-emerald-700 text-white' },
-                  { type: 'lite', label: 'Lite', cls: 'bg-indigo-600 hover:bg-indigo-700 text-white' },
-                  { type: 'free', label: 'Gratis', cls: 'bg-slate-200 hover:bg-slate-300 text-slate-700' },
+                  { key: 'pro-30', type: 'pro', days: 30, label: 'Pro Bulanan', cls: 'bg-emerald-600 hover:bg-emerald-700 text-white' },
+                  { key: 'pro-365', type: 'pro', days: 365, label: 'Pro Tahunan', cls: 'bg-emerald-700 hover:bg-emerald-800 text-white' },
+                  { key: 'lite-30', type: 'lite', days: 30, label: 'Lite Bulanan', cls: 'bg-indigo-600 hover:bg-indigo-700 text-white' },
+                  { key: 'lite-365', type: 'lite', days: 365, label: 'Lite Tahunan', cls: 'bg-indigo-700 hover:bg-indigo-800 text-white' },
+                  // Gratis: durasi sangat panjang (≈100 tahun) agar tidak pernah expired.
+                  { key: 'free', type: 'free', days: 36500, label: 'Gratis', cls: 'bg-slate-200 hover:bg-slate-300 text-slate-700' },
                 ].map((p) => (
                   <button
-                    key={p.type}
-                    onClick={() => handleChangePlan(p.type)}
-                    disabled={membership.type === p.type || upgrading !== null}
+                    key={p.key}
+                    onClick={() => handleChangePlan(p.type, p.days, p.key)}
+                    // Hanya Gratis yang dinonaktifkan saat sudah aktif. Pro/Lite tetap bisa
+                    // diklik untuk ganti durasi (bulanan↔tahunan) atau perpanjang.
+                    disabled={(p.type === 'free' && membership.type === 'free') || upgrading !== null}
                     className={`px-3 py-1.5 text-xs rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${p.cls}`}
                   >
-                    {upgrading === p.type
+                    {upgrading === p.key
                       ? 'Memproses...'
-                      : membership.type === p.type
-                        ? `${p.label} (aktif)`
-                        : `Naikkan ke ${p.label}`}
+                      : membership.type === p.type && p.type === 'free'
+                        ? 'Gratis (aktif)'
+                        : p.label}
                   </button>
                 ))}
               </div>
