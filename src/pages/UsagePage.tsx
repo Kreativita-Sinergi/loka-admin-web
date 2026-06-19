@@ -92,7 +92,7 @@ export default function UsagePage() {
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
               <XAxis dataKey="date" tick={{ fontSize: 11 }} tickLine={false} />
               <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={false} unit="j" />
-              <Tooltip formatter={(v: number) => [`${v} jam`, 'Pemakaian']} />
+              <Tooltip formatter={(v) => [`${v} jam`, 'Pemakaian']} />
               <Bar dataKey="Jam" fill="#6366f1" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
