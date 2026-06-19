@@ -53,7 +53,8 @@ export default function UsagePage() {
 
   if (!stats) return null
 
-  const rows = stats.businesses
+  // Backend bisa mengirim null untuk array kosong (slice nil di Go) — beri default aman.
+  const rows = stats.businesses ?? []
   const activeRate = stats.total_users > 0
     ? Math.round((stats.active_this_week / stats.total_users) * 100)
     : 0
@@ -61,7 +62,7 @@ export default function UsagePage() {
     ? stats.hours_this_week / stats.active_this_week
     : 0
 
-  const trendData = stats.daily_trend.map((d) => ({
+  const trendData = (stats.daily_trend ?? []).map((d) => ({
     date: format(new Date(d.date), 'd MMM'),
     Jam: Math.round(d.hours * 10) / 10,
   }))
@@ -79,7 +80,7 @@ export default function UsagePage() {
         <StatCard label="Aktif 24 Jam" value={stats.active_today} sub={`${fmtHours(stats.hours_today)} pemakaian`} />
         <StatCard label="Aktif 7 Hari" value={stats.active_this_week} sub={`${activeRate}% dari total user`} />
         <StatCard label="Jam Pakai 7 Hari" value={fmtHours(stats.hours_this_week)} sub={`±${fmtHours(avgHours)}/user aktif`} />
-        <StatCard label="API Calls 7 Hari" value={stats.api_calls_this_week.toLocaleString('id-ID')} sub={`${stats.api_calls_today.toLocaleString('id-ID')} hari ini`} />
+        <StatCard label="API Calls 7 Hari" value={(stats.api_calls_this_week ?? 0).toLocaleString('id-ID')} sub={`${(stats.api_calls_today ?? 0).toLocaleString('id-ID')} hari ini`} />
         <StatCard label="Total User" value={stats.total_users} />
       </div>
 
@@ -147,10 +148,10 @@ export default function UsagePage() {
                       {b.hours_this_week > 0 ? fmtHours(b.hours_this_week) : '—'}
                     </td>
                     <td className="px-5 py-3 text-right text-slate-600">
-                      {b.api_calls_this_week > 0 ? b.api_calls_this_week.toLocaleString('id-ID') : '—'}
+                      {(b.api_calls_this_week ?? 0) > 0 ? (b.api_calls_this_week ?? 0).toLocaleString('id-ID') : '—'}
                     </td>
                     <td className="px-5 py-3 text-right text-slate-500">
-                      {b.record_count.toLocaleString('id-ID')}
+                      {(b.record_count ?? 0).toLocaleString('id-ID')}
                     </td>
                     <td className="px-5 py-3 text-slate-500">{lastSeenLabel(b.last_seen_at)}</td>
                   </tr>
