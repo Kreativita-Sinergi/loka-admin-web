@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage'
 
 // Lazy-loaded pages — split into separate chunks for a smaller initial bundle.
 const DashboardPage = lazy(() => import('./pages/DashboardPage'))
+const UsagePage = lazy(() => import('./pages/UsagePage'))
 const BusinessesPage = lazy(() => import('./pages/BusinessesPage'))
 const BusinessDetailPage = lazy(() => import('./pages/BusinessDetailPage'))
 const NotificationsPage = lazy(() => import('./pages/NotificationsPage'))
@@ -34,6 +35,7 @@ export default function App() {
             }
           >
             <Route path="/" element={<DashboardPage />} />
+            <Route path="/usage" element={<UsagePage />} />
             <Route path="/businesses" element={<BusinessesPage />} />
             <Route path="/businesses/:id" element={<BusinessDetailPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />

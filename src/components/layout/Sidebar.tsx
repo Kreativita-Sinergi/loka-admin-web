@@ -3,6 +3,7 @@ import { useAuthStore } from '../../store/authStore'
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: '📊' },
+  { to: '/usage', label: 'User Aktif', icon: '🟢' },
   { to: '/businesses', label: 'Bisnis', icon: '🏪' },
   { to: '/prospects', label: 'Prospek', icon: '🎯' },
   { to: '/threads-bot', label: 'Bot Threads', icon: '🤖' },

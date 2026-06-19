@@ -11,6 +11,42 @@ export interface BusinessParams {
 export const getStats = (): Promise<SingleResponse<AdminStats>> =>
   axios.get('/admin/stats').then((r) => r.data)
 
+// ── User aktif (usage monitoring) ─────────────────────────────────────────────
+
+export interface BusinessActiveUsers {
+  business_id: string
+  business_name: string
+  total_users: number
+  active_today: number
+  active_this_week: number
+  hours_today: number
+  hours_this_week: number
+  api_calls_today: number
+  api_calls_this_week: number
+  record_count: number
+  last_seen_at: string | null
+}
+
+export interface UsageDailyPoint {
+  date: string
+  hours: number
+}
+
+export interface ActiveUsersStats {
+  active_today: number
+  active_this_week: number
+  total_users: number
+  hours_today: number
+  hours_this_week: number
+  daily_trend: UsageDailyPoint[]
+  api_calls_today: number
+  api_calls_this_week: number
+  businesses: BusinessActiveUsers[]
+}
+
+export const getActiveUsers = (): Promise<SingleResponse<ActiveUsersStats>> =>
+  axios.get('/admin/active-users').then((r) => r.data)
+
 export const getBusinesses = (params: BusinessParams = {}): Promise<PaginatedResponse<AdminBusiness>> =>
   axios.get('/admin/businesses', { params }).then((r) => r.data)
 
