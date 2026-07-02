@@ -1,5 +1,5 @@
 import axios from '../lib/axios'
-import type { AdminBusiness, AdminMembership, AdminStats, PaginatedResponse, SingleResponse } from '../types'
+import type { AdminBusiness, AdminBusinessType, AdminMembership, AdminStats, PaginatedResponse, SingleResponse } from '../types'
 
 export interface BusinessParams {
   page?: number
@@ -55,6 +55,17 @@ export const getBusinessById = (id: string): Promise<SingleResponse<AdminBusines
 
 export const toggleBusinessActive = (id: string): Promise<SingleResponse<AdminBusiness>> =>
   axios.patch(`/admin/businesses/${id}/toggle`).then((r) => r.data)
+
+export const updateBusiness = (
+  id: string,
+  data: { business_name: string; owner_name: string; business_type_id: number }
+): Promise<SingleResponse<AdminBusiness>> =>
+  axios.patch(`/admin/businesses/${id}`, data).then((r) => r.data)
+
+// Public master-data endpoint (no admin key required) — used to populate the
+// business type dropdown when editing a business profile.
+export const getBusinessTypes = (): Promise<SingleResponse<AdminBusinessType[]>> =>
+  axios.get('/business-type').then((r) => r.data)
 
 export const deleteBusiness = (id: string): Promise<SingleResponse<null>> =>
   axios.delete(`/admin/businesses/${id}`).then((r) => r.data)

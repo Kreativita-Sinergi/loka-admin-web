@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { getBusinessById, toggleBusinessActive, createMembership, updateMembership, deactivateMembership, deleteBusiness } from '../api/admin'
-import type { AdminBusiness } from '../types'
+import { getBusinessById, toggleBusinessActive, createMembership, updateMembership, deactivateMembership, deleteBusiness, updateBusiness, getBusinessTypes } from '../api/admin'
+import type { AdminBusiness, AdminBusinessType } from '../types'
 import Badge from '../components/ui/Badge'
 import Modal from '../components/ui/Modal'
 import DeleteConfirmModal from '../components/ui/DeleteConfirmModal'
@@ -21,6 +21,10 @@ export default function BusinessDetailPage() {
   const [deleteModal, setDeleteModal] = useState(false)
   const [upgrading, setUpgrading] = useState<string | null>(null)
   const [fetchTick, setFetchTick] = useState(0)
+  const [editBusinessModal, setEditBusinessModal] = useState(false)
+  const [businessForm, setBusinessForm] = useState({ business_name: '', owner_name: '', business_type_id: 0 })
+  const [businessTypes, setBusinessTypes] = useState<AdminBusinessType[]>([])
+  const [savingBusiness, setSavingBusiness] = useState(false)
 
   const refetch = () => {
     setLoading(true)
@@ -36,6 +40,34 @@ export default function BusinessDetailPage() {
       .finally(() => { if (!cancelled) setLoading(false) })
     return () => { cancelled = true }
   }, [id, navigate, fetchTick])
+
+  const openEditBusiness = () => {
+    if (!business) return
+    setBusinessForm({
+      business_name: business.business_name,
+      owner_name: business.owner_name,
+      business_type_id: business.business_type?.id ?? 0,
+    })
+    if (businessTypes.length === 0) {
+      getBusinessTypes().then((res) => setBusinessTypes(res.data)).catch(() => {})
+    }
+    setEditBusinessModal(true)
+  }
+
+  const handleUpdateBusiness = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!business) return
+    setSavingBusiness(true)
+    try {
+      await updateBusiness(business.id, businessForm)
+      setEditBusinessModal(false)
+      refetch()
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setSavingBusiness(false)
+    }
+  }
 
   const handleToggle = async () => {
     if (!business) return
@@ -147,10 +179,16 @@ export default function BusinessDetailPage() {
             <p className="text-sm text-slate-500">{business.id}</p>
           </div>
         </div>
-        <button onClick={() => setDeleteModal(true)}
-          className="flex items-center gap-1.5 px-3 py-2 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors">
-          🗑️ Hapus Bisnis
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={openEditBusiness}
+            className="flex items-center gap-1.5 px-3 py-2 text-sm text-slate-700 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
+            ✏️ Edit Profil Bisnis
+          </button>
+          <button onClick={() => setDeleteModal(true)}
+            className="flex items-center gap-1.5 px-3 py-2 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors">
+            🗑️ Hapus Bisnis
+          </button>
+        </div>
       </div>
 
       {/* Business info */}
@@ -350,6 +388,56 @@ export default function BusinessDetailPage() {
           <p className="text-sm text-slate-400">Tidak ada membership aktif</p>
         )}
       </div>
+
+      {/* Edit Business Profile Modal */}
+      <Modal title="Edit Profil Bisnis" open={editBusinessModal} onClose={() => setEditBusinessModal(false)}>
+        <form onSubmit={handleUpdateBusiness} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Nama Bisnis</label>
+            <input
+              type="text"
+              required
+              value={businessForm.business_name}
+              onChange={(e) => setBusinessForm((f) => ({ ...f, business_name: e.target.value }))}
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Nama Pemilik</label>
+            <input
+              type="text"
+              required
+              value={businessForm.owner_name}
+              onChange={(e) => setBusinessForm((f) => ({ ...f, owner_name: e.target.value }))}
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Jenis Bisnis</label>
+            <select
+              required
+              value={businessForm.business_type_id || ''}
+              onChange={(e) => setBusinessForm((f) => ({ ...f, business_type_id: parseInt(e.target.value) || 0 }))}
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="" disabled>Pilih jenis bisnis...</option>
+              {businessTypes.map((t) => (
+                <option key={t.id} value={t.id}>{t.name}</option>
+              ))}
+            </select>
+          </div>
+          <div className="flex gap-3 pt-2">
+            <button type="button" onClick={() => setEditBusinessModal(false)}
+              className="flex-1 px-4 py-2 border border-slate-200 rounded-lg text-sm hover:bg-slate-50">
+              Batal
+            </button>
+            <button type="submit" disabled={savingBusiness}
+              className="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm disabled:opacity-50">
+              {savingBusiness ? 'Menyimpan...' : 'Simpan'}
+            </button>
+          </div>
+        </form>
+      </Modal>
 
       {/* Create Membership Modal */}
       <Modal title="Buat Membership Baru" open={membershipModal} onClose={() => setMembershipModal(false)}>
