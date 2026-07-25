@@ -7,7 +7,7 @@ import RecipientPicker from '../components/ui/RecipientPicker'
 import { formatDistanceToNow, format } from 'date-fns'
 import { id as localeId } from 'date-fns/locale'
 
-const APP_LINK = 'https://play.google.com/store/apps/details?id=com.loka.kasir'
+const APP_LINK = 'https://play.google.com/store/apps/details?id=id.lokakasir.app'
 
 const TEMPLATES = [
   {
