@@ -1,5 +1,18 @@
 import { useState, useEffect } from 'react'
 
+/** Pesan kegagalan dari server, bukan "Coba lagi" generik.
+ *
+ *  Ini alat internal: saat penghapusan ditolak (mis. constraint database yang
+ *  belum ditangani), admin harus bisa membacanya langsung di layar, bukan harus
+ *  membuka DevTools untuk melihat body respons. */
+function deleteErrorMessage(err: unknown): string {
+  const data = (err as { response?: { data?: { message?: string; error?: { details?: string } } } })
+    .response?.data
+  if (!data?.message) return 'Gagal menghapus. Coba lagi.'
+  const details = data.error?.details
+  return details ? `${data.message} — ${details}` : data.message
+}
+
 interface DeleteConfirmModalProps {
   open: boolean
   businessName: string
@@ -25,8 +38,8 @@ export default function DeleteConfirmModal({ open, businessName, onClose, onConf
     setError('')
     try {
       await onConfirm()
-    } catch {
-      setError('Gagal menghapus. Coba lagi.')
+    } catch (err) {
+      setError(deleteErrorMessage(err))
     } finally {
       setLoading(false)
     }
