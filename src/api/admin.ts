@@ -6,6 +6,9 @@ export interface BusinessParams {
   limit?: number
   search?: string
   status?: string
+  /** Kolom pengurutan; server hanya menerima id, name, created_at, updated_at. */
+  sort_by?: 'id' | 'name' | 'created_at' | 'updated_at'
+  order_by?: 'asc' | 'desc'
 }
 
 export const getStats = (): Promise<SingleResponse<AdminStats>> =>

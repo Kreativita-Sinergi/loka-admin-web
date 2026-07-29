@@ -49,7 +49,17 @@ export default function BusinessesPage() {
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await getBusinesses({ page, limit, search, status })
+      // Terbaru di atas. Pagination server memakai `created_at asc` sebagai
+      // bawaan, sehingga pendaftar baru — yang justru paling sering dicari di
+      // halaman ini — terkubur di halaman terakhir.
+      const res = await getBusinesses({
+        page,
+        limit,
+        search,
+        status,
+        sort_by: 'created_at',
+        order_by: 'desc',
+      })
       setBusinesses(res.data ?? [])
       setTotal(res.pagination?.total ?? 0)
     } catch (err) {
