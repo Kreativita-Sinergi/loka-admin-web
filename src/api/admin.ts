@@ -112,7 +112,8 @@ export interface NotifyPayload {
 }
 
 export interface NotifyResult {
-  email: string
+  /** Alamat penerima — email untuk kanal email, email pemilik untuk kanal push. */
+  phone: string
   name: string
   success: boolean
   error?: string
@@ -128,11 +129,23 @@ export interface NotifyResponse {
 export const sendEmail = (payload: NotifyPayload): Promise<SingleResponse<NotifyResponse>> =>
   axios.post('/admin/notify/email', payload).then((r) => r.data)
 
+export interface PushPayload extends NotifyPayload {
+  /** Judul notifikasi yang muncul di layar perangkat. */
+  title?: string
+}
+
+/**
+ * Kirim push notification (FCM) ke aplikasi pengguna. Penerima ditentukan dari
+ * email — server memetakannya ke user aktif beserta perangkat terdaftarnya.
+ */
+export const sendPush = (payload: PushPayload): Promise<SingleResponse<NotifyResponse>> =>
+  axios.post('/admin/notify/push', payload).then((r) => r.data)
+
 export interface NotificationLog {
   id: string
   template: string
   is_bulk: boolean
-  email: string
+  phone: string
   recipient_name: string
   business_name: string
   message_preview: string

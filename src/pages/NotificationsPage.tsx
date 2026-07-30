@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import {
-  sendEmail, getNotificationLogs, getNotificationStats,
+  sendEmail, sendPush, getNotificationLogs, getNotificationStats,
   type NotifyResult, type NotificationLog, type NotificationStats,
 } from '../api/admin'
 import RecipientPicker from '../components/ui/RecipientPicker'
@@ -38,6 +38,40 @@ const TEMPLATES = [
   },
 ]
 
+/**
+ * Template push notification. Berbeda dari email: judul tampil di layar kunci
+ * perangkat dan isi harus pendek — notifikasi Android/iOS memotong teks panjang.
+ */
+const PUSH_TEMPLATES = [
+  {
+    id: 'feedback_push',
+    label: 'Minta Feedback',
+    icon: '💬',
+    activeColor: 'bg-emerald-600 text-white border-emerald-600',
+    title: 'Bagaimana pengalaman Anda dengan Loka Kasir?',
+    message: (name: string) =>
+      `Halo ${name || 'Pengguna'}, kami ingin mendengar masukan Anda tentang Loka Kasir — apa yang sudah membantu dan apa yang perlu kami perbaiki. Terima kasih!`,
+  },
+  {
+    id: 'promo_push',
+    label: 'Promosi & Update',
+    icon: '🎉',
+    activeColor: 'bg-orange-500 text-white border-orange-500',
+    title: 'Ada yang baru di Loka Kasir',
+    message: (name: string) =>
+      `Halo ${name || 'Pengguna'}, ada fitur & perbaikan terbaru di Loka Kasir. Buka aplikasi untuk melihatnya.`,
+  },
+  {
+    id: 'custom_push',
+    label: 'Pesan Kustom',
+    icon: '✏️',
+    activeColor: 'bg-slate-700 text-white border-slate-700',
+    title: '',
+    message: () => '',
+  },
+]
+
+type Channel = 'email' | 'push'
 type Tab = 'single' | 'bulk'
 type SendState = 'idle' | 'sending' | 'done'
 
@@ -45,14 +79,19 @@ const TEMPLATE_LABELS: Record<string, string> = {
   app_download: 'Undangan Download App',
   promo: 'Promosi & Update',
   custom: 'Pesan Kustom',
+  feedback_push: 'Push · Minta Feedback',
+  promo_push: 'Push · Promosi & Update',
+  custom_push: 'Push · Pesan Kustom',
 }
 
 export default function NotificationsPage() {
+  const [channel, setChannel] = useState<Channel>('email')
   const [tab, setTab] = useState<Tab>('single')
   const [templateId, setTemplateId] = useState('app_download')
   const [email, setEmail] = useState('')
   const [businessName, setBusinessName] = useState('')
   const [customMessage, setCustomMessage] = useState('')
+  const [customTitle, setCustomTitle] = useState('')
   const [sendState, setSendState] = useState<SendState>('idle')
   const [sendResult, setSendResult] = useState<{ total: number; sent: number; failed: number; results: NotifyResult[] } | null>(null)
   const [error, setError] = useState('')
@@ -73,23 +112,42 @@ export default function NotificationsPage() {
       .catch(() => setLogsLoading(false))
   }, [historyTick])
 
-  const selectedTemplate = TEMPLATES.find((t) => t.id === templateId)!
+  const isPush = channel === 'push'
+  const templates = isPush ? PUSH_TEMPLATES : TEMPLATES
+  const isCustom = templateId === 'custom' || templateId === 'custom_push'
+
+  const selectedTemplate = templates.find((t) => t.id === templateId) ?? templates[0]
   const previewName = tab === 'single' ? (businessName || 'Nama Bisnis') : 'Nama Bisnis'
-  const previewMessage = templateId === 'custom' ? customMessage : selectedTemplate.message(previewName)
+  const previewMessage = isCustom ? customMessage : selectedTemplate.message(previewName)
+  const previewTitle = isPush
+    ? (isCustom ? customTitle : (selectedTemplate as (typeof PUSH_TEMPLATES)[number]).title)
+    : ''
+
+  // Berpindah kanal mengganti daftar template, jadi pilihan lama tidak lagi valid.
+  const handleChannelChange = (next: Channel) => {
+    if (next === channel) return
+    setChannel(next)
+    setTemplateId(next === 'push' ? 'feedback_push' : 'app_download')
+    setError('')
+  }
 
   const handleSend = async () => {
     if (tab === 'single' && !email.trim()) { setError('Email penerima wajib diisi'); return }
     if (!previewMessage.trim()) { setError('Pesan tidak boleh kosong'); return }
+    if (isPush && !previewTitle.trim()) { setError('Judul notifikasi tidak boleh kosong'); return }
     setError('')
     setSendState('sending')
     try {
-      const res = await sendEmail({
+      const payload = {
         email: tab === 'single' ? email.trim() : undefined,
         business_name: businessName || undefined,
         template: templateId,
-        message: templateId === 'custom' ? customMessage : undefined,
+        message: isCustom ? customMessage : undefined,
         bulk: tab === 'bulk',
-      })
+      }
+      const res = isPush
+        ? await sendPush({ ...payload, title: previewTitle })
+        : await sendEmail(payload)
       setSendResult(res.data)
       setSendState('done')
       refreshHistory()
@@ -106,8 +164,12 @@ export default function NotificationsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold text-slate-800">Notifikasi Email</h2>
-          <p className="text-sm text-slate-500 mt-0.5">Kirim email notifikasi ke pengguna Loka Kasir</p>
+          <h2 className="text-xl font-bold text-slate-800">Notifikasi</h2>
+          <p className="text-sm text-slate-500 mt-0.5">
+            {isPush
+              ? 'Kirim push notification ke aplikasi pengguna Loka Kasir'
+              : 'Kirim email notifikasi ke pengguna Loka Kasir'}
+          </p>
         </div>
         {stats && (
           <div className="flex gap-3">
@@ -136,6 +198,20 @@ export default function NotificationsPage() {
             <SendResultCard result={sendResult} onReset={handleReset} />
           ) : (
             <>
+              {/* Kanal pengiriman */}
+              <div className="bg-white rounded-2xl border border-slate-200 p-1.5 flex gap-1.5">
+                {([['email', '📧 Email'], ['push', '🔔 Push ke Aplikasi']] as const).map(([c, label]) => (
+                  <button key={c} onClick={() => handleChannelChange(c)}
+                    className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                      channel === c
+                        ? (c === 'push' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-indigo-600 text-white shadow-sm')
+                        : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
+                    }`}>
+                    {label}
+                  </button>
+                ))}
+              </div>
+
               {/* Tab */}
               <div className="bg-white rounded-2xl border border-slate-200 p-1.5 flex gap-1.5">
                 {(['single', 'bulk'] as Tab[]).map((t) => (
@@ -165,7 +241,10 @@ export default function NotificationsPage() {
                     <div>
                       <p className="text-sm font-semibold text-amber-800">Kirim ke semua owner aktif</p>
                       <p className="text-xs text-amber-600 mt-1 leading-relaxed">
-                        Email akan dikirim ke seluruh pemilik bisnis yang akun-nya aktif. Nama bisnis masing-masing akan otomatis digunakan di template pesan.
+                        {isPush
+                          ? 'Push akan dikirim ke seluruh perangkat pemilik bisnis yang akun-nya aktif. Owner yang belum pernah login di aplikasi tidak punya perangkat terdaftar — notifikasinya hanya muncul di daftar in-app.'
+                          : 'Email akan dikirim ke seluruh pemilik bisnis yang akun-nya aktif.'}{' '}
+                        Nama bisnis masing-masing akan otomatis digunakan di template pesan.
                       </p>
                     </div>
                   </div>
@@ -179,7 +258,7 @@ export default function NotificationsPage() {
                   <h3 className="text-sm font-semibold text-slate-700">Template Pesan</h3>
                 </div>
                 <div className="grid grid-cols-3 gap-2 mb-3">
-                  {TEMPLATES.map((t) => (
+                  {templates.map((t) => (
                     <button key={t.id} onClick={() => setTemplateId(t.id)}
                       className={`flex flex-col items-center gap-1.5 px-3 py-3 rounded-xl border text-sm font-medium transition-all ${
                         templateId === t.id ? t.activeColor + ' shadow-sm' : 'border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50'
@@ -189,10 +268,17 @@ export default function NotificationsPage() {
                     </button>
                   ))}
                 </div>
-                {templateId === 'custom' && (
-                  <textarea rows={6} placeholder="Tulis pesan kustom di sini..." value={customMessage}
-                    onChange={(e) => setCustomMessage(e.target.value)}
-                    className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none" />
+                {isCustom && (
+                  <div className="space-y-2">
+                    {isPush && (
+                      <input type="text" placeholder="Judul notifikasi (tampil di layar perangkat)"
+                        value={customTitle} onChange={(e) => setCustomTitle(e.target.value)}
+                        className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+                    )}
+                    <textarea rows={isPush ? 4 : 6} placeholder="Tulis pesan kustom di sini..." value={customMessage}
+                      onChange={(e) => setCustomMessage(e.target.value)}
+                      className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none" />
+                  </div>
                 )}
               </div>
 
@@ -209,30 +295,63 @@ export default function NotificationsPage() {
                   <span className="w-6 h-6 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xs font-bold">3</span>
                   <h3 className="text-sm font-semibold text-slate-700">Preview & Kirim</h3>
                 </div>
-                {/* Email preview */}
-                <div className="border border-slate-200 rounded-xl overflow-hidden mb-4">
-                  <div className="bg-slate-50 border-b border-slate-200 px-4 py-2.5 flex items-center gap-2">
-                    <span className="text-xs text-slate-400 w-8">Dari:</span>
-                    <span className="text-xs text-slate-600">noreply@lokakasir.id</span>
-                  </div>
-                  <div className="bg-slate-50 border-b border-slate-200 px-4 py-2.5 flex items-center gap-2">
-                    <span className="text-xs text-slate-400 w-8">Ke:</span>
-                    <span className="text-xs text-slate-600 italic">
-                      {tab === 'bulk' ? 'semua owner aktif' : (email || 'email penerima')}
-                    </span>
-                  </div>
-                  <div className="px-4 py-4 min-h-28 bg-white">
-                    <p className="text-sm text-slate-800 whitespace-pre-wrap leading-relaxed">
-                      {previewMessage || <span className="text-slate-400 italic text-xs">Pilih template untuk melihat preview...</span>}
+                {isPush ? (
+                  /* Push preview — meniru kartu notifikasi di perangkat */
+                  <div className="bg-slate-800 rounded-xl p-4 mb-4">
+                    <p className="text-xs text-slate-400 mb-2">
+                      Ke: {tab === 'bulk' ? 'semua owner aktif' : (email || 'penerima')}
+                    </p>
+                    <div className="bg-white rounded-xl px-4 py-3 shadow-lg">
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <span className="w-4 h-4 rounded bg-indigo-600 text-white text-[9px] flex items-center justify-center font-bold">L</span>
+                        <span className="text-[11px] text-slate-400">Loka Kasir · sekarang</span>
+                      </div>
+                      <p className="text-sm font-semibold text-slate-800 leading-snug">
+                        {previewTitle || <span className="text-slate-400 italic font-normal">Judul notifikasi...</span>}
+                      </p>
+                      <p className="text-xs text-slate-600 mt-1 leading-relaxed line-clamp-3">
+                        {previewMessage || <span className="text-slate-400 italic">Isi notifikasi...</span>}
+                      </p>
+                    </div>
+                    <p className="text-[11px] text-slate-400 mt-3 leading-relaxed">
+                      Notifikasi juga tersimpan di daftar Notifikasi in-app, sehingga tetap terbaca meski push terlewat.
                     </p>
                   </div>
-                </div>
+                ) : (
+                  /* Email preview */
+                  <div className="border border-slate-200 rounded-xl overflow-hidden mb-4">
+                    <div className="bg-slate-50 border-b border-slate-200 px-4 py-2.5 flex items-center gap-2">
+                      <span className="text-xs text-slate-400 w-8">Dari:</span>
+                      <span className="text-xs text-slate-600">noreply@lokakasir.id</span>
+                    </div>
+                    <div className="bg-slate-50 border-b border-slate-200 px-4 py-2.5 flex items-center gap-2">
+                      <span className="text-xs text-slate-400 w-8">Ke:</span>
+                      <span className="text-xs text-slate-600 italic">
+                        {tab === 'bulk' ? 'semua owner aktif' : (email || 'email penerima')}
+                      </span>
+                    </div>
+                    <div className="px-4 py-4 min-h-28 bg-white">
+                      <p className="text-sm text-slate-800 whitespace-pre-wrap leading-relaxed">
+                        {previewMessage || <span className="text-slate-400 italic text-xs">Pilih template untuk melihat preview...</span>}
+                      </p>
+                    </div>
+                  </div>
+                )}
                 <button onClick={handleSend} disabled={sendState === 'sending'}
-                  className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-xl text-sm transition-colors flex items-center justify-center gap-2 shadow-sm">
+                  className={`w-full py-3.5 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-xl text-sm transition-colors flex items-center justify-center gap-2 shadow-sm ${
+                    isPush
+                      ? 'bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800'
+                      : 'bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800'
+                  }`}>
                   {sendState === 'sending' ? (
                     <><span className="animate-spin inline-block">⏳</span> Mengirim...</>
                   ) : (
-                    <><span>📧</span> {tab === 'bulk' ? 'Kirim ke Semua Pengguna' : 'Kirim Email'}</>
+                    <>
+                      <span>{isPush ? '🔔' : '📧'}</span>
+                      {tab === 'bulk'
+                        ? 'Kirim ke Semua Pengguna'
+                        : (isPush ? 'Kirim Push Notification' : 'Kirim Email')}
+                    </>
                   )}
                 </button>
               </div>
@@ -299,7 +418,7 @@ function LogItem({ log }: { log: NotificationLog }) {
             </div>
             {!log.is_bulk && log.recipient_name && (
               <p className="text-xs text-slate-500 mt-0.5 truncate">{log.recipient_name}
-                {log.email && <span className="text-slate-400"> · {log.email}</span>}
+                {log.phone && <span className="text-slate-400"> · {log.phone}</span>}
               </p>
             )}
             <p className="text-xs text-slate-400 mt-1 truncate">{log.message_preview}</p>
@@ -375,7 +494,7 @@ function SendResultCard({
           <span className="text-3xl">{allSuccess ? '🎉' : '⚠️'}</span>
           <div>
             <p className={`font-semibold text-base ${allSuccess ? 'text-emerald-800' : 'text-amber-800'}`}>
-              {allSuccess ? 'Semua email terkirim!' : 'Beberapa email gagal dikirim'}
+              {allSuccess ? 'Semua notifikasi terkirim!' : 'Sebagian tidak terkirim'}
             </p>
             <p className={`text-sm mt-0.5 ${allSuccess ? 'text-emerald-600' : 'text-amber-600'}`}>
               {result.sent} berhasil · {result.failed} gagal dari {result.total} total
@@ -425,7 +544,7 @@ function SendResultCard({
                   </div>
                   <div>
                     <p className="text-sm font-medium text-slate-700">{r.name}</p>
-                    <p className="text-xs text-slate-400">{r.email}</p>
+                    <p className="text-xs text-slate-400">{r.phone}</p>
                     {r.error && <p className="text-xs text-red-500 mt-0.5">{r.error}</p>}
                   </div>
                 </div>
