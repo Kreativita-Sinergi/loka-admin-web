@@ -28,6 +28,11 @@ export interface BusinessActiveUsers {
   api_calls_this_week: number
   record_count: number
   last_seen_at: string | null
+  /** Transaksi 7 hari terakhir — ukuran "masih berjualan atau tidak". */
+  trx_this_week: number
+  /** Paket aktif: free | trial | lite | pro. */
+  plan: string
+  created_at: string | null
 }
 
 export interface UsageDailyPoint {

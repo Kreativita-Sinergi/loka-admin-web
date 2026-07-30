@@ -22,6 +22,39 @@ function lastSeenLabel(iso: string | null): string {
   return formatDistanceToNow(new Date(iso), { addSuffix: true, locale: idLocale })
 }
 
+/** Tanggal daftar dalam bentuk pendek — memisahkan tenant yang memang baru
+ *  dari tenant lama yang mulai sepi. Keduanya sama-sama "jarang bertransaksi",
+ *  tetapi hanya salah satunya yang perlu dikhawatirkan. */
+function signupLabel(iso: string | null): string {
+  if (!iso) return '—'
+  return new Date(iso).toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
+}
+
+/** Lencana paket. Warna dipakai untuk membedakan yang membayar dari yang belum,
+ *  bukan sekadar hiasan: satu tenant Pro yang mulai sepi jauh lebih mendesak
+ *  daripada sepuluh akun Gratis yang diam. */
+function PlanBadge({ plan }: { plan: string }) {
+  const key = (plan || 'free').toLowerCase()
+  const style =
+    key === 'pro' || key === 'pro-yearly'
+      ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
+      : key === 'lite'
+        ? 'bg-sky-50 text-sky-700 border-sky-200'
+        : key === 'trial'
+          ? 'bg-amber-50 text-amber-700 border-amber-200'
+          : 'bg-slate-100 text-slate-500 border-slate-200'
+  const label = key === 'pro-yearly' ? 'Pro (Tahunan)' : key.charAt(0).toUpperCase() + key.slice(1)
+  return (
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-md border text-xs font-medium ${style}`}>
+      {label}
+    </span>
+  )
+}
+
 // Format jam desimal → "Xj Ym" yang enak dibaca.
 function fmtHours(h: number): string {
   const totalMin = Math.round(h * 60)
@@ -113,47 +146,54 @@ export default function UsagePage() {
             <thead>
               <tr className="text-left text-slate-500 border-b border-slate-200">
                 <th className="px-5 py-3 font-medium">Bisnis</th>
-                <th className="px-5 py-3 font-medium text-right">Total User</th>
-                <th className="px-5 py-3 font-medium text-right">Aktif 24 Jam</th>
-                <th className="px-5 py-3 font-medium text-right">Aktif 7 Hari</th>
-                <th className="px-5 py-3 font-medium text-right">Jam (7 Hari)</th>
-                <th className="px-5 py-3 font-medium text-right">API (7 Hari)</th>
+                <th className="px-5 py-3 font-medium">Paket</th>
+                <th className="px-5 py-3 font-medium text-right">Transaksi (7 Hari)</th>
+                <th className="px-5 py-3 font-medium text-right">Jam Pakai (7 Hari)</th>
                 <th className="px-5 py-3 font-medium text-right">Data</th>
                 <th className="px-5 py-3 font-medium">Terakhir Aktif</th>
+                <th className="px-5 py-3 font-medium">Daftar</th>
               </tr>
             </thead>
             <tbody>
               {rows.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-5 py-8 text-center text-slate-400">
+                  <td colSpan={7} className="px-5 py-8 text-center text-slate-400">
                     Belum ada data aktivitas
                   </td>
                 </tr>
               ) : (
                 rows.map((b) => (
                   <tr key={b.business_id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
-                    <td className="px-5 py-3 font-medium text-slate-800">{b.business_name}</td>
-                    <td className="px-5 py-3 text-right text-slate-600">{b.total_users}</td>
-                    <td className="px-5 py-3 text-right">
-                      <span className={b.active_today > 0 ? 'text-emerald-600 font-semibold' : 'text-slate-400'}>
-                        {b.active_today}
-                      </span>
+                    <td className="px-5 py-3 font-medium text-slate-800">
+                      {b.business_name}
+                      {/* Jumlah pengguna dipindah ke sini sebagai keterangan
+                          kecil: hampir seluruh tenant hanya punya satu, jadi
+                          satu kolom penuh berisi angka "1" tidak membantu
+                          siapa pun — tetapi tenant yang punya lima kasir tetap
+                          layak terlihat. */}
+                      {b.total_users > 1 && (
+                        <span className="ml-2 text-xs text-slate-400">{b.total_users} user</span>
+                      )}
+                    </td>
+                    <td className="px-5 py-3">
+                      <PlanBadge plan={b.plan} />
                     </td>
                     <td className="px-5 py-3 text-right">
-                      <span className={b.active_this_week > 0 ? 'text-indigo-600 font-semibold' : 'text-slate-400'}>
-                        {b.active_this_week}
+                      {/* Ukuran yang menjawab pertanyaan sebenarnya: bisnis ini
+                          masih berjualan atau tidak. Jam pemakaian hanya
+                          menghitung lama aplikasi dibuka. */}
+                      <span className={(b.trx_this_week ?? 0) > 0 ? 'text-emerald-600 font-semibold' : 'text-slate-400'}>
+                        {(b.trx_this_week ?? 0).toLocaleString('id-ID')}
                       </span>
                     </td>
                     <td className="px-5 py-3 text-right text-slate-600">
                       {b.hours_this_week > 0 ? fmtHours(b.hours_this_week) : '—'}
                     </td>
-                    <td className="px-5 py-3 text-right text-slate-600">
-                      {(b.api_calls_this_week ?? 0) > 0 ? (b.api_calls_this_week ?? 0).toLocaleString('id-ID') : '—'}
-                    </td>
                     <td className="px-5 py-3 text-right text-slate-500">
                       {(b.record_count ?? 0).toLocaleString('id-ID')}
                     </td>
                     <td className="px-5 py-3 text-slate-500">{lastSeenLabel(b.last_seen_at)}</td>
+                    <td className="px-5 py-3 text-slate-500">{signupLabel(b.created_at)}</td>
                   </tr>
                 ))
               )}
