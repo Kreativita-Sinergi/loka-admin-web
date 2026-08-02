@@ -162,7 +162,7 @@ export default function NotificationsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-slate-800">Notifikasi</h2>
           <p className="text-sm text-slate-500 mt-0.5">
@@ -172,17 +172,17 @@ export default function NotificationsPage() {
           </p>
         </div>
         {stats && (
-          <div className="flex gap-3">
-            <div className="text-center px-4 py-2 bg-emerald-50 border border-emerald-200 rounded-xl">
+          <div className="grid grid-cols-2 sm:flex gap-2 sm:gap-3 w-full lg:w-auto">
+            <div className="text-center px-3 sm:px-4 py-2 bg-emerald-50 border border-emerald-200 rounded-xl">
               <p className="text-lg font-bold text-emerald-700">{stats.total_sent.toLocaleString()}</p>
               <p className="text-xs text-emerald-600">Total Terkirim</p>
             </div>
-            <div className="text-center px-4 py-2 bg-indigo-50 border border-indigo-200 rounded-xl">
+            <div className="text-center px-3 sm:px-4 py-2 bg-indigo-50 border border-indigo-200 rounded-xl">
               <p className="text-lg font-bold text-indigo-700">{stats.success_rate.toFixed(0)}%</p>
               <p className="text-xs text-indigo-600">Sukses Rate</p>
             </div>
             {stats.total_failed > 0 && (
-              <div className="text-center px-4 py-2 bg-red-50 border border-red-200 rounded-xl">
+              <div className="text-center px-3 sm:px-4 py-2 bg-red-50 border border-red-200 rounded-xl col-span-2 sm:col-span-1">
                 <p className="text-lg font-bold text-red-700">{stats.total_failed.toLocaleString()}</p>
                 <p className="text-xs text-red-600">Total Gagal</p>
               </div>
@@ -227,7 +227,7 @@ export default function NotificationsPage() {
               </div>
 
               {/* Recipient */}
-              <div className="bg-white rounded-2xl border border-slate-200 p-5">
+              <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5">
                 <div className="flex items-center gap-2 mb-4">
                   <span className="w-6 h-6 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xs font-bold">1</span>
                   <h3 className="text-sm font-semibold text-slate-700">Penerima</h3>
@@ -252,12 +252,12 @@ export default function NotificationsPage() {
               </div>
 
               {/* Template */}
-              <div className="bg-white rounded-2xl border border-slate-200 p-5">
+              <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5">
                 <div className="flex items-center gap-2 mb-4">
                   <span className="w-6 h-6 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xs font-bold">2</span>
                   <h3 className="text-sm font-semibold text-slate-700">Template Pesan</h3>
                 </div>
-                <div className="grid grid-cols-3 gap-2 mb-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-3">
                   {templates.map((t) => (
                     <button key={t.id} onClick={() => setTemplateId(t.id)}
                       className={`flex flex-col items-center gap-1.5 px-3 py-3 rounded-xl border text-sm font-medium transition-all ${
@@ -290,7 +290,7 @@ export default function NotificationsPage() {
               )}
 
               {/* Preview + Send */}
-              <div className="bg-white rounded-2xl border border-slate-200 p-5">
+              <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5">
                 <div className="flex items-center gap-2 mb-4">
                   <span className="w-6 h-6 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xs font-bold">3</span>
                   <h3 className="text-sm font-semibold text-slate-700">Preview & Kirim</h3>
@@ -361,7 +361,7 @@ export default function NotificationsPage() {
 
         {/* === History panel (2/5) === */}
         <div className="xl:col-span-2">
-          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden sticky top-6">
+          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden xl:sticky xl:top-6">
             <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
               <h3 className="text-sm font-semibold text-slate-700">Riwayat Pengiriman</h3>
               <button onClick={refreshHistory}
@@ -370,7 +370,7 @@ export default function NotificationsPage() {
               </button>
             </div>
 
-            <div className="max-h-[calc(100vh-220px)] overflow-y-auto">
+            <div className="max-h-none xl:max-h-[calc(100vh-220px)] overflow-y-auto">
               {logsLoading ? (
                 <div className="py-12 text-center text-slate-400 text-sm">Memuat riwayat...</div>
               ) : logs.length === 0 ? (

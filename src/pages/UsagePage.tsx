@@ -109,7 +109,7 @@ export default function UsagePage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 min-[380px]:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
         <StatCard label="Aktif 24 Jam" value={stats.active_today} sub={`${fmtHours(stats.hours_today)} pemakaian`} />
         <StatCard label="Aktif 7 Hari" value={stats.active_this_week} sub={`${activeRate}% dari total user`} />
         <StatCard label="Jam Pakai 7 Hari" value={fmtHours(stats.hours_this_week)} sub={`±${fmtHours(avgHours)}/user aktif`} />
@@ -118,7 +118,7 @@ export default function UsagePage() {
       </div>
 
       {/* Daily usage trend */}
-      <div className="bg-white rounded-xl border border-slate-200 p-5">
+      <div className="min-w-0 bg-white rounded-xl border border-slate-200 p-4 sm:p-5">
         <h3 className="text-sm font-semibold text-slate-700 mb-4">Jam Pemakaian 14 Hari Terakhir</h3>
         {trendData.some((d) => d.Jam > 0) ? (
           <ResponsiveContainer width="100%" height={200}>

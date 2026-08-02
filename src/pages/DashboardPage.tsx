@@ -69,7 +69,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 min-[380px]:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <StatCard label="Total Bisnis" value={stats.total_businesses} sub={`${activeRate}% aktif`} />
         <StatCard label="Bisnis Aktif" value={stats.active_businesses} />
         <StatCard label="Total Pengguna" value={stats.total_users} sub={`${verifiedRate}% terverifikasi`} />
@@ -79,7 +79,7 @@ export default function DashboardPage() {
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Trend chart */}
-        <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-5">
+        <div className="lg:col-span-2 min-w-0 bg-white rounded-xl border border-slate-200 p-4 sm:p-5">
           <h3 className="text-sm font-semibold text-slate-700 mb-4">Registrasi 30 Hari Terakhir</h3>
           {trendData.length > 0 ? (
             <ResponsiveContainer width="100%" height={200}>
@@ -105,7 +105,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Membership pie */}
-        <div className="bg-white rounded-xl border border-slate-200 p-5">
+        <div className="min-w-0 bg-white rounded-xl border border-slate-200 p-4 sm:p-5">
           <h3 className="text-sm font-semibold text-slate-700 mb-4">Distribusi Membership Aktif</h3>
           {pieData.some((d) => d.value > 0) ? (
             <ResponsiveContainer width="100%" height={200}>
@@ -128,7 +128,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Membership breakdown table */}
-      <div className="bg-white rounded-xl border border-slate-200 p-5">
+      <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-5">
         <h3 className="text-sm font-semibold text-slate-700 mb-3">Rincian Membership</h3>
         <div className="flex gap-4 flex-wrap">
           {stats.membership_breakdown.map((m) => (

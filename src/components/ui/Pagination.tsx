@@ -10,11 +10,11 @@ export default function Pagination({ page, total, limit, onChange }: PaginationP
   if (totalPages <= 1) return null
 
   return (
-    <div className="flex items-center justify-between mt-4 text-sm text-slate-600">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-4 text-sm text-slate-600">
       <span>
         Menampilkan {(page - 1) * limit + 1}–{Math.min(page * limit, total)} dari {total} data
       </span>
-      <div className="flex gap-1">
+      <div className="flex gap-1 max-w-full overflow-x-auto pb-1">
         <button
           disabled={page <= 1}
           onClick={() => onChange(page - 1)}

@@ -58,7 +58,7 @@ export default function ThreadsBotPage() {
           <h2 className="text-2xl font-bold text-slate-900">Bot Threads</h2>
           <p className="text-sm text-slate-500 mt-0.5">Bot membuat draf balasan &amp; postingan otomatis — kamu tinggal ACC. Tidak ada yang tayang tanpa persetujuanmu.</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="grid grid-cols-1 min-[430px]:grid-cols-2 sm:flex items-center gap-2 w-full sm:w-auto">
           <button onClick={handlePoll} disabled={busy} className="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-sm font-semibold rounded-xl disabled:opacity-50">🔄 Cek Sekarang</button>
           <button onClick={handleGenerate} disabled={busy} className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-xl disabled:opacity-50">+ Buat Draf Postingan</button>
         </div>
@@ -152,7 +152,7 @@ function DraftCard({ draft, editable, onChanged, onAction }: {
       ) : (
         <p className="text-sm text-slate-700 whitespace-pre-wrap">{draft.generated_text}</p>
       )}
-      <div className="flex items-center justify-between text-xs text-slate-400">
+      <div className="flex flex-col min-[400px]:flex-row min-[400px]:items-center justify-between gap-1 text-xs text-slate-400">
         <span>{text.length} karakter</span>
         {draft.error && <span className="text-red-500">⚠ {draft.error}</span>}
       </div>

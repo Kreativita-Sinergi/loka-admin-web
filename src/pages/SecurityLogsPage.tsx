@@ -80,7 +80,7 @@ export default function SecurityLogsPage() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl border border-slate-200 p-4 flex flex-wrap gap-3">
+      <div className="bg-white rounded-xl border border-slate-200 p-3 sm:p-4 grid grid-cols-1 sm:flex sm:flex-wrap gap-3">
         <select
           value={params.action ?? ''}
           onChange={(e) => setParams((p) => ({ ...p, action: e.target.value, page: 1 }))}
@@ -101,7 +101,7 @@ export default function SecurityLogsPage() {
         </select>
         <button
           onClick={fetchLogs}
-          className="ml-auto px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
+          className="sm:ml-auto px-4 py-2.5 sm:py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
         >
           Refresh
         </button>
@@ -182,7 +182,7 @@ export default function SecurityLogsPage() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-slate-200">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 border-t border-slate-200">
             <span className="text-sm text-slate-500">
               Halaman {params.page} dari {totalPages}
             </span>

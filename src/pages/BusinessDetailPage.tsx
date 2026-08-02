@@ -171,30 +171,30 @@ export default function BusinessDetailPage() {
         }}
       />
 
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-start sm:items-center gap-3 min-w-0">
           <button onClick={() => navigate('/businesses')} className="text-slate-400 hover:text-slate-600">←</button>
-          <div>
-            <h2 className="text-xl font-bold text-slate-800">{business.business_name}</h2>
-            <p className="text-sm text-slate-500">{business.id}</p>
+          <div className="min-w-0">
+            <h2 className="text-xl font-bold text-slate-800 break-words">{business.business_name}</h2>
+            <p className="text-xs sm:text-sm text-slate-500 break-all">{business.id}</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="grid grid-cols-2 sm:flex sm:items-center gap-2">
           <button onClick={openEditBusiness}
-            className="flex items-center gap-1.5 px-3 py-2 text-sm text-slate-700 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
+            className="justify-center flex items-center gap-1.5 px-3 py-2 text-sm text-slate-700 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
             ✏️ Edit Profil Bisnis
           </button>
           <button onClick={() => setDeleteModal(true)}
-            className="flex items-center gap-1.5 px-3 py-2 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors">
+            className="justify-center flex items-center gap-1.5 px-3 py-2 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors">
             🗑️ Hapus Bisnis
           </button>
         </div>
       </div>
 
       {/* Business info */}
-      <div className="bg-white rounded-xl border border-slate-200 p-6">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-4">
+      <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
+          <div className="flex items-center gap-3 sm:gap-4 min-w-0">
             {business.image ? (
               <img src={business.image} alt="" className="w-16 h-16 rounded-xl object-cover" />
             ) : (
@@ -202,8 +202,8 @@ export default function BusinessDetailPage() {
                 {business.business_name.charAt(0).toUpperCase()}
               </div>
             )}
-            <div>
-              <h3 className="font-semibold text-slate-800">{business.business_name}</h3>
+            <div className="min-w-0">
+              <h3 className="font-semibold text-slate-800 break-words">{business.business_name}</h3>
               <p className="text-sm text-slate-500">{business.owner_name}</p>
               <p className="text-xs text-slate-400 mt-1">{business.business_type?.name ?? 'Tidak diketahui'}</p>
             </div>
@@ -225,7 +225,7 @@ export default function BusinessDetailPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 mt-5 pt-5 border-t border-slate-100 text-sm">
+        <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-4 mt-5 pt-5 border-t border-slate-100 text-sm">
           <div>
             <p className="text-slate-400 text-xs">Tipe Bisnis</p>
             <p className="text-slate-700 mt-0.5">{business.business_type?.name ?? '-'}</p>
@@ -247,9 +247,9 @@ export default function BusinessDetailPage() {
 
       {/* Owner info */}
       {business.owner && (
-        <div className="bg-white rounded-xl border border-slate-200 p-6">
+        <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-6">
           <h3 className="font-semibold text-slate-700 mb-4">Pemilik Akun</h3>
-          <div className="grid grid-cols-2 gap-4 text-sm">
+          <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-4 text-sm">
             <div>
               <p className="text-slate-400 text-xs">Nama</p>
               <p className="text-slate-700 mt-0.5">{business.owner.name ?? '-'}</p>
@@ -284,8 +284,8 @@ export default function BusinessDetailPage() {
       )}
 
       {/* Membership info */}
-      <div className="bg-white rounded-xl border border-slate-200 p-6">
-        <div className="flex items-center justify-between mb-4">
+      <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <h3 className="font-semibold text-slate-700">Membership</h3>
           <div className="flex gap-2">
             {membership && (
@@ -316,7 +316,7 @@ export default function BusinessDetailPage() {
         </div>
 
         {membership ? (
-          <div className="grid grid-cols-2 gap-4 text-sm">
+          <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-4 text-sm">
             <div>
               <p className="text-slate-400 text-xs">Paket</p>
               <div className="mt-0.5">

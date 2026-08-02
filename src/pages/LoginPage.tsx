@@ -29,7 +29,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-8">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 sm:p-8">
         <div className="text-center mb-8">
           <div className="text-4xl mb-3">🔐</div>
           <h1 className="text-xl font-bold text-slate-800">Loka Admin</h1>

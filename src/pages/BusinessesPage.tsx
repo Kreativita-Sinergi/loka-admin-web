@@ -130,7 +130,7 @@ export default function BusinessesPage() {
         </div>
       )}
 
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-bold text-slate-800">Bisnis</h2>
           <p className="text-sm text-slate-500 mt-0.5">{total} total bisnis terdaftar</p>
@@ -138,15 +138,15 @@ export default function BusinessesPage() {
         <button
           onClick={handleProcessDowngrades}
           disabled={processingDowngrade}
-          className="px-4 py-2 bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition"
+          className="w-full sm:w-auto px-4 py-2.5 sm:py-2 bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition"
         >
           {processingDowngrade ? 'Memproses...' : 'Proses Downgrade ke Gratis'}
         </button>
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl border border-slate-200 p-4 flex flex-wrap gap-3">
-        <form onSubmit={handleSearch} className="flex gap-2 flex-1 min-w-60">
+      <div className="bg-white rounded-xl border border-slate-200 p-3 sm:p-4 flex flex-col sm:flex-row sm:flex-wrap gap-3">
+        <form onSubmit={handleSearch} className="flex gap-2 flex-1 min-w-0 sm:min-w-60">
           <input
             type="text"
             placeholder="Cari nama bisnis atau pemilik..."
@@ -162,7 +162,7 @@ export default function BusinessesPage() {
         <select
           value={status}
           onChange={(e) => { setStatus(e.target.value); setPage(1) }}
-          className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="w-full sm:w-auto px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
         >
           {STATUS_OPTIONS.map((o) => (
             <option key={o.value} value={o.value}>{o.label}</option>

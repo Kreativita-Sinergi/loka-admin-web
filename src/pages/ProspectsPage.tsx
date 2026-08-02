@@ -137,7 +137,7 @@ export default function ProspectsPage() {
           <h2 className="text-2xl font-bold text-slate-900">Prospek Pelanggan</h2>
           <p className="text-sm text-slate-500 mt-0.5">Calon pengguna Loka Kasir — impor dari Google, hubungi via WhatsApp</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="grid grid-cols-1 min-[430px]:grid-cols-3 sm:flex items-center gap-2 w-full sm:w-auto">
           <button
             onClick={() => setImportOpen(true)}
             className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl"
@@ -178,13 +178,13 @@ export default function ProspectsPage() {
         </div>
         <form
           onSubmit={(e) => { e.preventDefault(); setSearch(searchInput); setPage(1) }}
-          className="flex gap-2 ml-auto"
+          className="flex gap-2 w-full lg:w-auto lg:ml-auto"
         >
           <input
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Cari nama / email / perusahaan..."
-            className="px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-60"
+            className="min-w-0 flex-1 lg:flex-none px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 lg:w-60"
           />
           <button type="submit" className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-sm font-medium rounded-xl">Cari</button>
         </form>
@@ -192,7 +192,7 @@ export default function ProspectsPage() {
 
       {/* Bulk action bar */}
       {selectedIds.length > 0 && (
-        <div className="flex items-center justify-between bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-2.5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-2.5">
           <span className="text-sm font-medium text-indigo-700">{selectedIds.length} prospek dipilih</span>
           <div className="flex gap-2">
             <button
@@ -217,7 +217,7 @@ export default function ProspectsPage() {
           <p className="text-sm text-slate-500 mt-1 max-w-md mx-auto">
             Pilih jenis usaha (kafe, toko, laundry…) &amp; kota, lalu impor bisnis dari Google Maps. Tinggal klik <b>Chat WA</b> untuk promosikan aplikasi kasirmu.
           </p>
-          <div className="flex items-center justify-center gap-2 mt-5">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-2 mt-5">
             <button
               onClick={() => setImportOpen(true)}
               className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl"
@@ -251,7 +251,7 @@ export default function ProspectsPage() {
           </div>
 
           {totalPages > 1 && (
-            <div className="flex items-center justify-between pt-2">
+            <div className="flex flex-col min-[430px]:flex-row min-[430px]:items-center justify-between gap-3 pt-2">
               <p className="text-xs text-slate-500">
                 {(page - 1) * LIMIT + 1}–{Math.min(page * LIMIT, total)} dari {total} prospek
               </p>
@@ -307,7 +307,7 @@ function ProspectRow({
   const cfg = STATUS_CONFIG[row.status] ?? STATUS_CONFIG.new
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-4">
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-3 flex-wrap sm:flex-nowrap">
         <input type="checkbox" checked={checked} onChange={onToggle} className="mt-1 w-4 h-4 accent-indigo-600" />
         <div className="flex-1 min-w-0 space-y-1">
           <div className="flex items-center gap-2 flex-wrap">
@@ -335,7 +335,7 @@ function ProspectRow({
           </div>
         </div>
 
-        <div className="shrink-0 flex flex-col items-end gap-2">
+        <div className="w-full sm:w-auto shrink-0 flex flex-row sm:flex-col items-center sm:items-end gap-2 pl-7 sm:pl-0">
           <select
             value={row.status}
             onChange={(e) => onStatusChange(e.target.value as ProspectStatus)}
@@ -345,7 +345,7 @@ function ProspectRow({
               <option key={v} value={v}>{c.label}</option>
             ))}
           </select>
-          <div className="flex gap-1.5">
+          <div className="flex gap-1.5 ml-auto sm:ml-0">
             <button onClick={onWhatsApp} disabled={!row.phone} title="Chat WhatsApp"
               className="p-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 rounded-xl text-sm disabled:opacity-40">💬</button>
             <button onClick={onSend} disabled={row.unsubscribed || !row.email} title="Kirim email"
@@ -394,8 +394,8 @@ function ProspectFormModal({ prospect, onClose, onSaved }: { prospect: Prospect 
   const input = 'w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500'
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl w-full max-w-md shadow-xl p-5" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center sm:p-4" onClick={onClose}>
+      <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-md shadow-xl p-4 sm:p-5 max-h-[90dvh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         <h3 className="text-sm font-bold text-slate-800 mb-4">{prospect ? 'Edit Prospek' : 'Tambah Prospek'}</h3>
         <div className="space-y-3">
           <input className={input} placeholder="Nama *" value={form.name} onChange={set('name')} autoFocus />
@@ -460,8 +460,8 @@ function SendEmailModal({ target, onClose, onSent }: { target: SendTarget; onClo
   const input = 'w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500'
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl w-full max-w-lg shadow-xl p-5" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center sm:p-4" onClick={onClose}>
+      <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-lg shadow-xl p-4 sm:p-5 max-h-[90dvh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         <h3 className="text-sm font-bold text-slate-800 mb-1">Kirim Email Pemasaran</h3>
         <p className="text-xs text-slate-500 mb-4">Penerima: <span className="font-medium text-slate-700">{recipientLabel}</span></p>
 
@@ -555,9 +555,9 @@ function ImportGoogleModal({ onClose, onImported }: { onClose: () => void; onImp
   const pickedCount = results.filter((r) => picked.has(r.place_id)).length
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl w-full max-w-2xl shadow-xl flex flex-col max-h-[88vh]" onClick={(e) => e.stopPropagation()}>
-        <div className="p-5 border-b border-slate-100">
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center sm:p-4" onClick={onClose}>
+      <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-2xl shadow-xl flex flex-col max-h-[92dvh] sm:max-h-[88vh]" onClick={(e) => e.stopPropagation()}>
+        <div className="p-4 sm:p-5 border-b border-slate-100 overflow-y-auto">
           <h3 className="text-sm font-bold text-slate-800 mb-0.5">Cari Bisnis untuk Diprospek</h3>
           <p className="text-xs text-slate-500 mb-3">Pilih jenis usaha &amp; kota, klik Cari — daftar bisnis dari Google Maps langsung muncul, tinggal impor &amp; hubungi via WhatsApp.</p>
 
@@ -616,7 +616,7 @@ function ImportGoogleModal({ onClose, onImported }: { onClose: () => void; onImp
           {info && <p className="text-xs text-slate-600 mt-2">{info}</p>}
         </div>
 
-        <div className="flex-1 overflow-y-auto p-5 space-y-2">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-2">
           {results.length === 0 ? (
             <p className="text-sm text-slate-400 text-center py-10">{searching ? 'Memuat…' : 'Belum ada hasil pencarian.'}</p>
           ) : (
@@ -643,8 +643,8 @@ function ImportGoogleModal({ onClose, onImported }: { onClose: () => void; onImp
           )}
         </div>
 
-        <div className="p-5 border-t border-slate-100 flex gap-2 items-center">
-          <span className="text-xs text-slate-500 mr-auto">{pickedCount} dipilih untuk diimpor</span>
+        <div className="p-4 sm:p-5 border-t border-slate-100 flex flex-wrap gap-2 items-center">
+          <span className="w-full sm:w-auto text-xs text-slate-500 sm:mr-auto">{pickedCount} dipilih untuk diimpor</span>
           <button onClick={onClose} className="px-4 py-2.5 border border-slate-200 text-slate-600 hover:bg-slate-50 text-sm rounded-xl">Tutup</button>
           <button onClick={handleImport} disabled={importing || pickedCount === 0} className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl disabled:opacity-50">
             {importing ? 'Mengimpor…' : `Impor ${pickedCount} prospek`}
