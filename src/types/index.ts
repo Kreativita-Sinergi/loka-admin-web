@@ -6,6 +6,16 @@ export interface AdminBusinessType {
   order_archetype: string
 }
 
+// Bidang usaha (sub-jenis di bawah satu pilar). Menentukan kolom isian tiap
+// transaksi dan istilah yang dipakai aplikasi kasir.
+export interface AdminBusinessVertical {
+  id: number
+  code: string
+  name: string
+  description: string
+  business_type_id: number
+}
+
 export interface AdminMembership {
   id: string
   type: 'free' | 'trial' | 'lite' | 'pro'
@@ -38,6 +48,7 @@ export interface AdminBusiness {
   business_name: string
   owner_name: string
   business_type: AdminBusinessType | null
+  business_vertical: AdminBusinessVertical | null
   image: string | null
   is_active: boolean
   created_at: string

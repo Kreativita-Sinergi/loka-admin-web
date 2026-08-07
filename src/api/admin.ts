@@ -1,5 +1,5 @@
 import axios from '../lib/axios'
-import type { AdminBusiness, AdminBusinessType, AdminMembership, AdminStats, PaginatedResponse, SingleResponse } from '../types'
+import type { AdminBusiness, AdminBusinessType, AdminBusinessVertical, AdminMembership, AdminStats, PaginatedResponse, SingleResponse } from '../types'
 
 export interface BusinessParams {
   page?: number
@@ -66,7 +66,15 @@ export const toggleBusinessActive = (id: string): Promise<SingleResponse<AdminBu
 
 export const updateBusiness = (
   id: string,
-  data: { business_name: string; owner_name: string; business_type_id: number }
+  data: {
+    business_name: string
+    owner_name: string
+    business_type_id: number
+    // null melepas bidang usaha; tidak dikirim sama sekali berarti "biarkan
+    // server yang memutuskan" — dan server melepasnya bila jenis bisnis berubah
+    // ke pilar yang tidak memuat bidang usaha lama.
+    business_vertical_id?: number | null
+  }
 ): Promise<SingleResponse<AdminBusiness>> =>
   axios.patch(`/admin/businesses/${id}`, data).then((r) => r.data)
 
@@ -74,6 +82,10 @@ export const updateBusiness = (
 // business type dropdown when editing a business profile.
 export const getBusinessTypes = (): Promise<SingleResponse<AdminBusinessType[]>> =>
   axios.get('/business-type').then((r) => r.data)
+
+// Bidang usaha per pilar. Endpoint publik yang sama dipakai layar pendaftaran.
+export const getBusinessVerticals = (businessTypeId: number): Promise<SingleResponse<AdminBusinessVertical[]>> =>
+  axios.get('/business-vertical', { params: { business_type_id: businessTypeId } }).then((r) => r.data)
 
 export const deleteBusiness = (id: string): Promise<SingleResponse<null>> =>
   axios.delete(`/admin/businesses/${id}`).then((r) => r.data)

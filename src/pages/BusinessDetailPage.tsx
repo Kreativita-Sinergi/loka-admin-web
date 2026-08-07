@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { getBusinessById, toggleBusinessActive, createMembership, updateMembership, deactivateMembership, deleteBusiness, updateBusiness, getBusinessTypes } from '../api/admin'
-import type { AdminBusiness, AdminBusinessType } from '../types'
+import { getBusinessById, toggleBusinessActive, createMembership, updateMembership, deactivateMembership, deleteBusiness, updateBusiness, getBusinessTypes, getBusinessVerticals } from '../api/admin'
+import type { AdminBusiness, AdminBusinessType, AdminBusinessVertical } from '../types'
 import Badge from '../components/ui/Badge'
 import Modal from '../components/ui/Modal'
 import DeleteConfirmModal from '../components/ui/DeleteConfirmModal'
@@ -22,8 +22,12 @@ export default function BusinessDetailPage() {
   const [upgrading, setUpgrading] = useState<string | null>(null)
   const [fetchTick, setFetchTick] = useState(0)
   const [editBusinessModal, setEditBusinessModal] = useState(false)
-  const [businessForm, setBusinessForm] = useState({ business_name: '', owner_name: '', business_type_id: 0 })
+  const [businessForm, setBusinessForm] = useState({ business_name: '', owner_name: '', business_type_id: 0, business_vertical_id: 0 })
   const [businessTypes, setBusinessTypes] = useState<AdminBusinessType[]>([])
+  // Bidang usaha selalu dimuat ulang per pilar: daftarnya berbeda tiap jenis
+  // bisnis, dan menyisakan daftar lama membuat admin bisa memilih pasangan yang
+  // langsung ditolak server.
+  const [verticals, setVerticals] = useState<AdminBusinessVertical[]>([])
   const [savingBusiness, setSavingBusiness] = useState(false)
 
   const refetch = () => {
@@ -47,9 +51,16 @@ export default function BusinessDetailPage() {
       business_name: business.business_name,
       owner_name: business.owner_name,
       business_type_id: business.business_type?.id ?? 0,
+      business_vertical_id: business.business_vertical?.id ?? 0,
     })
     if (businessTypes.length === 0) {
       getBusinessTypes().then((res) => setBusinessTypes(res.data)).catch(() => {})
+    }
+    const typeId = business.business_type?.id
+    if (typeId) {
+      getBusinessVerticals(typeId).then((res) => setVerticals(res.data ?? [])).catch(() => setVerticals([]))
+    } else {
+      setVerticals([])
     }
     setEditBusinessModal(true)
   }
@@ -59,7 +70,12 @@ export default function BusinessDetailPage() {
     if (!business) return
     setSavingBusiness(true)
     try {
-      await updateBusiness(business.id, businessForm)
+      // 0 di form berarti "tidak dipilih" — dikirim sebagai null supaya server
+      // benar-benar melepas bidang usahanya, bukan menganggapnya id nol.
+      await updateBusiness(business.id, {
+        ...businessForm,
+        business_vertical_id: businessForm.business_vertical_id || null,
+      })
       setEditBusinessModal(false)
       refetch()
     } catch (err) {
@@ -417,7 +433,16 @@ export default function BusinessDetailPage() {
             <select
               required
               value={businessForm.business_type_id || ''}
-              onChange={(e) => setBusinessForm((f) => ({ ...f, business_type_id: parseInt(e.target.value) || 0 }))}
+              onChange={(e) => {
+                const typeId = parseInt(e.target.value) || 0
+                // Bidang usaha lama milik pilar sebelumnya — dikosongkan agar
+                // admin memilih ulang, bukan mengirim pasangan yang tidak sepadan.
+                setBusinessForm((f) => ({ ...f, business_type_id: typeId, business_vertical_id: 0 }))
+                setVerticals([])
+                if (typeId) {
+                  getBusinessVerticals(typeId).then((res) => setVerticals(res.data ?? [])).catch(() => setVerticals([]))
+                }
+              }}
               className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               <option value="" disabled>Pilih jenis bisnis...</option>
@@ -425,6 +450,23 @@ export default function BusinessDetailPage() {
                 <option key={t.id} value={t.id}>{t.name}</option>
               ))}
             </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Bidang Usaha</label>
+            <select
+              value={businessForm.business_vertical_id || ''}
+              onChange={(e) => setBusinessForm((f) => ({ ...f, business_vertical_id: parseInt(e.target.value) || 0 }))}
+              disabled={!businessForm.business_type_id}
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-slate-50"
+            >
+              <option value="">Tidak dipilih</option>
+              {verticals.map((v) => (
+                <option key={v.id} value={v.id}>{v.name}</option>
+              ))}
+            </select>
+            <p className="mt-1 text-xs text-slate-500">
+              Menentukan kolom isian tiap transaksi dan istilah di aplikasi kasir.
+            </p>
           </div>
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={() => setEditBusinessModal(false)}
