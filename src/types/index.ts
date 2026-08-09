@@ -55,6 +55,21 @@ export interface AdminBusiness {
   updated_at: string
   owner: AdminOwner | null
   membership: AdminMembership | null
+  outlets: AdminOutlet[]
+}
+
+export interface AdminOutlet {
+  id: string
+  name: string
+  address: string | null
+  phone: string | null
+  is_active: boolean
+  subscription_status: string
+  subscription_end_date: string | null
+  created_at: string
+  admin_note: string | null
+  transactions_7d: number
+  last_transaction_at: string | null
 }
 
 export interface MembershipCount {

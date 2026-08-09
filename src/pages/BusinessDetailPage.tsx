@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
-import { getBusinessById, getActiveUsers, toggleBusinessActive, createMembership, updateMembership, deactivateMembership, deleteBusiness, updateBusiness, getBusinessTypes, getBusinessVerticals } from '../api/admin'
+import { getBusinessById, getActiveUsers, updateOutletAdminNote, toggleBusinessActive, createMembership, updateMembership, deactivateMembership, deleteBusiness, updateBusiness, getBusinessTypes, getBusinessVerticals } from '../api/admin'
 import type { BusinessActiveUsers } from '../api/admin'
 import type { AdminBusiness, AdminBusinessType, AdminBusinessVertical } from '../types'
 import Badge from '../components/ui/Badge'
@@ -32,6 +32,8 @@ export default function BusinessDetailPage() {
   // langsung ditolak server.
   const [verticals, setVerticals] = useState<AdminBusinessVertical[]>([])
   const [savingBusiness, setSavingBusiness] = useState(false)
+  const [outletNotes, setOutletNotes] = useState<Record<string, string>>({})
+  const [savingOutletNote, setSavingOutletNote] = useState<string | null>(null)
 
   const refetch = () => {
     setLoading(true)
@@ -173,6 +175,19 @@ export default function BusinessDetailPage() {
     }
   }
 
+  const saveOutletNote = async (outletId: string) => {
+    const note = (outletNotes[outletId] ?? '').trim()
+    setSavingOutletNote(outletId)
+    try {
+      await updateOutletAdminNote(outletId, note || null)
+      refetch()
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setSavingOutletNote(null)
+    }
+  }
+
   if (loading) {
     return <div className="flex items-center justify-center h-64 text-slate-400">Memuat...</div>
   }
@@ -242,6 +257,57 @@ export default function BusinessDetailPage() {
           <Metric label="Aktif hari ini" value={(usage?.active_today ?? 0).toLocaleString('id-ID')} hint="dari pengguna terdaftar" />
           <Metric label="API hari ini" value={(usage?.api_calls_today ?? 0).toLocaleString('id-ID')} hint="permintaan aplikasi" />
         </div>
+      </section>
+
+      <section className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <div className="px-4 sm:px-6 py-4 border-b border-slate-200">
+          <h3 className="font-semibold text-slate-700">Outlet ({business.outlets?.length ?? 0})</h3>
+          <p className="text-xs text-slate-400 mt-0.5">Semua cabang tercatat terpisah, termasuk yang belum pernah bertransaksi.</p>
+        </div>
+        {(business.outlets?.length ?? 0) === 0 ? (
+          <p className="px-6 py-8 text-center text-sm text-slate-400">Belum ada outlet terdaftar.</p>
+        ) : (
+          <div className="divide-y divide-slate-100">
+            {business.outlets.map((outlet) => {
+              const note = outletNotes[outlet.id] ?? outlet.admin_note ?? ''
+              return (
+                <div key={outlet.id} className="p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h4 className="font-medium text-slate-800">{outlet.name}</h4>
+                        <Badge variant={outlet.is_active ? 'success' : 'danger'}>{outlet.is_active ? 'Aktif' : 'Nonaktif'}</Badge>
+                        <Badge variant={outlet.subscription_status === 'active' ? 'success' : outlet.subscription_status === 'trial' ? 'warning' : 'neutral'}>{outlet.subscription_status || 'inactive'}</Badge>
+                      </div>
+                      {(outlet.address || outlet.phone) && <p className="mt-1 text-xs text-slate-500">{[outlet.address, outlet.phone].filter(Boolean).join(' · ')}</p>}
+                    </div>
+                    <div className="grid grid-cols-2 gap-x-5 gap-y-1 text-xs text-slate-500 shrink-0">
+                      <span>Transaksi 7 hari</span><strong className="text-right text-slate-700">{outlet.transactions_7d.toLocaleString('id-ID')}</strong>
+                      <span>Transaksi terakhir</span><strong className="text-right text-slate-700">{lastSeenLabel(outlet.last_transaction_at)}</strong>
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <label className="block text-xs font-medium text-slate-500 mb-1">Catatan internal super admin</label>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <textarea
+                        rows={2}
+                        maxLength={2000}
+                        value={note}
+                        onChange={(event) => setOutletNotes((notes) => ({ ...notes, [outlet.id]: event.target.value }))}
+                        placeholder="Contoh: perlu follow-up, kendala perangkat, atau status onboarding."
+                        className="flex-1 px-3 py-2 text-sm border border-slate-200 rounded-lg resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                      <button onClick={() => saveOutletNote(outlet.id)} disabled={savingOutletNote === outlet.id}
+                        className="self-end px-3 py-2 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg disabled:opacity-50">
+                        {savingOutletNote === outlet.id ? 'Menyimpan...' : 'Simpan'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
       </section>
 
       {/* Business info */}
