@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { getBusinessById, toggleBusinessActive, createMembership, updateMembership, deactivateMembership, deleteBusiness, updateBusiness, getBusinessTypes, getBusinessVerticals } from '../api/admin'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
+import { getBusinessById, getActiveUsers, toggleBusinessActive, createMembership, updateMembership, deactivateMembership, deleteBusiness, updateBusiness, getBusinessTypes, getBusinessVerticals } from '../api/admin'
+import type { BusinessActiveUsers } from '../api/admin'
 import type { AdminBusiness, AdminBusinessType, AdminBusinessVertical } from '../types'
 import Badge from '../components/ui/Badge'
 import Modal from '../components/ui/Modal'
@@ -11,7 +12,9 @@ import { id as localeId } from 'date-fns/locale'
 export default function BusinessDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const location = useLocation()
   const [business, setBusiness] = useState<AdminBusiness | null>(null)
+  const [usage, setUsage] = useState<BusinessActiveUsers | null>(null)
   const [loading, setLoading] = useState(true)
   const [membershipModal, setMembershipModal] = useState(false)
   const [form, setForm] = useState({ type: 'lite', days: 30 })
@@ -38,8 +41,12 @@ export default function BusinessDetailPage() {
   useEffect(() => {
     if (!id) return
     let cancelled = false
-    getBusinessById(id)
-      .then((res) => { if (!cancelled) setBusiness(res.data) })
+    Promise.all([getBusinessById(id), getActiveUsers()])
+      .then(([businessRes, usageRes]) => {
+        if (cancelled) return
+        setBusiness(businessRes.data)
+        setUsage((usageRes.data.businesses ?? []).find((row) => row.business_id === id) ?? null)
+      })
       .catch(() => { if (!cancelled) navigate('/businesses') })
       .finally(() => { if (!cancelled) setLoading(false) })
     return () => { cancelled = true }
@@ -174,6 +181,14 @@ export default function BusinessDetailPage() {
 
   const membership = business.membership
   const isExpired = membership && new Date(membership.end_date) < new Date()
+  const backTo = (location.state as { from?: string } | null)?.from === '/usage' ? '/usage' : '/businesses'
+  const usageState = !usage?.last_seen_at
+    ? { label: 'Belum pernah aktif', tone: 'text-slate-500 bg-slate-100' }
+    : usage.active_today > 0
+      ? { label: 'Aktif hari ini', tone: 'text-emerald-700 bg-emerald-50' }
+      : usage.active_this_week > 0
+        ? { label: 'Aktif minggu ini', tone: 'text-amber-700 bg-amber-50' }
+        : { label: 'Tidak aktif >7 hari', tone: 'text-red-700 bg-red-50' }
 
   return (
     <div className="space-y-6 max-w-4xl">
@@ -189,7 +204,7 @@ export default function BusinessDetailPage() {
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-start sm:items-center gap-3 min-w-0">
-          <button onClick={() => navigate('/businesses')} className="text-slate-400 hover:text-slate-600">←</button>
+          <button onClick={() => navigate(backTo)} className="text-slate-400 hover:text-slate-600" aria-label="Kembali">←</button>
           <div className="min-w-0">
             <h2 className="text-xl font-bold text-slate-800 break-words">{business.business_name}</h2>
             <p className="text-xs sm:text-sm text-slate-500 break-all">{business.id}</p>
@@ -206,6 +221,28 @@ export default function BusinessDetailPage() {
           </button>
         </div>
       </div>
+
+      {/* Snapshot operasional agar super admin bisa menilai kesehatan tenant
+          tanpa perlu membuka laporan milik pemilik bisnis. */}
+      <section className="bg-white rounded-xl border border-slate-200 p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+          <div>
+            <h3 className="font-semibold text-slate-700">Kesehatan Operasional</h3>
+            <p className="text-xs text-slate-400 mt-0.5">Ringkasan aktivitas 7 hari terakhir</p>
+          </div>
+          <span className={`w-fit px-2.5 py-1 rounded-full text-xs font-medium ${usageState.tone}`}>{usageState.label}</span>
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <Metric label="Transaksi" value={(usage?.trx_this_week ?? 0).toLocaleString('id-ID')} hint="7 hari terakhir" positive={(usage?.trx_this_week ?? 0) > 0} />
+          <Metric label="Jam pakai" value={formatUsageHours(usage?.hours_this_week ?? 0)} hint="7 hari terakhir" />
+          <Metric label="Pengguna aktif" value={`${usage?.active_this_week ?? 0}/${usage?.total_users ?? 0}`} hint="aktif / terdaftar" />
+          <Metric label="API calls" value={(usage?.api_calls_this_week ?? 0).toLocaleString('id-ID')} hint="7 hari terakhir" />
+          <Metric label="Terakhir aktif" value={lastSeenLabel(usage?.last_seen_at ?? null)} hint="aktivitas pengguna" />
+          <Metric label="Data tersimpan" value={(usage?.record_count ?? 0).toLocaleString('id-ID')} hint="transaksi + produk" />
+          <Metric label="Aktif hari ini" value={(usage?.active_today ?? 0).toLocaleString('id-ID')} hint="dari pengguna terdaftar" />
+          <Metric label="API hari ini" value={(usage?.api_calls_today ?? 0).toLocaleString('id-ID')} hint="permintaan aplikasi" />
+        </div>
+      </section>
 
       {/* Business info */}
       <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-6">
@@ -573,4 +610,31 @@ export default function BusinessDetailPage() {
       </Modal>
     </div>
   )
+}
+
+function Metric({ label, value, hint, positive }: { label: string; value: string; hint: string; positive?: boolean }) {
+  return (
+    <div className="rounded-lg border border-slate-100 bg-slate-50/60 px-3 py-3 min-w-0">
+      <p className="text-xs text-slate-500 truncate">{label}</p>
+      <p className={`mt-1 text-lg font-bold truncate ${positive ? 'text-emerald-600' : 'text-slate-800'}`}>{value}</p>
+      <p className="mt-0.5 text-[11px] text-slate-400 truncate">{hint}</p>
+    </div>
+  )
+}
+
+function formatUsageHours(hours: number): string {
+  const minutes = Math.round(hours * 60)
+  const wholeHours = Math.floor(minutes / 60)
+  const remainingMinutes = minutes % 60
+  if (wholeHours === 0) return `${remainingMinutes}m`
+  return remainingMinutes === 0 ? `${wholeHours}j` : `${wholeHours}j ${remainingMinutes}m`
+}
+
+function lastSeenLabel(iso: string | null): string {
+  if (!iso) return 'Belum pernah'
+  const diffMinutes = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000))
+  if (diffMinutes < 60) return `${diffMinutes}m lalu`
+  const hours = Math.floor(diffMinutes / 60)
+  if (hours < 24) return `${hours}j lalu`
+  return `${Math.floor(hours / 24)} hari lalu`
 }

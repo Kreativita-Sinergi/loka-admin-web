@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { getActiveUsers } from '../api/admin'
 import type { ActiveUsersStats } from '../api/admin'
 import { formatDistanceToNow, format } from 'date-fns'
@@ -66,6 +67,7 @@ function fmtHours(h: number): string {
 }
 
 export default function UsagePage() {
+  const navigate = useNavigate()
   const [stats, setStats] = useState<ActiveUsersStats | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -163,9 +165,14 @@ export default function UsagePage() {
                 </tr>
               ) : (
                 rows.map((b) => (
-                  <tr key={b.business_id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
+                  <tr
+                    key={b.business_id}
+                    onClick={() => navigate(`/businesses/${b.business_id}`, { state: { from: '/usage' } })}
+                    className="border-b border-slate-100 last:border-0 hover:bg-indigo-50/50 cursor-pointer transition-colors"
+                    title={`Lihat detail ${b.business_name}`}
+                  >
                     <td className="px-5 py-3 font-medium text-slate-800">
-                      {b.business_name}
+                      <span className="hover:text-indigo-600 hover:underline underline-offset-2">{b.business_name}</span>
                       {/* Jumlah pengguna dipindah ke sini sebagai keterangan
                           kecil: hampir seluruh tenant hanya punya satu, jadi
                           satu kolom penuh berisi angka "1" tidak membantu
