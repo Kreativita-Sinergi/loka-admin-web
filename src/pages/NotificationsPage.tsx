@@ -29,6 +29,15 @@ const TEMPLATES = [
       `Halo ${name || 'Pengguna'},\n\nAda kabar baik dari Loka Kasir!\n\nKami terus mengembangkan fitur-fitur baru untuk membantu bisnis Anda tumbuh lebih cepat.\n\nCek update terbaru di aplikasi:\n${APP_LINK}\n\nSalam,\nTim Loka Kasir`,
   },
   {
+    id: 'inactive_7d',
+    label: 'Cek Kabar (7 Hari Vakum)',
+    icon: '👋',
+    color: 'bg-amber-50 border-amber-300 text-amber-700',
+    activeColor: 'bg-amber-500 text-white border-amber-500',
+    message: (name: string) =>
+      `Halo ${name || 'Pengguna'},\n\nKami perhatikan Loka Kasir belum digunakan lagi dalam 7 hari terakhir. Sebelum apa-apa, kami ingin memastikan semuanya baik-baik saja di sisi Anda.\n\nKalau berkenan, boleh kami tahu:\n- Apakah ada kendala saat memakai Loka Kasir? Misalnya aplikasi terasa berat, fitur membingungkan, atau ada proses yang tidak jalan\n- Apakah ada fitur yang belum pas dengan cara kerja bisnis Anda?\n- Atau memang aktivitas jualan sedang libur untuk sementara?\n\nCukup balas email ini dengan jawaban singkat — satu dua kalimat pun sangat berarti. Masukan Anda kami pakai langsung untuk memperbaiki Loka Kasir.\n\nKalau ternyata ada kendala teknis, beri tahu kami. Tim kami siap membantu sampai tuntas, tanpa biaya tambahan.\n\nTerima kasih sudah memberi Loka Kasir kesempatan.\n\nSalam,\nTim Loka Kasir`,
+  },
+  {
     id: 'custom',
     label: 'Pesan Kustom',
     icon: '✏️',
@@ -62,6 +71,15 @@ const PUSH_TEMPLATES = [
       `Halo ${name || 'Pengguna'}, ada fitur & perbaikan terbaru di Loka Kasir. Buka aplikasi untuk melihatnya.`,
   },
   {
+    id: 'inactive_7d_push',
+    label: 'Cek Kabar (7 Hari Vakum)',
+    icon: '👋',
+    activeColor: 'bg-amber-500 text-white border-amber-500',
+    title: 'Semuanya baik-baik saja?',
+    message: (name: string) =>
+      `Halo ${name || 'Pengguna'}, kami lihat Loka Kasir belum dipakai 7 hari terakhir. Ada kendala atau masukan? Beri tahu kami lewat menu Bantuan — tim kami siap membantu.`,
+  },
+  {
     id: 'custom_push',
     label: 'Pesan Kustom',
     icon: '✏️',
@@ -78,9 +96,11 @@ type SendState = 'idle' | 'sending' | 'done'
 const TEMPLATE_LABELS: Record<string, string> = {
   app_download: 'Undangan Download App',
   promo: 'Promosi & Update',
+  inactive_7d: 'Cek Kabar · 7 Hari Vakum',
   custom: 'Pesan Kustom',
   feedback_push: 'Push · Minta Feedback',
   promo_push: 'Push · Promosi & Update',
+  inactive_7d_push: 'Push · Cek Kabar 7 Hari Vakum',
   custom_push: 'Push · Pesan Kustom',
 }
 
