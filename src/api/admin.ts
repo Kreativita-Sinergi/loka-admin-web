@@ -61,6 +61,9 @@ export const getBusinesses = (params: BusinessParams = {}): Promise<PaginatedRes
 export const getBusinessById = (id: string): Promise<SingleResponse<AdminBusiness>> =>
   axios.get(`/admin/businesses/${id}`).then((r) => r.data)
 
+export const resetUserPassword = (id: string): Promise<SingleResponse<null>> =>
+  axios.post(`/admin/users/${id}/reset-password`).then((r) => r.data)
+
 export const updateOutletAdminNote = (id: string, admin_note: string | null): Promise<SingleResponse<null>> =>
   axios.patch(`/admin/outlets/${id}/note`, { admin_note }).then((r) => r.data)
 

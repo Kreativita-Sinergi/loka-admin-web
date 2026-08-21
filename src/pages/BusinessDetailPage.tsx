@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
-import { getBusinessById, getActiveUsers, updateOutletAdminNote, toggleBusinessActive, createMembership, updateMembership, deactivateMembership, deleteBusiness, updateBusiness, getBusinessTypes, getBusinessVerticals } from '../api/admin'
+import { getBusinessById, getActiveUsers, updateOutletAdminNote, toggleBusinessActive, createMembership, updateMembership, deactivateMembership, deleteBusiness, updateBusiness, getBusinessTypes, getBusinessVerticals, resetUserPassword } from '../api/admin'
 import type { BusinessActiveUsers } from '../api/admin'
 import type { AdminBusiness, AdminBusinessType, AdminBusinessVertical } from '../types'
 import Badge from '../components/ui/Badge'
@@ -34,6 +34,7 @@ export default function BusinessDetailPage() {
   const [savingBusiness, setSavingBusiness] = useState(false)
   const [outletNotes, setOutletNotes] = useState<Record<string, string>>({})
   const [savingOutletNote, setSavingOutletNote] = useState<string | null>(null)
+  const [resettingPassword, setResettingPassword] = useState(false)
 
   const refetch = () => {
     setLoading(true)
@@ -185,6 +186,21 @@ export default function BusinessDetailPage() {
       console.error(err)
     } finally {
       setSavingOutletNote(null)
+    }
+  }
+
+  const handleResetPassword = async () => {
+    if (!business?.owner) return
+    if (!confirm(`Reset password ${business.owner.name ?? 'pemilik akun'} menjadi "admin"?`)) return
+    setResettingPassword(true)
+    try {
+      await resetUserPassword(business.owner.id)
+      alert('Password berhasil direset menjadi "admin".')
+    } catch (err) {
+      console.error(err)
+      alert('Password gagal direset. Silakan coba lagi.')
+    } finally {
+      setResettingPassword(false)
     }
   }
 
@@ -367,7 +383,19 @@ export default function BusinessDetailPage() {
       {/* Owner info */}
       {business.owner && (
         <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-6">
-          <h3 className="font-semibold text-slate-700 mb-4">Pemilik Akun</h3>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+            <div>
+              <h3 className="font-semibold text-slate-700">Pemilik Akun</h3>
+              <p className="text-xs text-slate-400 mt-0.5">Kelola akses pengguna utama bisnis ini.</p>
+            </div>
+            <button
+              onClick={handleResetPassword}
+              disabled={resettingPassword}
+              className="w-fit px-3 py-1.5 text-xs font-medium bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {resettingPassword ? 'Mereset...' : 'Reset Password ke admin'}
+            </button>
+          </div>
           <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-4 text-sm">
             <div>
               <p className="text-slate-400 text-xs">Nama</p>
