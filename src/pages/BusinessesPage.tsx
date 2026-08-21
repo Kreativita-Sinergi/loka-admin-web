@@ -12,7 +12,6 @@ const STATUS_OPTIONS = [
   { value: '', label: 'Semua' },
   { value: 'free', label: 'Gratis' },
   { value: 'trial', label: 'Trial' },
-  { value: 'lite', label: 'Lite' },
   { value: 'pro', label: 'Pro' },
   { value: 'expired', label: 'Expired' },
 ]
@@ -24,7 +23,6 @@ function membershipBadge(membership: AdminBusiness['membership']) {
   if (expired) return <Badge variant="danger">Expired</Badge>
   const map: Record<string, 'warning' | 'info' | 'success'> = {
     trial: 'warning',
-    lite: 'info',
     pro: 'success',
   }
   return <Badge variant={map[membership.type] ?? 'neutral'}>{membership.type.toUpperCase()}</Badge>
@@ -69,7 +67,18 @@ export default function BusinessesPage() {
     }
   }, [page, search, status])
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => {
+    let active = true
+    getBusinesses({ page, limit, search, status, sort_by: 'created_at', order_by: 'desc' })
+      .then((res) => {
+        if (!active) return
+        setBusinesses(res.data ?? [])
+        setTotal(res.pagination?.total ?? 0)
+      })
+      .catch(console.error)
+      .finally(() => { if (active) setLoading(false) })
+    return () => { active = false }
+  }, [page, search, status])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -98,7 +107,7 @@ export default function BusinessesPage() {
   }
 
   const handleProcessDowngrades = async () => {
-    if (!confirm('Jalankan downgrade massal semua trial/pro/lite yang expired ke paket Gratis?')) return
+    if (!confirm('Jalankan downgrade massal semua trial/pro yang expired ke paket Gratis?')) return
     setProcessingDowngrade(true)
     setDowngradeResult(null)
     try {

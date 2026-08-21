@@ -9,7 +9,6 @@ import { format } from 'date-fns'
 
 const MEMBERSHIP_COLORS: Record<string, string> = {
   trial: '#f59e0b',
-  lite: '#6366f1',
   pro: '#10b981',
 }
 

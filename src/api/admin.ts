@@ -1,5 +1,5 @@
 import axios from '../lib/axios'
-import type { AdminBusiness, AdminBusinessType, AdminBusinessVertical, AdminMembership, AdminStats, PaginatedResponse, SingleResponse } from '../types'
+import type { AdminBusiness, AdminBusinessType, AdminBusinessVertical, AdminMembership, AdminPasswordReset, AdminStats, PaginatedResponse, SingleResponse } from '../types'
 
 export interface BusinessParams {
   page?: number
@@ -30,7 +30,7 @@ export interface BusinessActiveUsers {
   last_seen_at: string | null
   /** Transaksi 7 hari terakhir — ukuran "masih berjualan atau tidak". */
   trx_this_week: number
-  /** Paket aktif: free | trial | lite | pro. */
+  /** Paket aktif: free | trial | pro. */
   plan: string
   created_at: string | null
 }
@@ -61,7 +61,7 @@ export const getBusinesses = (params: BusinessParams = {}): Promise<PaginatedRes
 export const getBusinessById = (id: string): Promise<SingleResponse<AdminBusiness>> =>
   axios.get(`/admin/businesses/${id}`).then((r) => r.data)
 
-export const resetUserPassword = (id: string): Promise<SingleResponse<null>> =>
+export const resetUserPassword = (id: string): Promise<SingleResponse<AdminPasswordReset>> =>
   axios.post(`/admin/users/${id}/reset-password`).then((r) => r.data)
 
 export const updateOutletAdminNote = (id: string, admin_note: string | null): Promise<SingleResponse<null>> =>

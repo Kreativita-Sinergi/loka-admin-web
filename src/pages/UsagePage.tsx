@@ -41,14 +41,16 @@ function signupLabel(iso: string | null): string {
 function PlanBadge({ plan }: { plan: string }) {
   const key = (plan || 'free').toLowerCase()
   const style =
-    key === 'pro' || key === 'pro-yearly'
+    key === 'pro' || key === 'pro-yearly' || key === 'pro-3year'
       ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
-      : key === 'lite'
-        ? 'bg-sky-50 text-sky-700 border-sky-200'
-        : key === 'trial'
+      : key === 'trial'
           ? 'bg-amber-50 text-amber-700 border-amber-200'
           : 'bg-slate-100 text-slate-500 border-slate-200'
-  const label = key === 'pro-yearly' ? 'Pro (Tahunan)' : key.charAt(0).toUpperCase() + key.slice(1)
+  const label = key === 'pro-yearly'
+    ? 'Pro (Tahunan)'
+    : key === 'pro-3year'
+      ? 'Pro (3 Tahun)'
+      : key.charAt(0).toUpperCase() + key.slice(1)
   return (
     <span className={`inline-flex items-center px-2 py-0.5 rounded-md border text-xs font-medium ${style}`}>
       {label}

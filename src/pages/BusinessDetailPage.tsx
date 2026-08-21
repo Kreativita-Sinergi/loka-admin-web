@@ -17,7 +17,7 @@ export default function BusinessDetailPage() {
   const [usage, setUsage] = useState<BusinessActiveUsers | null>(null)
   const [loading, setLoading] = useState(true)
   const [membershipModal, setMembershipModal] = useState(false)
-  const [form, setForm] = useState({ type: 'lite', days: 30 })
+  const [form, setForm] = useState({ type: 'pro', days: 30 })
   const [submitting, setSubmitting] = useState(false)
   const [editMembershipModal, setEditMembershipModal] = useState(false)
   const [editForm, setEditForm] = useState({ type: '', extend_days: 0, end_date: '' })
@@ -146,13 +146,22 @@ export default function BusinessDetailPage() {
     }
   }
 
-  // days: durasi paket berbayar dari sekarang (30 = bulanan, 365 = tahunan).
+  // days: durasi paket berbayar dari sekarang (30 = bulanan, 365 = tahunan,
+  // 1095 = tiga tahun).
   // Untuk paket Gratis pakai durasi sangat panjang agar tidak pernah expired.
   const handleChangePlan = async (type: string, days: number, actionKey: string) => {
     if (!business?.membership) return
-    const typeLabel = type === 'pro' ? 'Pro' : type === 'lite' ? 'Lite' : 'Gratis'
+    const typeLabel = type === 'pro' ? 'Pro' : 'Gratis'
     const durationLabel =
-      type === 'free' ? '' : days === 30 ? ' bulanan' : days === 365 ? ' tahunan' : ` ${days} hari`
+      type === 'free'
+        ? ''
+        : days === 30
+          ? ' bulanan'
+          : days === 365
+            ? ' tahunan'
+            : days === 1095
+              ? ' 3 tahun'
+              : ` ${days} hari`
     if (!confirm(`Ubah paket bisnis ini ke ${typeLabel}${durationLabel}?`)) return
     setUpgrading(actionKey)
     try {
@@ -191,11 +200,13 @@ export default function BusinessDetailPage() {
 
   const handleResetPassword = async () => {
     if (!business?.owner) return
-    if (!confirm(`Reset password ${business.owner.name ?? 'pemilik akun'} menjadi "admin"?`)) return
+    if (!confirm(`Buat password sementara untuk ${business.owner.name ?? 'pemilik akun'}? Password berlaku 30 menit dan wajib diganti setelah login.`)) return
     setResettingPassword(true)
     try {
-      await resetUserPassword(business.owner.id)
-      alert('Password berhasil direset menjadi "admin".')
+      const result = await resetUserPassword(business.owner.id)
+      const temporaryPassword = result.data.temporary_password
+      try { await navigator.clipboard?.writeText(temporaryPassword) } catch { /* tetap tampilkan di dialog */ }
+      alert(`Password sementara: ${temporaryPassword}\n\nBerlaku sampai ${format(new Date(result.data.expires_at), 'dd MMM yyyy HH:mm', { locale: localeId })}. Password sudah disalin; kirimkan melalui saluran yang aman.`)
     } catch (err) {
       console.error(err)
       alert('Password gagal direset. Silakan coba lagi.')
@@ -393,7 +404,7 @@ export default function BusinessDetailPage() {
               disabled={resettingPassword}
               className="w-fit px-3 py-1.5 text-xs font-medium bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {resettingPassword ? 'Mereset...' : 'Reset Password ke admin'}
+              {resettingPassword ? 'Membuat...' : 'Buat Password Sementara'}
             </button>
           </div>
           <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-4 text-sm">
@@ -472,7 +483,7 @@ export default function BusinessDetailPage() {
                 ) : isExpired ? (
                   <Badge variant="danger">Expired</Badge>
                 ) : (
-                  <Badge variant={membership.type === 'pro' ? 'success' : membership.type === 'lite' ? 'info' : 'warning'}>
+                  <Badge variant={membership.type === 'pro' ? 'success' : 'warning'}>
                     {membership.type.toUpperCase()}
                   </Badge>
                 )}
@@ -508,15 +519,14 @@ export default function BusinessDetailPage() {
                 {[
                   { key: 'pro-30', type: 'pro', days: 30, label: 'Pro Bulanan', cls: 'bg-emerald-600 hover:bg-emerald-700 text-white' },
                   { key: 'pro-365', type: 'pro', days: 365, label: 'Pro Tahunan', cls: 'bg-emerald-700 hover:bg-emerald-800 text-white' },
-                  { key: 'lite-30', type: 'lite', days: 30, label: 'Lite Bulanan', cls: 'bg-indigo-600 hover:bg-indigo-700 text-white' },
-                  { key: 'lite-365', type: 'lite', days: 365, label: 'Lite Tahunan', cls: 'bg-indigo-700 hover:bg-indigo-800 text-white' },
+                  { key: 'pro-1095', type: 'pro', days: 1095, label: 'Pro 3 Tahun', cls: 'bg-emerald-800 hover:bg-emerald-900 text-white' },
                   // Gratis: durasi sangat panjang (≈100 tahun) agar tidak pernah expired.
                   { key: 'free', type: 'free', days: 36500, label: 'Gratis', cls: 'bg-slate-200 hover:bg-slate-300 text-slate-700' },
                 ].map((p) => (
                   <button
                     key={p.key}
                     onClick={() => handleChangePlan(p.type, p.days, p.key)}
-                    // Hanya Gratis yang dinonaktifkan saat sudah aktif. Pro/Lite tetap bisa
+                    // Hanya Gratis yang dinonaktifkan saat sudah aktif. Pro tetap bisa
                     // diklik untuk ganti durasi (bulanan↔tahunan) atau perpanjang.
                     disabled={(p.type === 'free' && membership.type === 'free') || upgrading !== null}
                     className={`px-3 py-1.5 text-xs rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${p.cls}`}
@@ -627,7 +637,6 @@ export default function BusinessDetailPage() {
             >
               <option value="free">Gratis</option>
               <option value="trial">Trial</option>
-              <option value="lite">Lite</option>
               <option value="pro">Pro</option>
             </select>
           </div>
@@ -666,7 +675,6 @@ export default function BusinessDetailPage() {
             >
               <option value="free">Gratis</option>
               <option value="trial">Trial</option>
-              <option value="lite">Lite</option>
               <option value="pro">Pro</option>
             </select>
           </div>

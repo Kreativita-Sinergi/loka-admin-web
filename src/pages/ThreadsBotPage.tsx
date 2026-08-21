@@ -31,6 +31,18 @@ const SOURCE_LABEL: Record<string, string> = {
 
 type Tab = 'queue' | 'history' | 'settings'
 
+function SettingsToggle({ label, desc, val, onChange }: { label: string; desc: string; val: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <label className="flex items-start gap-3 cursor-pointer">
+      <input type="checkbox" checked={val} onChange={(e) => onChange(e.target.checked)} className="mt-1 w-4 h-4 accent-indigo-600" />
+      <div>
+        <p className="text-sm font-medium text-slate-800">{label}</p>
+        <p className="text-xs text-slate-500">{desc}</p>
+      </div>
+    </label>
+  )
+}
+
 export default function ThreadsBotPage() {
   const [tab, setTab] = useState<Tab>('queue')
   const [busy, setBusy] = useState(false)
@@ -199,23 +211,13 @@ function SettingsPanel({ onSaved }: { onSaved: () => void }) {
     } finally { setSaving(false) }
   }
 
-  const Toggle = ({ label, desc, val, onChange }: { label: string; desc: string; val: boolean; onChange: (v: boolean) => void }) => (
-    <label className="flex items-start gap-3 cursor-pointer">
-      <input type="checkbox" checked={val} onChange={(e) => onChange(e.target.checked)} className="mt-1 w-4 h-4 accent-indigo-600" />
-      <div>
-        <p className="text-sm font-medium text-slate-800">{label}</p>
-        <p className="text-xs text-slate-500">{desc}</p>
-      </div>
-    </label>
-  )
-
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-5 max-w-2xl">
-      <Toggle label="Aktifkan bot" desc="Saat aktif, bot otomatis membuat draf (tetap menunggu ACC). Matikan untuk menjeda total." val={s.enabled} onChange={(v) => set('enabled', v)} />
+      <SettingsToggle label="Aktifkan bot" desc="Saat aktif, bot otomatis membuat draf (tetap menunggu ACC). Matikan untuk menjeda total." val={s.enabled} onChange={(v) => set('enabled', v)} />
       <div className="h-px bg-slate-100" />
-      <Toggle label="Balas komentar di postingan bot" desc="Buat draf balasan untuk orang yang berkomentar di thread buatan bot." val={s.auto_reply_own} onChange={(v) => set('auto_reply_own', v)} />
-      <Toggle label="Balas mention" desc="Balas orang yang men-tag akun Threads-mu. (Butuh izin threads_manage_mentions.)" val={s.reply_mentions} onChange={(v) => set('reply_mentions', v)} />
-      <Toggle label="Pantau kata kunci" desc="Cari postingan publik berisi kata kunci lalu buat draf balasan. (Butuh izin threads_keyword_search.)" val={s.keyword_enabled} onChange={(v) => set('keyword_enabled', v)} />
+      <SettingsToggle label="Balas komentar di postingan bot" desc="Buat draf balasan untuk orang yang berkomentar di thread buatan bot." val={s.auto_reply_own} onChange={(v) => set('auto_reply_own', v)} />
+      <SettingsToggle label="Balas mention" desc="Balas orang yang men-tag akun Threads-mu. (Butuh izin threads_manage_mentions.)" val={s.reply_mentions} onChange={(v) => set('reply_mentions', v)} />
+      <SettingsToggle label="Pantau kata kunci" desc="Cari postingan publik berisi kata kunci lalu buat draf balasan. (Butuh izin threads_keyword_search.)" val={s.keyword_enabled} onChange={(v) => set('keyword_enabled', v)} />
 
       <div>
         <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Kata kunci (pisahkan dengan koma)</label>

@@ -18,7 +18,7 @@ export interface AdminBusinessVertical {
 
 export interface AdminMembership {
   id: string
-  type: 'free' | 'trial' | 'lite' | 'pro'
+  type: 'free' | 'trial' | 'pro'
   start_date: string
   end_date: string
   is_active: boolean
@@ -41,6 +41,11 @@ export interface AdminOwner {
   is_email_verified: boolean
   is_active: boolean
   created_at: string
+}
+
+export interface AdminPasswordReset {
+  temporary_password: string
+  expires_at: string
 }
 
 export interface AdminBusiness {

@@ -66,7 +66,20 @@ export default function SecurityLogsPage() {
     }
   }, [params])
 
-  useEffect(() => { fetchLogs() }, [fetchLogs])
+  useEffect(() => {
+    let active = true
+    const cleaned: SecurityLogsParams = { ...params }
+    if (!cleaned.action) delete cleaned.action
+    if (!cleaned.status) delete cleaned.status
+    getSecurityLogs(cleaned)
+      .then((res) => {
+        if (!active) return
+        setLogs(res.data.data ?? [])
+        setTotal(res.data.total ?? 0)
+      })
+      .finally(() => { if (active) setLoading(false) })
+    return () => { active = false }
+  }, [params])
 
   const totalPages = Math.ceil(total / (params.limit ?? 20))
 
