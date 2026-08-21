@@ -5,6 +5,7 @@ const navItems = [
   { to: '/', label: 'Dashboard', icon: '📊' },
   { to: '/usage', label: 'User Aktif', icon: '🟢' },
   { to: '/businesses', label: 'Bisnis', icon: '🏪' },
+  { to: '/reset-transactions', label: 'Reset Transaksi', icon: '🧹' },
   { to: '/prospects', label: 'Prospek', icon: '🎯' },
   { to: '/threads-bot', label: 'Bot Threads', icon: '🤖' },
   { to: '/notifications', label: 'Notifikasi', icon: '📤' },

@@ -48,6 +48,20 @@ export interface AdminPasswordReset {
   expires_at: string
 }
 
+export interface AdminTransactionResetPreview {
+  business_id: string
+  business_name: string
+  total_transactions: number
+  paid_transactions: number
+  total_sales: number
+  first_transaction_at: string | null
+  last_transaction_at: string | null
+}
+
+export interface AdminTransactionResetResult {
+  deleted_transactions: number
+}
+
 export interface AdminBusiness {
   id: string
   business_name: string

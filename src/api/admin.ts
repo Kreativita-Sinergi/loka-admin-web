@@ -1,5 +1,5 @@
 import axios from '../lib/axios'
-import type { AdminBusiness, AdminBusinessType, AdminBusinessVertical, AdminMembership, AdminPasswordReset, AdminStats, PaginatedResponse, SingleResponse } from '../types'
+import type { AdminBusiness, AdminBusinessType, AdminBusinessVertical, AdminMembership, AdminPasswordReset, AdminStats, AdminTransactionResetPreview, AdminTransactionResetResult, PaginatedResponse, SingleResponse } from '../types'
 
 export interface BusinessParams {
   page?: number
@@ -95,6 +95,12 @@ export const getBusinessVerticals = (businessTypeId: number): Promise<SingleResp
 
 export const deleteBusiness = (id: string): Promise<SingleResponse<null>> =>
   axios.delete(`/admin/businesses/${id}`).then((r) => r.data)
+
+export const getTransactionResetPreview = (businessId: string): Promise<SingleResponse<AdminTransactionResetPreview>> =>
+  axios.get(`/admin/businesses/${businessId}/transactions/reset-preview`).then((r) => r.data)
+
+export const resetTransactions = (businessId: string, confirmation: string): Promise<SingleResponse<AdminTransactionResetResult>> =>
+  axios.delete(`/admin/businesses/${businessId}/transactions`, { data: { confirmation } }).then((r) => r.data)
 
 export const getMemberships = (params: BusinessParams = {}): Promise<PaginatedResponse<AdminMembership>> =>
   axios.get('/admin/memberships', { params }).then((r) => r.data)
