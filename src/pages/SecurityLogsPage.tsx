@@ -5,6 +5,7 @@ const ACTION_LABELS: Record<string, string> = {
   request_forgot_password: 'Minta OTP (Web)',
   mobile_request_forgot_password: 'Minta OTP (Mobile)',
   reset_password: 'Reset Password',
+  admin_reset_password: 'Reset Password oleh Admin',
 }
 
 const ACTION_OPTIONS = [
@@ -12,6 +13,7 @@ const ACTION_OPTIONS = [
   { value: 'request_forgot_password', label: 'Minta OTP (Web)' },
   { value: 'mobile_request_forgot_password', label: 'Minta OTP (Mobile)' },
   { value: 'reset_password', label: 'Reset Password' },
+  { value: 'admin_reset_password', label: 'Reset Password oleh Admin' },
 ]
 
 const STATUS_OPTIONS = [
