@@ -35,6 +35,21 @@ const VERTICALS = [
   { value: 'PERCETAKAN', label: 'Percetakan & Fotokopi' },
 ]
 
+/** Golongan obat menurut Permenkes — kembaran entity.DrugClass di server;
+ *  keduanya harus berubah bersamaan. Kosong berarti "bukan obat", dan itulah
+ *  mayoritas isi rak apotek: popok, susu, alat kesehatan. */
+const DRUG_CLASSES = [
+  { value: '', label: 'Bukan obat' },
+  { value: 'BEBAS', label: 'Obat Bebas' },
+  { value: 'BEBAS_TERBATAS', label: 'Obat Bebas Terbatas' },
+  { value: 'KERAS', label: 'Obat Keras' },
+  { value: 'PSIKOTROPIKA', label: 'Psikotropika' },
+  { value: 'NARKOTIKA', label: 'Narkotika' },
+]
+
+const drugClassLabel = (code: string | null) =>
+  DRUG_CLASSES.find((d) => d.value === (code ?? ''))?.label ?? code
+
 const verticalLabel = (code: string) =>
   VERTICALS.find((v) => v.value === code)?.label ?? code
 
@@ -47,6 +62,9 @@ const EMPTY_FORM: MasterProductPayload = {
   suggested_sell_price: null,
   vertical_code: 'MINIMARKET',
   is_weight_based: false,
+  drug_class: '',
+  active_ingredient: '',
+  bpom_registration: '',
   is_active: true,
 }
 
@@ -122,6 +140,9 @@ export default function MasterProductsPage() {
       suggested_sell_price: item.suggested_sell_price,
       vertical_code: item.vertical_code,
       is_weight_based: item.is_weight_based,
+      drug_class: item.drug_class ?? '',
+      active_ingredient: item.active_ingredient ?? '',
+      bpom_registration: item.bpom_registration ?? '',
       is_active: item.is_active,
     })
     setFormOpen(true)
@@ -270,17 +291,34 @@ export default function MasterProductsPage() {
                 items.map((item) => (
                   <tr key={item.id} className="hover:bg-slate-50 transition-colors">
                     <td className="px-4 py-3">
-                      <div className="font-medium text-slate-700 capitalize">{item.name}</div>
-                      <div className="flex gap-1.5 mt-0.5">
-                        {item.brand_name && (
-                          <span className="text-xs text-slate-400 capitalize">{item.brand_name}</span>
-                        )}
-                        {item.is_weight_based && (
-                          <span className="text-xs text-amber-600">kiloan</span>
-                        )}
-                        {!item.is_active && (
-                          <span className="text-xs text-rose-600">nonaktif</span>
-                        )}
+                      <div className="flex items-center gap-2.5">
+                        {/* Foto ditampilkan justru supaya bisa DIKURASI: sejak panen ikut
+                            membawa foto, gambar yang salah atau tidak pantas dari satu toko
+                            akan terbit di katalog seluruh toko sampai ada yang melihatnya di sini. */}
+                        <span className="shrink-0 w-9 h-9 rounded-lg bg-slate-100 overflow-hidden flex items-center justify-center">
+                          {item.image ? (
+                            <img src={item.image} alt="" loading="lazy" className="w-full h-full object-cover" />
+                          ) : (
+                            <span className="text-[10px] text-slate-300">foto</span>
+                          )}
+                        </span>
+                        <div>
+                          <div className="font-medium text-slate-700 capitalize">{item.name}</div>
+                          <div className="flex gap-1.5 mt-0.5">
+                            {item.brand_name && (
+                              <span className="text-xs text-slate-400 capitalize">{item.brand_name}</span>
+                            )}
+                            {item.is_weight_based && (
+                              <span className="text-xs text-amber-600">kiloan</span>
+                            )}
+                            {item.drug_class && (
+                              <span className="text-xs text-rose-600">{drugClassLabel(item.drug_class)}</span>
+                            )}
+                            {!item.is_active && (
+                              <span className="text-xs text-rose-600">nonaktif</span>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     </td>
                     <td className="px-4 py-3 font-mono text-xs text-slate-600">
@@ -405,6 +443,38 @@ export default function MasterProductsPage() {
               />
             </Field>
           </div>
+          {/* Kolom apotek. Sengaja ada di panel kurasi: panen mendiamkan golongan
+              obat yang diperselisihkan toko-tokonya, dan yang didiamkan itu
+              hanya bisa diselesaikan manusia yang memeriksa kemasannya. */}
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Golongan obat" hint="Kosongkan bila barang ini bukan obat.">
+              <select
+                value={form.drug_class ?? ''}
+                onChange={(e) => setForm((f) => ({ ...f, drug_class: e.target.value }))}
+                className={inputClass}
+              >
+                {DRUG_CLASSES.map((d) => (
+                  <option key={d.value} value={d.value}>{d.label}</option>
+                ))}
+              </select>
+            </Field>
+            <Field label="Zat aktif">
+              <input
+                value={form.active_ingredient ?? ''}
+                onChange={(e) => setForm((f) => ({ ...f, active_ingredient: e.target.value }))}
+                className={inputClass}
+                placeholder="paracetamol"
+              />
+            </Field>
+          </div>
+          <Field label="Nomor izin edar (BPOM)">
+            <input
+              value={form.bpom_registration ?? ''}
+              onChange={(e) => setForm((f) => ({ ...f, bpom_registration: e.target.value }))}
+              className={inputClass}
+              placeholder="DKL1234567890A1"
+            />
+          </Field>
           <Field label="Sub-jenis usaha">
             <select
               value={form.vertical_code}

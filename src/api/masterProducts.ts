@@ -21,6 +21,14 @@ export interface MasterProduct {
   source_business_count: number
   vertical_code: string
   is_weight_based: boolean
+  /** Kolom apotek. Panen hanya mengisinya bila SELURUH toko penyumbang yang
+   *  mengisinya sepakat: golongan obat memutuskan boleh-tidaknya sebuah obat
+   *  diserahkan tanpa resep, jadi satu salah ketik tidak boleh cukup untuk
+   *  menurunkan obat keras menjadi obat bebas di rak apotek lain. Yang
+   *  diperselisihkan dibiarkan kosong dan diisi lewat kurasi di sini. */
+  drug_class: string | null
+  active_ingredient: string | null
+  bpom_registration: string | null
   /** Baris terverifikasi tidak pernah ditimpa oleh panen berikutnya. */
   is_verified: boolean
   is_active: boolean
@@ -46,6 +54,9 @@ export interface MasterProductPayload {
   suggested_sell_price?: number | null
   vertical_code: string
   is_weight_based: boolean
+  drug_class?: string | null
+  active_ingredient?: string | null
+  bpom_registration?: string | null
   is_active?: boolean
 }
 
