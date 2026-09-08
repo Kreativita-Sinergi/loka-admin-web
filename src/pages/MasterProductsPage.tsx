@@ -3,6 +3,8 @@ import Modal from '../components/ui/Modal'
 import Pagination from '../components/ui/Pagination'
 import {
   createMasterProduct,
+  getPendingMasterProductCount,
+  publishMasterProducts,
   deleteMasterProduct,
   getMasterProducts,
   harvestMasterProducts,
@@ -93,6 +95,12 @@ export default function MasterProductsPage() {
   const [form, setForm] = useState<MasterProductPayload>(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
   const [harvesting, setHarvesting] = useState(false)
+  const [publishing, setPublishing] = useState(false)
+  // Jumlah baris yang menunggu tinjau. Panen melahirkan baris dalam keadaan
+  // PADAM — tanpa angka ini, satu-satunya cara tahu ada yang menunggu adalah
+  // menyaringnya sendiri, dan yang tidak pernah dilihat tidak akan pernah
+  // terbit.
+  const [pending, setPending] = useState(0)
 
   // reloadToken memaksa pemuatan ulang setelah simpan/hapus/panen. Pemuatannya
   // ada DI DALAM effect, bukan di fungsi yang dipanggil effect: memanggil
@@ -122,6 +130,18 @@ export default function MasterProductsPage() {
       active = false
     }
   }, [params, reloadToken])
+
+  useEffect(() => {
+    let active = true
+    getPendingMasterProductCount(params.vertical || undefined)
+      .then((res) => {
+        if (active) setPending(res.data?.pending ?? 0)
+      })
+      .catch(() => undefined)
+    return () => {
+      active = false
+    }
+  }, [params.vertical, reloadToken])
 
   const openCreate = () => {
     setEditing(null)
@@ -183,13 +203,54 @@ export default function MasterProductsPage() {
     }
   }
 
+  /** Menerbitkan baris yang sedang tampil.
+   *
+   *  Sengaja "yang tampil", bukan "semua yang menunggu": penerbitan borongan
+   *  tanpa batas berarti menyetujui ribuan baris yang tidak pernah muncul di
+   *  layar siapa pun — persis kebalikan dari gunanya gerbang ini. */
+  const publishVisible = async () => {
+    const ids = items.filter((i) => !i.is_active).map((i) => i.id)
+    if (ids.length === 0) return
+    if (
+      !window.confirm(
+        `Terbitkan ${ids.length} baris yang tampil? Setelah terbit, isinya — termasuk fotonya — terlihat oleh semua toko.`
+      )
+    ) {
+      return
+    }
+    setPublishing(true)
+    setError('')
+    setNotice('')
+    try {
+      const res = await publishMasterProducts(ids)
+      setNotice(`${res.data.published} baris diterbitkan.`)
+      reload()
+    } catch (err) {
+      setError(errorMessage(err, 'Gagal menerbitkan.'))
+    } finally {
+      setPublishing(false)
+    }
+  }
+
+  const publishOne = async (item: MasterProduct) => {
+    try {
+      await publishMasterProducts([item.id])
+      setNotice(`"${item.name}" diterbitkan.`)
+      reload()
+    } catch (err) {
+      setError(errorMessage(err, 'Gagal menerbitkan.'))
+    }
+  }
+
   const harvest = async () => {
     setHarvesting(true)
     setError('')
     setNotice('')
     try {
       const res = await harvestMasterProducts()
-      setNotice(`Panen selesai — ${res.data.affected} baris katalog diperbarui.`)
+      setNotice(
+        `Panen selesai — ${res.data.affected} baris katalog diperbarui. Baris baru MENUNGGU TINJAU dan belum terlihat toko mana pun sampai diterbitkan.`
+      )
       reload()
     } catch (err) {
       setError(errorMessage(err, 'Panen gagal.'))
@@ -206,11 +267,22 @@ export default function MasterProductsPage() {
           <p className="text-sm text-slate-500 mt-1 max-w-2xl">
             Isian yang dipakai toko baru agar tidak perlu mengetik ulang rak yang isinya sama dengan
             ribuan toko lain. Panen mengagregasi produk seluruh toko per barcode; barang tanpa
-            barcode — beras curah, telur kiloan, gorengan — hanya bisa masuk lewat tombol Tambah
-            di bawah.
+            barcode — beras curah, telur kiloan, gorengan — disatukan lewat namanya di dalam satu
+            sub-jenis usaha. Baris hasil panen MENUNGGU TINJAU: ia belum terlihat toko mana pun
+            sampai diterbitkan dari sini, karena foto yang ikut terpanen berasal dari toko lain.
           </p>
         </div>
         <div className="flex gap-2 shrink-0">
+          {pending > 0 && (
+            <button
+              onClick={publishVisible}
+              disabled={publishing || items.every((i) => i.is_active)}
+              className="px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 disabled:opacity-50"
+              title="Menerbitkan baris yang sedang tampil di layar ini"
+            >
+              {publishing ? 'Menerbitkan…' : `Terbitkan yang tampil (${pending} menunggu)`}
+            </button>
+          )}
           <button
             onClick={harvest}
             disabled={harvesting}
@@ -248,6 +320,17 @@ export default function MasterProductsPage() {
           placeholder="Cari nama barang…"
           className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
+        <select
+          value={params.sort_by ?? ''}
+          onChange={(e) => {
+            setLoading(true)
+            setParams((p) => ({ ...p, sort_by: e.target.value, page: 1 }))
+          }}
+          className="border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        >
+          <option value="">Semua status</option>
+          <option value="pending">Menunggu tinjau</option>
+        </select>
         <select
           value={params.vertical ?? ''}
           onChange={(e) => {
@@ -315,7 +398,7 @@ export default function MasterProductsPage() {
                               <span className="text-xs text-rose-600">{drugClassLabel(item.drug_class)}</span>
                             )}
                             {!item.is_active && (
-                              <span className="text-xs text-rose-600">nonaktif</span>
+                              <span className="text-xs text-amber-600">menunggu tinjau</span>
                             )}
                           </div>
                         </div>
@@ -346,6 +429,14 @@ export default function MasterProductsPage() {
                       )}
                     </td>
                     <td className="px-4 py-3 text-right whitespace-nowrap">
+                      {!item.is_active && (
+                        <button
+                          onClick={() => publishOne(item)}
+                          className="text-emerald-600 hover:text-emerald-800 text-sm mr-3"
+                        >
+                          Terbitkan
+                        </button>
+                      )}
                       <button
                         onClick={() => openEdit(item)}
                         className="text-indigo-600 hover:text-indigo-800 text-sm mr-3"

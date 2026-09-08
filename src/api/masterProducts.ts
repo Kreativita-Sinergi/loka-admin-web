@@ -42,6 +42,10 @@ export interface MasterProductParams {
   limit?: number
   search?: string
   vertical?: string
+  /** "pending" menyaring baris yang belum diterbitkan. Dikirim lewat `sort_by`
+   *  karena Pagination di server dipakai belasan layar lain — lihat catatan di
+   *  FindWithPagination. */
+  sort_by?: string
 }
 
 export interface MasterProductPayload {
@@ -64,6 +68,23 @@ export const getMasterProducts = (
   params: MasterProductParams = {}
 ): Promise<PaginatedResponse<MasterProduct>> =>
   axios.get('/admin/master-products', { params }).then((r) => r.data)
+
+/** Menerbitkan baris hasil panen.
+ *
+ *  Panen sengaja melahirkan baris dalam keadaan PADAM: sejak ia ikut membawa
+ *  foto, satu gambar yang salah dari sebuah toko akan terbit ke seluruh toko
+ *  sekaligus. Inilah satu-satunya pintu yang membuatnya terlihat. */
+export const publishMasterProducts = (
+  ids: string[]
+): Promise<SingleResponse<{ published: number }>> =>
+  axios.post('/admin/master-products/publish', { ids }).then((r) => r.data)
+
+export const getPendingMasterProductCount = (
+  vertical?: string
+): Promise<SingleResponse<{ pending: number }>> =>
+  axios
+    .get('/admin/master-products/pending', { params: { vertical } })
+    .then((r) => r.data)
 
 export const createMasterProduct = (
   data: MasterProductPayload
