@@ -109,6 +109,14 @@ export const downloadBusinessCatalogCandidates = (businessId: string) =>
     .get(`/admin/master-products/from-business/${businessId}`, { responseType: 'blob' })
     .then((r) => r.data as Blob)
 
+/** Memuat daftar awal bawaan (267 barang kelontong + apotek) ke katalog.
+ *
+ *  Ada supaya mengisi katalog tidak menuntut siapa pun mengunduh berkas dari
+ *  repositori lebih dulu. Aman ditekan berkali-kali: impor memakai upsert. */
+export const loadStarterCatalog = (): Promise<
+  SingleResponse<{ total: number; success: number; failed: number }>
+> => axios.post('/admin/master-products/starter').then((r) => r.data)
+
 export const masterProductTemplateUrl = '/admin/master-products/import/template'
 
 export const createMasterProduct = (

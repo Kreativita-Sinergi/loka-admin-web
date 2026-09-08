@@ -7,6 +7,7 @@ import {
   createMasterProduct,
   downloadBusinessCatalogCandidates,
   importMasterProducts,
+  loadStarterCatalog,
   getPendingMasterProductCount,
   publishMasterProducts,
   deleteMasterProduct,
@@ -101,6 +102,7 @@ export default function MasterProductsPage() {
   const [harvesting, setHarvesting] = useState(false)
   const [publishing, setPublishing] = useState(false)
   const [importing, setImporting] = useState(false)
+  const [seeding, setSeeding] = useState(false)
   // Daftar toko untuk mengambil kandidat katalog. Panen tidak akan pernah
   // menolong toko yang sudah mendata 350 barang sendirian — ia menuntut TIGA
   // toko mengeja barang yang sama persis, dan setiap toko mengetik dengan
@@ -315,6 +317,36 @@ export default function MasterProductsPage() {
     }
   }
 
+  /** Memuat daftar awal bawaan.
+   *
+   *  Panen TIDAK akan pernah mengisi rak sembako: ia menuntut tiga toko mengeja
+   *  barang yang sama persis, dan 2.466 produk di 115 toko hanya menghasilkan
+   *  17 nama yang mencapainya. Tombol inilah yang benar-benar mengisi katalog. */
+  const seedStarter = async () => {
+    if (
+      !window.confirm(
+        'Muat 267 barang bawaan (kelontong + apotek) ke katalog? Nama, kategori, dan satuan diisi; harga dikosongkan karena tiap toko menentukan sendiri. Aman diulang.'
+      )
+    ) {
+      return
+    }
+    setSeeding(true)
+    setError('')
+    setNotice('')
+    try {
+      const res = await loadStarterCatalog()
+      const { total, success, failed } = res.data
+      setNotice(
+        `Daftar awal dimuat — ${success} dari ${total} barang masuk${failed > 0 ? `, ${failed} gagal` : ''}. Barang kurasi langsung aktif, tidak menunggu tinjau.`
+      )
+      reload()
+    } catch (err) {
+      setError(errorMessage(err, 'Gagal memuat daftar awal.'))
+    } finally {
+      setSeeding(false)
+    }
+  }
+
   const harvest = async () => {
     setHarvesting(true)
     setError('')
@@ -369,6 +401,14 @@ export default function MasterProductsPage() {
               if (file) void importFile(file)
             }}
           />
+          <button
+            onClick={seedStarter}
+            disabled={seeding}
+            className="px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 disabled:opacity-50"
+            title="Mengisi katalog dengan 267 barang kelontong dan apotek bawaan"
+          >
+            {seeding ? 'Memuat…' : '✨ Muat daftar awal'}
+          </button>
           <button
             onClick={() => fileRef.current?.click()}
             disabled={importing}
