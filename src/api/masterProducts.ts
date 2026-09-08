@@ -86,6 +86,23 @@ export const getPendingMasterProductCount = (
     .get('/admin/master-products/pending', { params: { vertical } })
     .then((r) => r.data)
 
+/** Mengunggah berkas katalog kurasi.
+ *
+ *  Jalur kedua di samping panen: panen hanya menyatukan barang yang dieja SAMA
+ *  PERSIS oleh tiga toko, dan pada data nyata barang sembako hampir tidak pernah
+ *  dieja sama — gula tercatat di 11 toko dengan sembilan ejaan berbeda. */
+export const importMasterProducts = (
+  file: File
+): Promise<SingleResponse<{ total: number; success: number; failed: number; errors: { row: number; product: string; message: string }[] }>> => {
+  const form = new FormData()
+  form.append('file', file)
+  return axios
+    .post('/admin/master-products/import', form)
+    .then((r) => r.data)
+}
+
+export const masterProductTemplateUrl = '/admin/master-products/import/template'
+
 export const createMasterProduct = (
   data: MasterProductPayload
 ): Promise<SingleResponse<MasterProduct>> =>

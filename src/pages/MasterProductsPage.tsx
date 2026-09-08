@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Modal from '../components/ui/Modal'
 import Pagination from '../components/ui/Pagination'
 import {
   createMasterProduct,
+  importMasterProducts,
   getPendingMasterProductCount,
   publishMasterProducts,
   deleteMasterProduct,
@@ -96,6 +97,8 @@ export default function MasterProductsPage() {
   const [saving, setSaving] = useState(false)
   const [harvesting, setHarvesting] = useState(false)
   const [publishing, setPublishing] = useState(false)
+  const [importing, setImporting] = useState(false)
+  const fileRef = useRef<HTMLInputElement>(null)
   // Jumlah baris yang menunggu tinjau. Panen melahirkan baris dalam keadaan
   // PADAM — tanpa angka ini, satu-satunya cara tahu ada yang menunggu adalah
   // menyaringnya sendiri, dan yang tidak pernah dilihat tidak akan pernah
@@ -242,6 +245,32 @@ export default function MasterProductsPage() {
     }
   }
 
+  /** Mengunggah berkas katalog.
+   *
+   *  Baris kurasi masuk langsung dalam keadaan aktif — gerbang tinjau melindungi
+   *  dari foto dan nama milik toko lain, sedangkan berkas ini diketik admin
+   *  sendiri. Menahannya di belakang gerbang hanya menyuruh orang menyetujui
+   *  pekerjaannya sendiri. */
+  const importFile = async (file: File) => {
+    setImporting(true)
+    setError('')
+    setNotice('')
+    try {
+      const res = await importMasterProducts(file)
+      const { total, success, failed, errors } = res.data
+      setNotice(
+        `Impor selesai — ${success} dari ${total} baris masuk${failed > 0 ? `, ${failed} gagal` : ''}.` +
+          (errors?.length ? ` Baris pertama yang gagal: ${errors[0].row} — ${errors[0].message}` : '')
+      )
+      reload()
+    } catch (err) {
+      setError(errorMessage(err, 'Impor gagal.'))
+    } finally {
+      setImporting(false)
+      if (fileRef.current) fileRef.current.value = ''
+    }
+  }
+
   const harvest = async () => {
     setHarvesting(true)
     setError('')
@@ -268,7 +297,10 @@ export default function MasterProductsPage() {
             Isian yang dipakai toko baru agar tidak perlu mengetik ulang rak yang isinya sama dengan
             ribuan toko lain. Panen mengagregasi produk seluruh toko per barcode; barang tanpa
             barcode — beras curah, telur kiloan, gorengan — disatukan lewat namanya di dalam satu
-            sub-jenis usaha. Baris hasil panen MENUNGGU TINJAU: ia belum terlihat toko mana pun
+            sub-jenis usaha — tetapi hanya bila TIGA toko mengejanya sama persis, dan barang
+            sembako hampir tidak pernah dieja sama. Karena itu ada Impor CSV: daftar baku yang
+            diketik sekali, masuk sebagai kurasi, dan tidak pernah ditimpa panen. Baris hasil
+            panen MENUNGGU TINJAU: ia belum terlihat toko mana pun
             sampai diterbitkan dari sini, karena foto yang ikut terpanen berasal dari toko lain.
           </p>
         </div>
@@ -283,6 +315,24 @@ export default function MasterProductsPage() {
               {publishing ? 'Menerbitkan…' : `Terbitkan yang tampil (${pending} menunggu)`}
             </button>
           )}
+          <input
+            ref={fileRef}
+            type="file"
+            accept=".csv,text/csv"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0]
+              if (file) void importFile(file)
+            }}
+          />
+          <button
+            onClick={() => fileRef.current?.click()}
+            disabled={importing}
+            className="px-4 py-2 border border-slate-200 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-100 disabled:opacity-50"
+            title="Unggah berkas CSV berisi daftar barang baku"
+          >
+            {importing ? 'Mengimpor…' : '⬆️ Impor CSV'}
+          </button>
           <button
             onClick={harvest}
             disabled={harvesting}
