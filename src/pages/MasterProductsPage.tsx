@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Modal from '../components/ui/Modal'
 import Pagination from '../components/ui/Pagination'
+import { getBusinesses } from '../api/admin'
+import type { AdminBusiness } from '../types'
 import {
   createMasterProduct,
+  downloadBusinessCatalogCandidates,
   importMasterProducts,
   getPendingMasterProductCount,
   publishMasterProducts,
@@ -98,6 +101,12 @@ export default function MasterProductsPage() {
   const [harvesting, setHarvesting] = useState(false)
   const [publishing, setPublishing] = useState(false)
   const [importing, setImporting] = useState(false)
+  // Daftar toko untuk mengambil kandidat katalog. Panen tidak akan pernah
+  // menolong toko yang sudah mendata 350 barang sendirian — ia menuntut TIGA
+  // toko mengeja barang yang sama persis, dan setiap toko mengetik dengan
+  // caranya sendiri.
+  const [businesses, setBusinesses] = useState<AdminBusiness[]>([])
+  const [sourceBusiness, setSourceBusiness] = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
   // Jumlah baris yang menunggu tinjau. Panen melahirkan baris dalam keadaan
   // PADAM — tanpa angka ini, satu-satunya cara tahu ada yang menunggu adalah
@@ -145,6 +154,41 @@ export default function MasterProductsPage() {
       active = false
     }
   }, [params.vertical, reloadToken])
+
+  useEffect(() => {
+    let active = true
+    getBusinesses({ page: 1, limit: 200 })
+      .then((res) => {
+        if (active) setBusinesses(res.data ?? [])
+      })
+      .catch(() => undefined)
+    return () => {
+      active = false
+    }
+  }, [])
+
+  /** Mengunduh daftar barang sebuah toko sebagai berkas kandidat.
+   *
+   *  Sengaja lewat berkas, bukan salin langsung: nama barang di sebuah toko
+   *  sering singkatan internalnya ("es er ce", "malboro hitam 16"), dan
+   *  menyalinnya bulat-bulat berarti menerbitkan salah ketik satu toko sebagai
+   *  nama baku bagi semua toko. */
+  const downloadCandidates = async () => {
+    if (!sourceBusiness) return
+    try {
+      const blob = await downloadBusinessCatalogCandidates(sourceBusiness)
+      const nama = businesses.find((b) => b.id === sourceBusiness)?.business_name ?? 'toko'
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `kandidat-katalog-${nama.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.csv`
+      a.click()
+      URL.revokeObjectURL(url)
+      setNotice(`Daftar barang "${nama}" diunduh. Rapikan namanya dulu, lalu unggah lewat Impor CSV.`)
+    } catch (err) {
+      setError(errorMessage(err, 'Gagal mengunduh daftar toko.'))
+    }
+  }
 
   const openCreate = () => {
     setEditing(null)
@@ -359,6 +403,36 @@ export default function MasterProductsPage() {
           {error}
         </div>
       )}
+
+      {/* Ambil dari toko: jalan keluar untuk yang tidak bisa diperbaiki panen —
+          toko yang sudah mendata ratusan barang sendirian tetap tidak menyumbang
+          apa pun, karena panen menuntut tiga toko mengeja barang yang sama. */}
+      <div className="flex flex-col sm:flex-row gap-3 items-start bg-slate-50 border border-slate-200 rounded-lg p-3">
+        <div className="flex-1">
+          <p className="text-sm font-medium text-slate-700">Ambil daftar dari satu toko</p>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Mengunduh nama, barcode, kategori, dan satuan milik toko itu — tanpa harga dan tanpa
+            foto. Rapikan namanya di spreadsheet, lalu unggah lewat Impor CSV.
+          </p>
+        </div>
+        <select
+          value={sourceBusiness}
+          onChange={(e) => setSourceBusiness(e.target.value)}
+          className="border border-slate-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 min-w-56"
+        >
+          <option value="">Pilih toko…</option>
+          {businesses.map((b) => (
+            <option key={b.id} value={b.id}>{b.business_name}</option>
+          ))}
+        </select>
+        <button
+          onClick={downloadCandidates}
+          disabled={!sourceBusiness}
+          className="px-4 py-2 border border-slate-200 bg-white text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-100 disabled:opacity-50"
+        >
+          Unduh CSV
+        </button>
+      </div>
 
       <div className="flex flex-col sm:flex-row gap-3">
         <input

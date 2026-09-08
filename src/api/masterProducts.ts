@@ -101,6 +101,14 @@ export const importMasterProducts = (
     .then((r) => r.data)
 }
 
+/** Mengunduh daftar barang satu toko sebagai kandidat katalog (tanpa harga,
+ *  tanpa foto). Untuk DIBACA dan dirapikan dulu, lalu diunggah lewat impor:
+ *  nama barang di sebuah toko sering singkatan internalnya sendiri. */
+export const downloadBusinessCatalogCandidates = (businessId: string) =>
+  axios
+    .get(`/admin/master-products/from-business/${businessId}`, { responseType: 'blob' })
+    .then((r) => r.data as Blob)
+
 export const masterProductTemplateUrl = '/admin/master-products/import/template'
 
 export const createMasterProduct = (
