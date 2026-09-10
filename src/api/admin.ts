@@ -124,7 +124,10 @@ export const deactivateMembership = (id: string): Promise<SingleResponse<null>> 
 export const processDowngrades = (): Promise<SingleResponse<null>> =>
   axios.post('/admin/memberships/process-downgrades').then((r) => r.data)
 
-export const loginAdmin = (username: string, password: string): Promise<{ token: string }> =>
+export const loginAdmin = (
+  username: string,
+  password: string,
+): Promise<{ token: string; expires_at?: string }> =>
   axios.post('/admin/login', { username, password }).then((r) => r.data.data)
 
 export interface NotifyPayload {

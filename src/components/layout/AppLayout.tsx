@@ -4,7 +4,7 @@ import Sidebar from './Sidebar'
 import { useAuthStore } from '../../store/authStore'
 
 export default function AppLayout() {
-  const apiKey = useAuthStore((s) => s.apiKey)
+  const token = useAuthStore((s) => s.activeToken())
   const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
@@ -14,7 +14,7 @@ export default function AppLayout() {
     return () => { document.body.style.overflow = previousOverflow }
   }, [menuOpen])
 
-  if (!apiKey) return <Navigate to="/login" replace />
+  if (!token) return <Navigate to="/login" replace />
 
   return (
     <div className="min-h-screen bg-slate-50">

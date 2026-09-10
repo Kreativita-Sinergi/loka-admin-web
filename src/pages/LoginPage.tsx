@@ -17,8 +17,11 @@ export default function LoginPage() {
     setLoading(true)
     setError('')
     try {
-      const { token } = await loginAdmin(username.trim(), password.trim())
-      login(token)
+      const { token, expires_at: expiresAt } = await loginAdmin(
+        username.trim(),
+        password.trim(),
+      )
+      login(token, expiresAt ?? null)
       navigate('/')
     } catch {
       setError('Username atau password salah.')

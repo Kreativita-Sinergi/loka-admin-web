@@ -10,9 +10,11 @@ const instance = axios.create({
 })
 
 instance.interceptors.request.use((config) => {
-  const key = useAuthStore.getState().apiKey
-  if (key) {
-    config.headers['X-Admin-Key'] = key
+  // Token sesi, bukan kunci permanen: dikirim sebagai Bearer seperti token
+  // pada umumnya, dan berhenti dikirim begitu masa berlakunya lewat.
+  const token = useAuthStore.getState().activeToken()
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
   }
   return config
 })
