@@ -158,7 +158,7 @@ export default function BusinessesPage() {
         <form onSubmit={handleSearch} className="flex gap-2 flex-1 min-w-0 sm:min-w-60">
           <input
             type="text"
-            placeholder="Cari nama bisnis atau pemilik..."
+            placeholder="Cari nama bisnis, pemilik, nama/email pengguna..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             className="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -223,6 +223,13 @@ export default function BusinessesPage() {
                     </td>
                     <td className="px-4 py-3">
                       <p className="text-slate-700">{b.owner_name}</p>
+                      {/* Email ikut ditampilkan sejak pencarian bisa memakainya:
+                          hasil yang cocok lewat email tetapi tidak menunjukkan
+                          email mana pun membuat admin menebak kenapa baris ini
+                          muncul. */}
+                      {b.owner?.email && (
+                        <p className="text-xs text-slate-500 break-all">{b.owner.email}</p>
+                      )}
                       {b.owner?.phone_number && (
                         <p className="text-xs text-slate-400">{b.owner.phone_number}</p>
                       )}
