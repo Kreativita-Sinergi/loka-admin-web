@@ -143,25 +143,27 @@ export default function UsagePage() {
 
       <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
         <div className="px-5 py-4 border-b border-slate-200">
-          <h3 className="text-sm font-semibold text-slate-700">Aktivitas per Bisnis</h3>
+          <h3 className="text-sm font-semibold text-slate-700">Aktivitas per Bisnis <span className="font-normal text-slate-400">({rows.length})</span></h3>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm whitespace-nowrap">
             <thead>
               <tr className="text-left text-slate-500 border-b border-slate-200">
-                <th className="px-5 py-3 font-medium">Bisnis</th>
-                <th className="px-5 py-3 font-medium">Paket</th>
-                <th className="px-5 py-3 font-medium text-right">Transaksi (7 Hari)</th>
-                <th className="px-5 py-3 font-medium text-right">Jam Pakai (7 Hari)</th>
-                <th className="px-5 py-3 font-medium text-right">Data</th>
-                <th className="px-5 py-3 font-medium">Terakhir Aktif</th>
-                <th className="px-5 py-3 font-medium">Daftar</th>
+                <th className="px-4 py-2.5 font-medium align-bottom">Bisnis</th>
+                <th className="px-4 py-2.5 font-medium align-bottom">Paket</th>
+                <th className="px-4 py-2.5 font-medium align-bottom text-right">Transaksi<br /><span className="text-xs font-normal text-slate-400">7 hari</span></th>
+                <th className="px-4 py-2.5 font-medium align-bottom text-right">User Aktif<br /><span className="text-xs font-normal text-slate-400">24j / 7h</span></th>
+                <th className="px-4 py-2.5 font-medium align-bottom text-right">Jam Pakai<br /><span className="text-xs font-normal text-slate-400">24j / 7h</span></th>
+                <th className="px-4 py-2.5 font-medium align-bottom text-right">API Calls<br /><span className="text-xs font-normal text-slate-400">24j / 7h</span></th>
+                <th className="px-4 py-2.5 font-medium align-bottom text-right">Data</th>
+                <th className="px-4 py-2.5 font-medium align-bottom">Terakhir Aktif</th>
+                <th className="px-4 py-2.5 font-medium align-bottom">Daftar</th>
               </tr>
             </thead>
             <tbody>
               {rows.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-5 py-8 text-center text-slate-400">
+                  <td colSpan={9} className="px-5 py-8 text-center text-slate-400">
                     Belum ada data aktivitas
                   </td>
                 </tr>
@@ -173,7 +175,7 @@ export default function UsagePage() {
                     className="border-b border-slate-100 last:border-0 hover:bg-indigo-50/50 cursor-pointer transition-colors"
                     title={`Lihat detail ${b.business_name}`}
                   >
-                    <td className="px-5 py-3 font-medium text-slate-800">
+                    <td className="px-4 py-2 font-medium text-slate-800">
                       <span className="hover:text-indigo-600 hover:underline underline-offset-2">{b.business_name}</span>
                       {/* Jumlah pengguna dipindah ke sini sebagai keterangan
                           kecil: hampir seluruh tenant hanya punya satu, jadi
@@ -184,10 +186,10 @@ export default function UsagePage() {
                         <span className="ml-2 text-xs text-slate-400">{b.total_users} user</span>
                       )}
                     </td>
-                    <td className="px-5 py-3">
+                    <td className="px-4 py-2">
                       <PlanBadge plan={b.plan} />
                     </td>
-                    <td className="px-5 py-3 text-right">
+                    <td className="px-4 py-2 text-right">
                       {/* Ukuran yang menjawab pertanyaan sebenarnya: bisnis ini
                           masih berjualan atau tidak. Jam pemakaian hanya
                           menghitung lama aplikasi dibuka. */}
@@ -195,14 +197,30 @@ export default function UsagePage() {
                         {(b.trx_this_week ?? 0).toLocaleString('id-ID')}
                       </span>
                     </td>
-                    <td className="px-5 py-3 text-right text-slate-600">
+                    <td className="px-4 py-2 text-right text-slate-600 whitespace-nowrap">
+                      <span className={b.active_today > 0 ? 'text-slate-800 font-medium' : 'text-slate-400'}>{b.active_today ?? 0}</span>
+                      <span className="text-slate-300"> / </span>
+                      {b.active_this_week ?? 0}
+                    </td>
+                    <td className="px-4 py-2 text-right text-slate-600 whitespace-nowrap">
+                      <span className={b.hours_today > 0 ? 'text-slate-800 font-medium' : 'text-slate-400'}>
+                        {b.hours_today > 0 ? fmtHours(b.hours_today) : '—'}
+                      </span>
+                      <span className="text-slate-300"> / </span>
                       {b.hours_this_week > 0 ? fmtHours(b.hours_this_week) : '—'}
                     </td>
-                    <td className="px-5 py-3 text-right text-slate-500">
+                    <td className="px-4 py-2 text-right text-slate-600 whitespace-nowrap">
+                      <span className={(b.api_calls_today ?? 0) > 0 ? 'text-slate-800 font-medium' : 'text-slate-400'}>
+                        {(b.api_calls_today ?? 0).toLocaleString('id-ID')}
+                      </span>
+                      <span className="text-slate-300"> / </span>
+                      {(b.api_calls_this_week ?? 0).toLocaleString('id-ID')}
+                    </td>
+                    <td className="px-4 py-2 text-right text-slate-500">
                       {(b.record_count ?? 0).toLocaleString('id-ID')}
                     </td>
-                    <td className="px-5 py-3 text-slate-500">{lastSeenLabel(b.last_seen_at)}</td>
-                    <td className="px-5 py-3 text-slate-500">{signupLabel(b.created_at)}</td>
+                    <td className="px-4 py-2 text-slate-500">{lastSeenLabel(b.last_seen_at)}</td>
+                    <td className="px-4 py-2 text-slate-500">{signupLabel(b.created_at)}</td>
                   </tr>
                 ))
               )}
