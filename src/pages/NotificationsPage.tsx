@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import {
-  sendEmail, sendPush, getNotificationLogs, getNotificationStats,
+  sendEmail, sendPush, uploadNotificationImage, getNotificationLogs, getNotificationStats,
   type NotifyResult, type NotificationLog, type NotificationStats,
 } from '../api/admin'
 import RecipientPicker from '../components/ui/RecipientPicker'
@@ -57,27 +57,27 @@ const PUSH_TEMPLATES = [
     label: 'Minta Feedback',
     icon: '💬',
     activeColor: 'bg-emerald-600 text-white border-emerald-600',
-    title: 'Bagaimana pengalaman Anda dengan Loka Kasir?',
+    title: 'Bagaimana Pengalaman Anda dengan Loka Kasir?',
     message: (name: string) =>
-      `Halo ${name || 'Pengguna'}, kami ingin mendengar masukan Anda tentang Loka Kasir — apa yang sudah membantu dan apa yang perlu kami perbaiki. Terima kasih!`,
+      `Halo ${name || 'Pengguna'}, kami ingin mendengar masukan Anda: apa yang sudah membantu dan apa yang perlu kami perbaiki. Terima kasih!`,
   },
   {
     id: 'promo_push',
     label: 'Promosi & Update',
     icon: '🎉',
     activeColor: 'bg-orange-500 text-white border-orange-500',
-    title: 'Ada yang baru di Loka Kasir',
+    title: 'Ada Fitur Baru di Loka Kasir',
     message: (name: string) =>
-      `Halo ${name || 'Pengguna'}, ada fitur & perbaikan terbaru di Loka Kasir. Buka aplikasi untuk melihatnya.`,
+      `Halo ${name || 'Pengguna'}, ada fitur dan perbaikan terbaru di Loka Kasir. Buka aplikasi untuk melihatnya.`,
   },
   {
     id: 'inactive_7d_push',
     label: 'Cek Kabar (7 Hari Vakum)',
     icon: '👋',
     activeColor: 'bg-amber-500 text-white border-amber-500',
-    title: 'Semuanya baik-baik saja?',
+    title: 'Semuanya Baik-baik Saja?',
     message: (name: string) =>
-      `Halo ${name || 'Pengguna'}, kami lihat Loka Kasir belum dipakai 7 hari terakhir. Ada kendala atau masukan? Beri tahu kami lewat menu Bantuan — tim kami siap membantu.`,
+      `Halo ${name || 'Pengguna'}, Loka Kasir belum dipakai selama 7 hari terakhir. Kalau ada kendala atau masukan, sampaikan lewat menu Bantuan. Tim kami siap membantu.`,
   },
   {
     id: 'custom_push',
@@ -112,6 +112,10 @@ export default function NotificationsPage() {
   const [businessName, setBusinessName] = useState('')
   const [customMessage, setCustomMessage] = useState('')
   const [customTitle, setCustomTitle] = useState('')
+  // Gambar pendamping push (opsional). Diunggah begitu dipilih supaya yang
+  // dikirim hanya URL-nya, bukan berkas besar di setiap penerima bulk.
+  const [imageUrl, setImageUrl] = useState('')
+  const [imageUploading, setImageUploading] = useState(false)
   const [sendState, setSendState] = useState<SendState>('idle')
   const [sendResult, setSendResult] = useState<{ total: number; sent: number; failed: number; results: NotifyResult[] } | null>(null)
   const [error, setError] = useState('')
@@ -166,7 +170,7 @@ export default function NotificationsPage() {
         bulk: tab === 'bulk',
       }
       const res = isPush
-        ? await sendPush({ ...payload, title: previewTitle })
+        ? await sendPush({ ...payload, title: previewTitle, image_url: imageUrl || undefined })
         : await sendEmail(payload)
       setSendResult(res.data)
       setSendState('done')
@@ -178,6 +182,36 @@ export default function NotificationsPage() {
   }
 
   const handleReset = () => { setSendState('idle'); setSendResult(null); setError('') }
+
+  const handleImagePick = (file: File | undefined) => {
+    if (!file) return
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      setError('Format gambar harus JPG, PNG, atau WebP')
+      return
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      setError('Ukuran gambar maksimal 2 MB')
+      return
+    }
+    setError('')
+    setImageUploading(true)
+    const reader = new FileReader()
+    reader.onload = async () => {
+      try {
+        const res = await uploadNotificationImage(String(reader.result))
+        setImageUrl(res.data.url)
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Gagal mengunggah gambar')
+      } finally {
+        setImageUploading(false)
+      }
+    }
+    reader.onerror = () => {
+      setError('Gambar tidak bisa dibaca')
+      setImageUploading(false)
+    }
+    reader.readAsDataURL(file)
+  }
 
   return (
     <div className="space-y-6">
@@ -300,6 +334,29 @@ export default function NotificationsPage() {
                       className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none" />
                   </div>
                 )}
+                {isPush && (
+                  <div className="mt-3">
+                    <p className="text-xs font-medium text-slate-600 mb-1.5">Gambar (opsional)</p>
+                    {imageUrl ? (
+                      <div className="flex items-center gap-3">
+                        <img src={imageUrl} alt="" className="w-20 h-20 rounded-xl object-cover border border-slate-200" />
+                        <button type="button" onClick={() => setImageUrl('')}
+                          className="text-xs font-semibold text-red-600 hover:text-red-700">
+                          Hapus gambar
+                        </button>
+                      </div>
+                    ) : (
+                      <label className={`flex items-center justify-center gap-2 px-3 py-3 border border-dashed border-slate-300 rounded-xl text-sm text-slate-500 ${imageUploading ? 'opacity-60' : 'cursor-pointer hover:bg-slate-50'}`}>
+                        <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" disabled={imageUploading}
+                          onChange={(e) => { handleImagePick(e.target.files?.[0]); e.target.value = '' }} />
+                        {imageUploading ? 'Mengunggah...' : '🖼️ Pilih gambar (JPG/PNG/WebP, maks. 2 MB)'}
+                      </label>
+                    )}
+                    <p className="text-[11px] text-slate-400 mt-1.5">
+                      Tampil besar di notifikasi HP dan di daftar Notifikasi aplikasi. Rasio lebar 2:1 paling pas.
+                    </p>
+                  </div>
+                )}
               </div>
 
               {error && (
@@ -332,6 +389,9 @@ export default function NotificationsPage() {
                       <p className="text-xs text-slate-600 mt-1 leading-relaxed line-clamp-3">
                         {previewMessage || <span className="text-slate-400 italic">Isi notifikasi...</span>}
                       </p>
+                      {imageUrl && (
+                        <img src={imageUrl} alt="" className="mt-2 w-full max-h-40 rounded-lg object-cover" />
+                      )}
                     </div>
                     <p className="text-[11px] text-slate-400 mt-3 leading-relaxed">
                       Notifikasi juga tersimpan di daftar Notifikasi in-app, sehingga tetap terbaca meski push terlewat.
@@ -488,6 +548,9 @@ function LogItem({ log }: { log: NotificationLog }) {
             <div className="pt-1.5 border-t border-slate-200">
               <p className="text-slate-400 mb-1">Preview pesan:</p>
               <p className="text-slate-600 leading-relaxed whitespace-pre-wrap">{log.message_preview}</p>
+              {log.image_url && (
+                <img src={log.image_url} alt="" className="mt-2 w-full max-h-40 rounded-lg object-cover border border-slate-200" />
+              )}
             </div>
           </div>
         </div>

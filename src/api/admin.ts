@@ -159,7 +159,16 @@ export const sendEmail = (payload: NotifyPayload): Promise<SingleResponse<Notify
 export interface PushPayload extends NotifyPayload {
   /** Judul notifikasi yang muncul di layar perangkat. */
   title?: string
+  /** Gambar pendamping (https) — hasil uploadNotificationImage. */
+  image_url?: string
 }
+
+/**
+ * Unggah gambar notifikasi (data URL atau base64). Server memeriksa jenis dari
+ * isi berkas (JPG/PNG/WebP, maks. 2 MB) dan mengembalikan URL https-nya.
+ */
+export const uploadNotificationImage = (image: string): Promise<SingleResponse<{ url: string }>> =>
+  axios.post('/admin/notify/image', { image }).then((r) => r.data)
 
 /**
  * Kirim push notification (FCM) ke aplikasi pengguna. Penerima ditentukan dari
@@ -176,6 +185,7 @@ export interface NotificationLog {
   recipient_name: string
   business_name: string
   message_preview: string
+  image_url?: string | null
   total: number
   sent: number
   failed: number
