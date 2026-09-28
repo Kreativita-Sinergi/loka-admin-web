@@ -112,6 +112,11 @@ export interface AdminStats {
   province_distribution?: RegionCount[]
   top_cities?: RegionCount[]
   unknown_region?: number
+  /** Sebaran menurut lokasi IP pemakai. */
+  geo_provinces?: RegionCount[]
+  geo_cities?: RegionCount[]
+  geo_located?: number
+  geo_abroad?: number
 }
 
 export interface RegionCount {

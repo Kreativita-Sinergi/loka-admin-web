@@ -59,6 +59,7 @@ function RegionList({ title, rows, total }: { title: string; rows: RegionCount[]
 export default function DashboardPage() {
   const [stats, setStats] = useState<AdminStats | null>(null)
   const [loading, setLoading] = useState(true)
+  const [regionSource, setRegionSource] = useState<'ip' | 'profile'>('ip')
 
   useEffect(() => {
     getStats()
@@ -163,13 +164,45 @@ export default function DashboardPage() {
       {/* Sebaran wilayah */}
       {stats.province_distribution && (
         <div className="space-y-2">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <RegionList title="Sebaran per Provinsi" rows={stats.province_distribution} total={stats.total_businesses} />
-            <RegionList title="10 Kota/Kabupaten Teratas" rows={stats.top_cities ?? []} total={stats.total_businesses} />
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <h3 className="text-sm font-semibold text-slate-700">Sebaran Pengguna</h3>
+            <div className="inline-flex rounded-lg border border-slate-200 bg-white p-0.5 text-xs">
+              {([['ip', 'Lokasi pemakaian (IP)'], ['profile', 'Profil bisnis']] as const).map(([key, label]) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setRegionSource(key)}
+                  className={`px-3 py-1.5 rounded-md ${regionSource === key ? 'bg-indigo-600 text-white' : 'text-slate-600 hover:bg-slate-50'}`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
-          <p className="text-xs text-slate-400">
-            Warna tua = bisnis aktif. {stats.unknown_region ?? 0} dari {stats.total_businesses} bisnis belum mengisi wilayah.
-          </p>
+          {regionSource === 'ip' ? (
+            <>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <RegionList title="Per Provinsi" rows={stats.geo_provinces ?? []} total={stats.total_businesses} />
+                <RegionList title="10 Kota Teratas" rows={stats.geo_cities ?? []} total={stats.total_businesses} />
+              </div>
+              <p className="text-xs text-slate-400">
+                Warna tua = bisnis aktif. {stats.geo_located ?? 0} dari {stats.total_businesses} bisnis sudah terdeteksi
+                lokasinya{stats.geo_abroad ? ` (${stats.geo_abroad} di luar Indonesia)` : ''}; terisi otomatis saat aplikasi dipakai.
+                IP seluler sering terbaca di kota gateway operator, jadi kota kurang tepat dibanding provinsi.
+                Data lokasi IP: DB-IP.com.
+              </p>
+            </>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <RegionList title="Per Provinsi" rows={stats.province_distribution} total={stats.total_businesses} />
+                <RegionList title="10 Kota/Kabupaten Teratas" rows={stats.top_cities ?? []} total={stats.total_businesses} />
+              </div>
+              <p className="text-xs text-slate-400">
+                Warna tua = bisnis aktif. {stats.unknown_region ?? 0} dari {stats.total_businesses} bisnis belum mengisi wilayah.
+              </p>
+            </>
+          )}
         </div>
       )}
 
