@@ -108,6 +108,18 @@ export interface AdminStats {
   verified_users: number
   membership_breakdown: MembershipCount[]
   registrations_trend: RegistrationTrend[]
+  // Opsional: service lama belum mengirimnya.
+  province_distribution?: RegionCount[]
+  top_cities?: RegionCount[]
+  unknown_region?: number
+}
+
+export interface RegionCount {
+  name: string
+  /** Nama provinsi, hanya pada baris kota. */
+  parent?: string
+  count: number
+  active: number
 }
 
 export interface Pagination {

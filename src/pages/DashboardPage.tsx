@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getStats } from '../api/admin'
-import type { AdminStats } from '../types'
+import type { AdminStats, RegionCount } from '../types'
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend,
@@ -18,6 +18,40 @@ function StatCard({ label, value, sub }: { label: string; value: number | string
       <p className="text-sm text-slate-500">{label}</p>
       <p className="text-2xl font-bold text-slate-800 mt-1">{value}</p>
       {sub && <p className="text-xs text-slate-400 mt-1">{sub}</p>}
+    </div>
+  )
+}
+
+function RegionList({ title, rows, total }: { title: string; rows: RegionCount[]; total: number }) {
+  const max = Math.max(1, ...rows.map((r) => r.count))
+  return (
+    <div className="min-w-0 bg-white rounded-xl border border-slate-200 p-4 sm:p-5">
+      <h3 className="text-sm font-semibold text-slate-700 mb-3">{title}</h3>
+      {rows.length > 0 ? (
+        <ul className="space-y-2.5 max-h-80 overflow-y-auto pr-1">
+          {rows.map((r) => (
+            <li key={`${r.parent ?? ''}|${r.name}`}>
+              <div className="flex items-baseline justify-between gap-3 text-sm">
+                <span className="text-slate-700 truncate">
+                  {r.name}
+                  {r.parent && <span className="text-xs text-slate-400"> · {r.parent}</span>}
+                </span>
+                <span className="text-slate-500 tabular-nums shrink-0">
+                  {r.count}
+                  <span className="text-xs text-slate-400"> ({total > 0 ? Math.round((r.count / total) * 100) : 0}%)</span>
+                </span>
+              </div>
+              <div className="mt-1 h-1.5 rounded-full bg-slate-100 overflow-hidden" title={`${r.active} aktif dari ${r.count}`}>
+                <div className="h-full bg-indigo-200" style={{ width: `${(r.count / max) * 100}%` }}>
+                  <div className="h-full bg-indigo-500" style={{ width: `${r.count > 0 ? (r.active / r.count) * 100 : 0}%` }} />
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div className="h-32 flex items-center justify-center text-slate-400 text-sm">Belum ada data wilayah</div>
+      )}
     </div>
   )
 }
@@ -125,6 +159,19 @@ export default function DashboardPage() {
           )}
         </div>
       </div>
+
+      {/* Sebaran wilayah */}
+      {stats.province_distribution && (
+        <div className="space-y-2">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <RegionList title="Sebaran per Provinsi" rows={stats.province_distribution} total={stats.total_businesses} />
+            <RegionList title="10 Kota/Kabupaten Teratas" rows={stats.top_cities ?? []} total={stats.total_businesses} />
+          </div>
+          <p className="text-xs text-slate-400">
+            Warna tua = bisnis aktif. {stats.unknown_region ?? 0} dari {stats.total_businesses} bisnis belum mengisi wilayah.
+          </p>
+        </div>
+      )}
 
       {/* Membership breakdown table */}
       <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-5">
