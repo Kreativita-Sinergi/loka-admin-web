@@ -24,15 +24,15 @@ export interface BusinessActiveUsers {
   active_this_week: number
   hours_today: number
   hours_this_week: number
-  api_calls_today: number
-  api_calls_this_week: number
-  record_count: number
+  api_calls_today?: number
+  api_calls_this_week?: number
+  record_count?: number
   last_seen_at: string | null
   /** Transaksi 7 hari terakhir — ukuran "masih berjualan atau tidak". */
-  trx_this_week: number
+  trx_this_week?: number
   /** Paket aktif: free | trial | pro. */
-  plan: string
-  created_at: string | null
+  plan?: string
+  created_at?: string | null
 }
 
 export interface UsageDailyPoint {
@@ -47,8 +47,8 @@ export interface ActiveUsersStats {
   hours_today: number
   hours_this_week: number
   daily_trend: UsageDailyPoint[]
-  api_calls_today: number
-  api_calls_this_week: number
+  api_calls_today?: number
+  api_calls_this_week?: number
   businesses: BusinessActiveUsers[]
 }
 

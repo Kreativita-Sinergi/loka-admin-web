@@ -1,233 +1,107 @@
-import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { getActiveUsers } from '../api/admin'
-import type { ActiveUsersStats } from '../api/admin'
-import { formatDistanceToNow, format } from 'date-fns'
-import { id as idLocale } from 'date-fns/locale'
-import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-} from 'recharts'
+import type { BusinessActiveUsers } from '../api/admin'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { AnalyticsHeader, AnalyticsState, MetricCard } from '../components/analytics/AnalyticsUI'
+import Pagination from '../components/ui/Pagination'
+import { useAnalytics } from '../hooks/useAnalytics'
+import { dailySeries, formatDate, formatHours, formatNumber, percentage } from '../lib/analytics'
 
-function StatCard({ label, value, sub }: { label: string; value: number | string; sub?: string }) {
-  return (
-    <div className="bg-white rounded-xl border border-slate-200 p-5">
-      <p className="text-sm text-slate-500">{label}</p>
-      <p className="text-2xl font-bold text-slate-800 mt-1">{value}</p>
-      {sub && <p className="text-xs text-slate-400 mt-1">{sub}</p>}
-    </div>
-  )
+function PlanBadge({ plan }: { plan?: string }) {
+  const key = plan?.toLowerCase()
+  const label = key === 'free' ? 'Gratis' : key === 'pro-yearly' ? 'Pro tahunan' : key === 'pro-3year' ? 'Pro 3 tahun' : plan || '—'
+  return <span className={`inline-flex rounded-md px-2 py-1 text-xs font-medium capitalize ${key?.startsWith('pro') ? 'bg-indigo-50 text-indigo-700' : key === 'trial' ? 'bg-amber-50 text-amber-700' : 'bg-slate-100 text-slate-500'}`}>{label}</span>
 }
 
-function lastSeenLabel(iso: string | null): string {
-  if (!iso) return 'Belum pernah'
-  return formatDistanceToNow(new Date(iso), { addSuffix: true, locale: idLocale })
-}
-
-/** Tanggal daftar dalam bentuk pendek — memisahkan tenant yang memang baru
- *  dari tenant lama yang mulai sepi. Keduanya sama-sama "jarang bertransaksi",
- *  tetapi hanya salah satunya yang perlu dikhawatirkan. */
-function signupLabel(iso: string | null): string {
-  if (!iso) return '—'
-  return new Date(iso).toLocaleDateString('id-ID', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  })
-}
-
-/** Lencana paket. Warna dipakai untuk membedakan yang membayar dari yang belum,
- *  bukan sekadar hiasan: satu tenant Pro yang mulai sepi jauh lebih mendesak
- *  daripada sepuluh akun Gratis yang diam. */
-function PlanBadge({ plan }: { plan: string }) {
-  const key = (plan || 'free').toLowerCase()
-  const style =
-    key === 'pro' || key === 'pro-yearly' || key === 'pro-3year'
-      ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
-      : key === 'trial'
-          ? 'bg-amber-50 text-amber-700 border-amber-200'
-          : 'bg-slate-100 text-slate-500 border-slate-200'
-  const label = key === 'pro-yearly'
-    ? 'Pro (Tahunan)'
-    : key === 'pro-3year'
-      ? 'Pro (3 Tahun)'
-      : key.charAt(0).toUpperCase() + key.slice(1)
-  return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-md border text-xs font-medium ${style}`}>
-      {label}
-    </span>
-  )
-}
-
-// Format jam desimal → "Xj Ym" yang enak dibaca.
-function fmtHours(h: number): string {
-  const totalMin = Math.round(h * 60)
-  const hh = Math.floor(totalMin / 60)
-  const mm = totalMin % 60
-  if (hh === 0) return `${mm}m`
-  if (mm === 0) return `${hh}j`
-  return `${hh}j ${mm}m`
+type Filter = 'all' | 'selling' | 'active' | 'quiet'
+type Sort = 'transactions' | 'recent' | 'users' | 'hours'
+function hasActivity(row: BusinessActiveUsers, period: 'day' | 'week') {
+  return (period === 'day' ? row.active_today : row.active_this_week) > 0
 }
 
 export default function UsagePage() {
-  const navigate = useNavigate()
-  const [stats, setStats] = useState<ActiveUsersStats | null>(null)
-  const [loading, setLoading] = useState(true)
+  const { data: stats, loading, error, updatedAt, refresh } = useAnalytics(getActiveUsers)
+  const [period, setPeriod] = useState<'day' | 'week'>('week')
+  const [search, setSearch] = useState('')
+  const [filter, setFilter] = useState<Filter>('all')
+  const [sort, setSort] = useState<Sort>('recent')
+  const [page, setPage] = useState(1)
+  const rows = stats?.businesses ?? []
+  const activeKey = period === 'day' ? 'active_today' : 'active_this_week'
+  const hoursKey = period === 'day' ? 'hours_today' : 'hours_this_week'
+  const apiKey = period === 'day' ? 'api_calls_today' : 'api_calls_this_week'
+  const activeBusinesses = rows.filter(row => hasActivity(row, period)).length
+  const sellingBusinesses = rows.filter(row => (row.trx_this_week ?? 0) > 0).length
+  const transactionsAvailable = rows.every(row => row.trx_this_week != null)
+  const transactions = rows.reduce((sum, row) => sum + (row.trx_this_week ?? 0), 0)
+  const filtered = rows.filter(row => {
+    if (!`${row.business_name} ${row.business_id}`.toLowerCase().includes(search.trim().toLowerCase())) return false
+    return filter === 'all' || (filter === 'selling' && (row.trx_this_week ?? 0) > 0) || (filter === 'active' && hasActivity(row, period)) || (filter === 'quiet' && !hasActivity(row, period))
+  }).sort((a, b) => {
+    const score = (row: BusinessActiveUsers) => sort === 'transactions' ? row.trx_this_week ?? -1 : sort === 'users' ? row[activeKey] : sort === 'hours' ? row[hoursKey] : Date.parse(row.last_seen_at ?? '') || 0
+    return score(b) - score(a) || a.business_name.localeCompare(b.business_name, 'id')
+  })
+  const currentPage = Math.min(page, Math.max(1, Math.ceil(filtered.length / 15)))
+  const trend = dailySeries(stats?.daily_trend, 14, point => point.hours)
+  const inconsistent = stats && (stats.active_today > stats.active_this_week || stats.active_this_week > stats.total_users || rows.some(row => row.active_today > row.active_this_week || row.active_this_week > row.total_users))
 
-  useEffect(() => {
-    getActiveUsers()
-      .then((r) => setStats(r.data))
-      .catch(console.error)
-      .finally(() => setLoading(false))
-  }, [])
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <p className="text-slate-400">Memuat data pemakaian...</p>
+  return <div className="space-y-6">
+    <AnalyticsHeader title="Aktivitas & Pemakaian" description="Pantau pengguna aplikasi, bisnis yang bertransaksi, dan jejak pemakaian." loading={loading} updatedAt={updatedAt} refresh={refresh} />
+    <AnalyticsState loading={loading} error={error} hasData={!!stats} />
+    {stats && <>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-slate-500">Akun demo dikecualikan dari statistik.</p>
+        <div className="inline-flex rounded-xl border border-slate-200 bg-white p-1">{(['day', 'week'] as const).map(key => <button key={key} type="button" aria-pressed={period === key} onClick={() => { setPeriod(key); setPage(1) }} className={`rounded-lg px-4 py-2 text-sm font-medium ${period === key ? 'bg-indigo-600 text-white' : 'text-slate-500 hover:bg-slate-50'}`}>{key === 'day' ? '24 jam terakhir' : '7 hari terakhir'}</button>)}</div>
       </div>
-    )
-  }
-
-  if (!stats) return null
-
-  // Backend bisa mengirim null untuk array kosong (slice nil di Go) — beri default aman.
-  const rows = stats.businesses ?? []
-  const activeRate = stats.total_users > 0
-    ? Math.round((stats.active_this_week / stats.total_users) * 100)
-    : 0
-  const avgHours = stats.active_this_week > 0
-    ? stats.hours_this_week / stats.active_this_week
-    : 0
-
-  const trendData = (stats.daily_trend ?? []).map((d) => ({
-    date: format(new Date(d.date), 'd MMM'),
-    Jam: Math.round(d.hours * 10) / 10,
-  }))
-
-  return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-bold text-slate-800">User Aktif & Pemakaian</h2>
-        <p className="text-sm text-slate-500 mt-0.5">
-          Aktivitas dan jam pemakaian aplikasi & web kasir lintas seluruh bisnis
-        </p>
+      {inconsistent && <div role="alert" className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">Hitungan pengguna dari server belum konsisten: pengguna aktif melebihi total, atau aktif 24 jam melebihi 7 hari. Angka asli tetap ditampilkan agar masalah data bisa ditelusuri.</div>}
+      <div className="grid grid-cols-1 gap-4 min-[380px]:grid-cols-2 xl:grid-cols-4">
+        <MetricCard label="Pengguna aktif" value={formatNumber(stats[activeKey])} detail={`${percentage(stats[activeKey], stats.total_users)}% dari ${formatNumber(stats.total_users)} akun pemilik, admin, dan karyawan`} accent />
+        <MetricCard label="Bisnis dengan pengguna aktif" value={formatNumber(activeBusinesses)} detail={`${percentage(activeBusinesses, rows.length)}% dari ${formatNumber(rows.length)} bisnis terdaftar`} />
+        <MetricCard label="Durasi sesi tercatat" value={formatHours(stats[hoursKey])} detail="Akumulasi sesi seluruh pengguna; bukan waktu layar atau jam buka toko." />
+        <MetricCard label={period === 'day' ? 'API hari ini · UTC' : 'API · 7 hari kalender UTC'} value={formatNumber(stats[apiKey])} detail="Request aplikasi, termasuk sinkronisasi. Periode API mengikuti tanggal UTC." />
       </div>
-
-      <div className="grid grid-cols-1 min-[380px]:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
-        <StatCard label="Aktif 24 Jam" value={stats.active_today} sub={`${fmtHours(stats.hours_today)} pemakaian`} />
-        <StatCard label="Aktif 7 Hari" value={stats.active_this_week} sub={`${activeRate}% dari total user`} />
-        <StatCard label="Jam Pakai 7 Hari" value={fmtHours(stats.hours_this_week)} sub={`±${fmtHours(avgHours)}/user aktif`} />
-        <StatCard label="API Calls 7 Hari" value={(stats.api_calls_this_week ?? 0).toLocaleString('id-ID')} sub={`${(stats.api_calls_today ?? 0).toLocaleString('id-ID')} hari ini`} />
-        <StatCard label="Total User" value={stats.total_users} />
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 lg:col-span-2">
+          <h3 className="font-semibold text-slate-800">Tren durasi sesi</h3><p className="mt-1 mb-5 text-xs text-slate-500">14 tanggal terakhir · UTC · tanggal tanpa sesi ditampilkan nol</p>
+          <ResponsiveContainer width="100%" height={240}><BarChart data={trend} margin={{ left: 0, right: 8 }}><CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} /><XAxis dataKey="label" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} minTickGap={24} /><YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={false} unit=" j" /><Tooltip labelFormatter={(_, payload) => `${payload[0]?.payload.date ?? ''} · UTC`} formatter={v => [formatHours(Number(v)), 'Durasi sesi']} /><Bar dataKey="value" fill="#6366f1" radius={[5, 5, 0, 0]} maxBarSize={32} /></BarChart></ResponsiveContainer>
+          {!trend.some(point => point.value > 0) && <p className="text-center text-xs text-slate-400">Belum ada durasi sesi tercatat pada periode ini.</p>}
+        </div>
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50/50 p-5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Aktivitas penjualan · 7 hari</p><p className="mt-4 text-4xl font-semibold tracking-tight text-slate-900">{transactionsAvailable ? formatNumber(sellingBusinesses) : '—'} <span className="text-lg font-normal text-slate-500">bisnis</span></p>
+          <p className="mt-2 text-sm text-slate-600">{transactionsAvailable ? `${formatNumber(transactions)} transaksi penjualan tercatat` : 'Data transaksi belum tersedia lengkap.'}</p>
+          <p className="mt-5 text-xs leading-5 text-slate-500">Transaksi berstatus penjualan, tanpa pembatalan atau refund. Pengguna yang membuka aplikasi belum tentu melakukan penjualan.</p>
+          <button type="button" onClick={() => { setFilter('selling'); setSort('transactions'); setPage(1) }} className="mt-5 text-sm font-semibold text-emerald-700 hover:underline">Lihat bisnis bertransaksi →</button>
+        </div>
       </div>
-
-      {/* Daily usage trend */}
-      <div className="min-w-0 bg-white rounded-xl border border-slate-200 p-4 sm:p-5">
-        <h3 className="text-sm font-semibold text-slate-700 mb-4">Jam Pemakaian 14 Hari Terakhir</h3>
-        {trendData.some((d) => d.Jam > 0) ? (
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={trendData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-              <XAxis dataKey="date" tick={{ fontSize: 11 }} tickLine={false} />
-              <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={false} unit="j" />
-              <Tooltip formatter={(v) => [`${v} jam`, 'Pemakaian']} />
-              <Bar dataKey="Jam" fill="#6366f1" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        ) : (
-          <div className="h-48 flex items-center justify-center text-slate-400 text-sm">
-            Belum ada data pemakaian
+      <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden">
+        <div className="space-y-4 border-b border-slate-200 p-5">
+          <div className="flex flex-wrap items-center justify-between gap-2"><h3 className="font-semibold text-slate-800">Aktivitas per bisnis</h3><span className="text-xs text-slate-500">{formatNumber(filtered.length)} dari {formatNumber(rows.length)} bisnis</span></div>
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <input type="search" aria-label="Cari bisnis" placeholder="Cari nama atau ID bisnis…" value={search} onChange={e => { setSearch(e.target.value); setPage(1) }} className="min-w-0 flex-1 rounded-lg border border-slate-200 px-3 py-2 text-sm sm:min-w-48" />
+            <select aria-label="Filter aktivitas" value={filter} onChange={e => { setFilter(e.target.value as Filter); setPage(1) }} className="rounded-lg border border-slate-200 px-3 py-2 text-sm"><option value="all">Semua aktivitas</option><option value="selling">Bertransaksi · 7 hari</option><option value="active">Ada pengguna aktif</option><option value="quiet">Tanpa pengguna aktif</option></select>
+            <select aria-label="Urutkan bisnis" value={sort} onChange={e => { setSort(e.target.value as Sort); setPage(1) }} className="rounded-lg border border-slate-200 px-3 py-2 text-sm"><option value="recent">Terakhir aktif</option><option value="transactions">Transaksi terbanyak</option><option value="users">Pengguna aktif terbanyak</option><option value="hours">Durasi sesi terbanyak</option></select>
           </div>
-        )}
-      </div>
-
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-        <div className="px-5 py-4 border-b border-slate-200">
-          <h3 className="text-sm font-semibold text-slate-700">Aktivitas per Bisnis <span className="font-normal text-slate-400">({rows.length})</span></h3>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm whitespace-nowrap">
-            <thead>
-              <tr className="text-left text-slate-500 border-b border-slate-200">
-                <th className="px-4 py-2.5 font-medium align-bottom">Bisnis</th>
-                <th className="px-4 py-2.5 font-medium align-bottom">Paket</th>
-                <th className="px-4 py-2.5 font-medium align-bottom text-right">Transaksi<br /><span className="text-xs font-normal text-slate-400">7 hari</span></th>
-                <th className="px-4 py-2.5 font-medium align-bottom text-right">User Aktif<br /><span className="text-xs font-normal text-slate-400">24j / 7h</span></th>
-                <th className="px-4 py-2.5 font-medium align-bottom text-right">Jam Pakai<br /><span className="text-xs font-normal text-slate-400">24j / 7h</span></th>
-                <th className="px-4 py-2.5 font-medium align-bottom text-right">API Calls<br /><span className="text-xs font-normal text-slate-400">24j / 7h</span></th>
-                <th className="px-4 py-2.5 font-medium align-bottom text-right">Data</th>
-                <th className="px-4 py-2.5 font-medium align-bottom">Terakhir Aktif</th>
-                <th className="px-4 py-2.5 font-medium align-bottom">Daftar</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.length === 0 ? (
-                <tr>
-                  <td colSpan={9} className="px-5 py-8 text-center text-slate-400">
-                    Belum ada data aktivitas
-                  </td>
-                </tr>
-              ) : (
-                rows.map((b) => (
-                  <tr
-                    key={b.business_id}
-                    onClick={() => navigate(`/businesses/${b.business_id}`, { state: { from: '/usage' } })}
-                    className="border-b border-slate-100 last:border-0 hover:bg-indigo-50/50 cursor-pointer transition-colors"
-                    title={`Lihat detail ${b.business_name}`}
-                  >
-                    <td className="px-4 py-2 font-medium text-slate-800">
-                      <span className="hover:text-indigo-600 hover:underline underline-offset-2">{b.business_name}</span>
-                      {/* Jumlah pengguna dipindah ke sini sebagai keterangan
-                          kecil: hampir seluruh tenant hanya punya satu, jadi
-                          satu kolom penuh berisi angka "1" tidak membantu
-                          siapa pun — tetapi tenant yang punya lima kasir tetap
-                          layak terlihat. */}
-                      {b.total_users > 1 && (
-                        <span className="ml-2 text-xs text-slate-400">{b.total_users} user</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-2">
-                      <PlanBadge plan={b.plan} />
-                    </td>
-                    <td className="px-4 py-2 text-right">
-                      {/* Ukuran yang menjawab pertanyaan sebenarnya: bisnis ini
-                          masih berjualan atau tidak. Jam pemakaian hanya
-                          menghitung lama aplikasi dibuka. */}
-                      <span className={(b.trx_this_week ?? 0) > 0 ? 'text-emerald-600 font-semibold' : 'text-slate-400'}>
-                        {(b.trx_this_week ?? 0).toLocaleString('id-ID')}
-                      </span>
-                    </td>
-                    <td className="px-4 py-2 text-right text-slate-600 whitespace-nowrap">
-                      <span className={b.active_today > 0 ? 'text-slate-800 font-medium' : 'text-slate-400'}>{b.active_today ?? 0}</span>
-                      <span className="text-slate-300"> / </span>
-                      {b.active_this_week ?? 0}
-                    </td>
-                    <td className="px-4 py-2 text-right text-slate-600 whitespace-nowrap">
-                      <span className={b.hours_today > 0 ? 'text-slate-800 font-medium' : 'text-slate-400'}>
-                        {b.hours_today > 0 ? fmtHours(b.hours_today) : '—'}
-                      </span>
-                      <span className="text-slate-300"> / </span>
-                      {b.hours_this_week > 0 ? fmtHours(b.hours_this_week) : '—'}
-                    </td>
-                    <td className="px-4 py-2 text-right text-slate-600 whitespace-nowrap">
-                      <span className={(b.api_calls_today ?? 0) > 0 ? 'text-slate-800 font-medium' : 'text-slate-400'}>
-                        {(b.api_calls_today ?? 0).toLocaleString('id-ID')}
-                      </span>
-                      <span className="text-slate-300"> / </span>
-                      {(b.api_calls_this_week ?? 0).toLocaleString('id-ID')}
-                    </td>
-                    <td className="px-4 py-2 text-right text-slate-500">
-                      {(b.record_count ?? 0).toLocaleString('id-ID')}
-                    </td>
-                    <td className="px-4 py-2 text-slate-500">{lastSeenLabel(b.last_seen_at)}</td>
-                    <td className="px-4 py-2 text-slate-500">{signupLabel(b.created_at)}</td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        <div className="overflow-x-auto"><table className="w-full text-sm">
+          <thead className="bg-slate-50 text-xs text-slate-500"><tr>{['Bisnis / pengguna', 'Paket', 'Transaksi · 7 hari', `Pengguna · ${period === 'day' ? '24 jam' : '7 hari'}`, 'Durasi sesi', `API · ${period === 'day' ? 'hari ini UTC' : '7 hari kalender UTC'}`, 'Transaksi + produk', 'Terakhir aktif · WIB'].map((label, i) => <th key={label} className={`px-4 py-3 font-medium ${i >= 2 && i <= 6 ? 'text-right' : 'text-left'}`}>{label}</th>)}</tr></thead>
+          <tbody className="divide-y divide-slate-100">
+            {filtered.slice((currentPage - 1) * 15, currentPage * 15).map(row => <tr key={row.business_id} className="hover:bg-slate-50">
+              <td className="px-4 py-3"><Link to={`/businesses/${row.business_id}`} state={{ from: '/usage' }} className="font-semibold text-slate-800 hover:text-indigo-600 hover:underline">{row.business_name}</Link><p className="mt-1 text-xs text-slate-400">{formatNumber(row.total_users)} pengguna · Daftar {formatDate(row.created_at)}</p></td>
+              <td className="px-4 py-3"><PlanBadge plan={row.plan} /></td>
+              <td className={`px-4 py-3 text-right tabular-nums ${(row.trx_this_week ?? 0) > 0 ? 'font-semibold text-emerald-600' : 'text-slate-400'}`}>{formatNumber(row.trx_this_week)}</td>
+              <td className="px-4 py-3 text-right tabular-nums"><span className={row[activeKey] > 0 ? 'font-semibold text-indigo-600' : 'text-slate-400'}>{formatNumber(row[activeKey])}</span><span className="text-slate-400"> / {formatNumber(row.total_users)}</span></td>
+              <td className="px-4 py-3 text-right text-slate-600 tabular-nums">{formatHours(row[hoursKey])}</td>
+              <td className="px-4 py-3 text-right text-slate-600 tabular-nums">{formatNumber(row[apiKey])}</td>
+              <td className="px-4 py-3 text-right text-slate-500 tabular-nums">{formatNumber(row.record_count)}</td>
+              <td className="px-4 py-3 text-xs text-slate-500">{row.last_seen_at ? formatDate(row.last_seen_at, true) : 'Belum tercatat'}</td>
+            </tr>)}
+            {!filtered.length && <tr><td colSpan={8} className="px-5 py-12 text-center text-slate-400">{rows.length ? 'Tidak ada bisnis yang cocok dengan filter.' : 'Belum ada bisnis tercatat.'}</td></tr>}
+          </tbody>
+        </table></div>
+        <div className="border-t border-slate-100 px-5 py-3"><Pagination page={currentPage} total={filtered.length} limit={15} onChange={setPage} /></div>
       </div>
-    </div>
-  )
+      <details className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600"><summary className="cursor-pointer font-medium">Cara membaca data</summary><div className="mt-3 space-y-2 text-xs leading-5"><p>Pengguna aktif adalah akun yang memiliki jejak request terautentikasi dalam 24 jam atau 7 hari terakhir, termasuk akun karyawan. Angka ini bukan jumlah pengguna yang sedang online.</p><p>Durasi sesi diperkirakan dari request pertama hingga terakhir. Jeda lebih dari 15 menit memulai sesi baru. Request tunggal tetap dihitung sebagai aktivitas meskipun durasinya nol; sinkronisasi latar belakang juga bisa tercatat.</p><p>API menggunakan hari kalender UTC (berganti pukul 07.00 WIB), sehingga berbeda dari jendela aktivitas 24 jam / 7 hari. Jam ditampilkan sebagai total sesi, bukan rata-rata waktu layar.</p><p>Tanda — berarti data belum tersedia. Kolom transaksi + produk adalah jumlah record, bukan ukuran penyimpanan.</p></div></details>
+    </>}
+  </div>
 }

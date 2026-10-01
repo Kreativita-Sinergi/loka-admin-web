@@ -3,7 +3,7 @@ import { useAuthStore } from '../../store/authStore'
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: '📊' },
-  { to: '/usage', label: 'User Aktif', icon: '🟢' },
+  { to: '/usage', label: 'Aktivitas & Pemakaian', icon: '🟢' },
   { to: '/businesses', label: 'Bisnis', icon: '🏪' },
   { to: '/master-products', label: 'Katalog Produk', icon: '📦' },
   { to: '/reset-transactions', label: 'Reset Transaksi', icon: '🧹' },

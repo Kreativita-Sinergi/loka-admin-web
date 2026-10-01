@@ -5,8 +5,7 @@ import type { AdminBusiness } from '../types'
 import Badge from '../components/ui/Badge'
 import Pagination from '../components/ui/Pagination'
 import DeleteConfirmModal from '../components/ui/DeleteConfirmModal'
-import { format } from 'date-fns'
-import { id as localeId } from 'date-fns/locale'
+import { formatDate } from '../lib/analytics'
 
 const STATUS_OPTIONS = [
   { value: '', label: 'Semua' },
@@ -17,7 +16,7 @@ const STATUS_OPTIONS = [
 ]
 
 function membershipBadge(membership: AdminBusiness['membership']) {
-  if (!membership) return <Badge variant="neutral">Tidak ada</Badge>
+  if (!membership) return <Badge variant="neutral">GRATIS</Badge>
   if (membership.type === 'free') return <Badge variant="neutral">GRATIS</Badge>
   const expired = new Date(membership.end_date) < new Date() || !membership.is_active
   if (expired) return <Badge variant="danger">Expired</Badge>
@@ -30,6 +29,7 @@ function membershipBadge(membership: AdminBusiness['membership']) {
 
 export default function BusinessesPage() {
   const [businesses, setBusinesses] = useState<AdminBusiness[]>([])
+  const [error, setError] = useState<string | null>(null)
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
@@ -46,6 +46,7 @@ export default function BusinessesPage() {
 
   const load = useCallback(async () => {
     setLoading(true)
+    setError(null)
     try {
       // Terbaru di atas. Pagination server memakai `created_at asc` sebagai
       // bawaan, sehingga pendaftar baru — yang justru paling sering dicari di
@@ -58,10 +59,13 @@ export default function BusinessesPage() {
         sort_by: 'created_at',
         order_by: 'desc',
       })
+      if (!res.status) throw new Error(res.message)
+      setError(null)
       setBusinesses(res.data ?? [])
       setTotal(res.pagination?.total ?? 0)
     } catch (err) {
       console.error(err)
+      setError('Gagal memuat daftar bisnis. Silakan coba lagi.')
     } finally {
       setLoading(false)
     }
@@ -72,16 +76,19 @@ export default function BusinessesPage() {
     getBusinesses({ page, limit, search, status, sort_by: 'created_at', order_by: 'desc' })
       .then((res) => {
         if (!active) return
+        if (!res.status) throw new Error(res.message)
+        setError(null)
         setBusinesses(res.data ?? [])
         setTotal(res.pagination?.total ?? 0)
       })
-      .catch(console.error)
+      .catch(() => { if (active) setError('Gagal memuat daftar bisnis. Silakan coba lagi.') })
       .finally(() => { if (active) setLoading(false) })
     return () => { active = false }
   }, [page, search, status])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
+    if (searchInput !== search || page !== 1) setLoading(true)
     setSearch(searchInput)
     setPage(1)
   }
@@ -142,7 +149,7 @@ export default function BusinessesPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-bold text-slate-800">Bisnis</h2>
-          <p className="text-sm text-slate-500 mt-0.5">{total} total bisnis terdaftar</p>
+          <p className="text-sm text-slate-500 mt-0.5">{loading ? 'Memuat daftar bisnis…' : error ? 'Daftar bisnis gagal dimuat' : `${total.toLocaleString('id-ID')} bisnis sesuai filter`}</p>
         </div>
         <button
           onClick={handleProcessDowngrades}
@@ -152,6 +159,8 @@ export default function BusinessesPage() {
           {processingDowngrade ? 'Memproses...' : 'Proses Downgrade ke Gratis'}
         </button>
       </div>
+
+      {error && <div role="alert" className="flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"><span>{error}</span><button type="button" onClick={load} disabled={loading} className="font-semibold underline disabled:opacity-50">Coba lagi</button></div>}
 
       {/* Filters */}
       <div className="bg-white rounded-xl border border-slate-200 p-3 sm:p-4 flex flex-col sm:flex-row sm:flex-wrap gap-3">
@@ -170,7 +179,7 @@ export default function BusinessesPage() {
 
         <select
           value={status}
-          onChange={(e) => { setStatus(e.target.value); setPage(1) }}
+          onChange={(e) => { setLoading(true); setStatus(e.target.value); setPage(1) }}
           className="w-full sm:w-auto px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
         >
           {STATUS_OPTIONS.map((o) => (
@@ -189,7 +198,7 @@ export default function BusinessesPage() {
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Pemilik</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Tipe</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Membership</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Status</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Akses bisnis</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Daftar</th>
                 <th className="text-right px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Aksi</th>
               </tr>
@@ -199,9 +208,9 @@ export default function BusinessesPage() {
                 <tr>
                   <td colSpan={7} className="text-center py-12 text-slate-400">Memuat data...</td>
                 </tr>
-              ) : businesses.length === 0 ? (
+              ) : error || businesses.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="text-center py-12 text-slate-400">Tidak ada data</td>
+                  <td colSpan={7} className="text-center py-12 text-slate-400">{error ? 'Daftar bisnis belum berhasil dimuat.' : 'Tidak ada bisnis sesuai filter.'}</td>
                 </tr>
               ) : (
                 businesses.map((b) => (
@@ -240,9 +249,9 @@ export default function BusinessesPage() {
                     <td className="px-4 py-3">
                       <div className="flex flex-col gap-1">
                         {membershipBadge(b.membership)}
-                        {b.membership && (
+                        {b.membership && b.membership.type !== 'free' && (
                           <span className="text-xs text-slate-400">
-                            {b.membership.days_remaining > 0
+                            {b.membership.is_active && new Date(b.membership.end_date) > new Date() && b.membership.days_remaining > 0
                               ? `${b.membership.days_remaining} hari lagi`
                               : 'Sudah berakhir'}
                           </span>
@@ -251,11 +260,11 @@ export default function BusinessesPage() {
                     </td>
                     <td className="px-4 py-3">
                       <Badge variant={b.is_active ? 'success' : 'danger'}>
-                        {b.is_active ? 'Aktif' : 'Nonaktif'}
+                        {b.is_active ? 'Diaktifkan' : 'Dinonaktifkan'}
                       </Badge>
                     </td>
                     <td className="px-4 py-3 text-slate-500 text-xs">
-                      {format(new Date(b.created_at), 'd MMM yyyy', { locale: localeId })}
+                      {formatDate(b.created_at)}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex justify-end gap-2">
@@ -291,9 +300,9 @@ export default function BusinessesPage() {
           </table>
         </div>
 
-        {!loading && (
+        {!loading && !error && (
           <div className="px-4 py-3 border-t border-slate-100">
-            <Pagination page={page} total={total} limit={limit} onChange={setPage} />
+            <Pagination page={page} total={total} limit={limit} onChange={(next) => { if (next !== page) { setLoading(true); setPage(next) } }} />
           </div>
         )}
       </div>

@@ -1,25 +1,19 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { getStats } from '../api/admin'
-import type { AdminStats, RegionCount } from '../types'
+import type { RegionCount } from '../types'
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend,
 } from 'recharts'
-import { format } from 'date-fns'
+import { AnalyticsHeader, AnalyticsState, MetricCard } from '../components/analytics/AnalyticsUI'
+import { useAnalytics } from '../hooks/useAnalytics'
+import { dailySeries, formatNumber, percentage } from '../lib/analytics'
 
 const MEMBERSHIP_COLORS: Record<string, string> = {
+  free: '#94a3b8',
   trial: '#f59e0b',
   pro: '#10b981',
-}
-
-function StatCard({ label, value, sub }: { label: string; value: number | string; sub?: string }) {
-  return (
-    <div className="bg-white rounded-xl border border-slate-200 p-5">
-      <p className="text-sm text-slate-500">{label}</p>
-      <p className="text-2xl font-bold text-slate-800 mt-1">{value}</p>
-      {sub && <p className="text-xs text-slate-400 mt-1">{sub}</p>}
-    </div>
-  )
 }
 
 function RegionList({ title, rows, total }: { title: string; rows: RegionCount[]; total: number }) {
@@ -37,13 +31,13 @@ function RegionList({ title, rows, total }: { title: string; rows: RegionCount[]
                   {r.parent && <span className="text-xs text-slate-400"> · {r.parent}</span>}
                 </span>
                 <span className="text-slate-500 tabular-nums shrink-0">
-                  {r.count}
+                  {formatNumber(r.count)}
                   <span className="text-xs text-slate-400"> ({total > 0 ? Math.round((r.count / total) * 100) : 0}%)</span>
                 </span>
               </div>
-              <div className="mt-1 h-1.5 rounded-full bg-slate-100 overflow-hidden" title={`${r.active} aktif dari ${r.count}`}>
+              <div className="mt-1 h-1.5 rounded-full bg-slate-100 overflow-hidden" title={`${formatNumber(r.active)} diaktifkan dari ${formatNumber(r.count)} bisnis`}>
                 <div className="h-full bg-indigo-200" style={{ width: `${(r.count / max) * 100}%` }}>
-                  <div className="h-full bg-indigo-500" style={{ width: `${r.count > 0 ? (r.active / r.count) * 100 : 0}%` }} />
+                  <div className="h-full bg-indigo-500" style={{ width: `${r.count > 0 ? Math.min(100, (r.active / r.count) * 100) : 0}%` }} />
                 </div>
               </div>
             </li>
@@ -57,64 +51,43 @@ function RegionList({ title, rows, total }: { title: string; rows: RegionCount[]
 }
 
 export default function DashboardPage() {
-  const [stats, setStats] = useState<AdminStats | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [regionSource, setRegionSource] = useState<'ip' | 'profile'>('ip')
+  const { data: stats, loading, error, updatedAt, refresh } = useAnalytics(getStats)
+  const [regionSource, setRegionSource] = useState<'ip' | 'profile'>('profile')
+  const trendData = dailySeries(stats?.registrations_trend, 30, point => point.count)
+  const header = <AnalyticsHeader title="Dashboard" description="Ringkasan bisnis, akun pemilik/admin, dan membership Loka Kasir." loading={loading} updatedAt={updatedAt} refresh={refresh} />
+  if (!stats) return <div className="space-y-6">{header}<AnalyticsState loading={loading} error={error} hasData={false} /></div>
 
-  useEffect(() => {
-    getStats()
-      .then((r) => setStats(r.data))
-      .catch(console.error)
-      .finally(() => setLoading(false))
-  }, [])
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <p className="text-slate-400">Memuat statistik...</p>
-      </div>
-    )
-  }
-
-  if (!stats) return null
-
-  const trendData = stats.registrations_trend.map((d) => ({
-    date: format(new Date(d.date), 'd MMM'),
-    Registrasi: d.count,
-  }))
-
-  const pieData = stats.membership_breakdown.map((m) => ({
-    name: m.type.charAt(0).toUpperCase() + m.type.slice(1),
+  const pieData = (stats.membership_breakdown ?? []).map((m) => ({
+    name: m.type === 'free' ? 'Gratis' : m.type.charAt(0).toUpperCase() + m.type.slice(1),
+    color: MEMBERSHIP_COLORS[m.type] || '#94a3b8',
     value: m.count,
   }))
 
-  const activeRate = stats.total_businesses > 0
-    ? Math.round((stats.active_businesses / stats.total_businesses) * 100)
-    : 0
-  const verifiedRate = stats.total_users > 0
-    ? Math.round((stats.verified_users / stats.total_users) * 100)
-    : 0
+  const activeRate = percentage(stats.active_businesses, stats.total_businesses)
+  const verifiedRate = percentage(stats.verified_users, stats.total_users)
+  const registrationTotal = trendData.reduce((sum, point) => sum + point.value, 0)
+  const membershipTotal = pieData.reduce((sum, point) => sum + point.value, 0)
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-bold text-slate-800">Dashboard</h2>
-        <p className="text-sm text-slate-500 mt-0.5">Ringkasan pengguna dan bisnis Loka Kasir</p>
+      {header}
+      <AnalyticsState loading={loading} error={error} hasData />
+      <div className="rounded-xl border border-indigo-100 bg-indigo-50/50 px-4 py-3 text-sm leading-6 text-indigo-800">
+        Status bisnis di halaman ini menunjukkan izin akses akun. Aktivitas pemakaian dan transaksi bisa dilihat di <Link to="/usage" className="font-semibold underline underline-offset-2">Aktivitas & Pemakaian →</Link>
       </div>
-
-      {/* Stat cards */}
       <div className="grid grid-cols-1 min-[380px]:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <StatCard label="Total Bisnis" value={stats.total_businesses} sub={`${activeRate}% aktif`} />
-        <StatCard label="Bisnis Aktif" value={stats.active_businesses} />
-        <StatCard label="Total Pengguna" value={stats.total_users} sub={`${verifiedRate}% terverifikasi`} />
-        <StatCard label="Pengguna Terverifikasi" value={stats.verified_users} />
+        <MetricCard label="Bisnis terdaftar" value={formatNumber(stats.total_businesses)} detail="Seluruh bisnis, tanpa akun demo" />
+        <MetricCard label="Bisnis diaktifkan" value={formatNumber(stats.active_businesses)} detail={`${activeRate}% berstatus aktif; bukan aktivitas penggunaan`} />
+        <MetricCard label="Akun pemilik & admin" value={formatNumber(stats.total_users)} detail="Akun karyawan dihitung di halaman pemakaian" />
+        <MetricCard label="Akun terverifikasi" value={formatNumber(stats.verified_users)} detail={`${verifiedRate}% dari akun pemilik & admin`} />
       </div>
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Trend chart */}
         <div className="lg:col-span-2 min-w-0 bg-white rounded-xl border border-slate-200 p-4 sm:p-5">
-          <h3 className="text-sm font-semibold text-slate-700 mb-4">Registrasi 30 Hari Terakhir</h3>
+          <h3 className="text-sm font-semibold text-slate-700 mb-4">Registrasi bisnis · 30 tanggal terakhir</h3>
+          <p className="mb-4 text-xs text-slate-500">{formatNumber(registrationTotal)} bisnis baru · UTC · hari tanpa registrasi ditampilkan nol</p>
           {trendData.length > 0 ? (
             <ResponsiveContainer width="100%" height={200}>
               <AreaChart data={trendData}>
@@ -125,10 +98,10 @@ export default function DashboardPage() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                <XAxis dataKey="date" tick={{ fontSize: 11 }} tickLine={false} />
+                <XAxis dataKey="label" tick={{ fontSize: 11 }} tickLine={false} />
                 <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={false} allowDecimals={false} />
-                <Tooltip />
-                <Area type="monotone" dataKey="Registrasi" stroke="#6366f1" fill="url(#colorReg)" strokeWidth={2} />
+                <Tooltip formatter={value => [formatNumber(Number(value)), 'Bisnis']} />
+                <Area type="linear" dataKey="value" stroke="#6366f1" fill="url(#colorReg)" strokeWidth={2} />
               </AreaChart>
             </ResponsiveContainer>
           ) : (
@@ -140,35 +113,38 @@ export default function DashboardPage() {
 
         {/* Membership pie */}
         <div className="min-w-0 bg-white rounded-xl border border-slate-200 p-4 sm:p-5">
-          <h3 className="text-sm font-semibold text-slate-700 mb-4">Distribusi Membership Aktif</h3>
+          <h3 className="text-sm font-semibold text-slate-700 mb-4">Paket bisnis</h3>
+          <p className="mb-4 text-xs text-slate-500">{formatNumber(membershipTotal)} bisnis · satu paket per bisnis</p>
+          {membershipTotal !== stats.total_businesses && <p className="mb-3 text-xs text-amber-700">Distribusi paket dari server belum mencakup seluruh bisnis.</p>}
           {pieData.some((d) => d.value > 0) ? (
             <ResponsiveContainer width="100%" height={200}>
               <PieChart>
                 <Pie data={pieData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value" paddingAngle={3}>
                   {pieData.map((entry) => (
-                    <Cell key={entry.name} fill={MEMBERSHIP_COLORS[entry.name.toLowerCase()] || '#94a3b8'} />
+                    <Cell key={entry.name} fill={entry.color} />
                   ))}
                 </Pie>
                 <Legend iconSize={10} />
-                <Tooltip />
+                <Tooltip formatter={value => [formatNumber(Number(value)), 'Bisnis']} />
               </PieChart>
             </ResponsiveContainer>
           ) : (
             <div className="h-48 flex items-center justify-center text-slate-400 text-sm">
-              Belum ada membership aktif
+              Belum ada data paket bisnis
             </div>
           )}
         </div>
       </div>
 
       {/* Sebaran wilayah */}
-      {stats.province_distribution && (
+      {(stats.province_distribution != null || stats.geo_provinces != null) && (
         <div className="space-y-2">
           <div className="flex items-center justify-between gap-3 flex-wrap">
-            <h3 className="text-sm font-semibold text-slate-700">Sebaran Pengguna</h3>
+            <h3 className="text-sm font-semibold text-slate-700">Sebaran Bisnis</h3>
             <div className="inline-flex rounded-lg border border-slate-200 bg-white p-0.5 text-xs">
               {([['ip', 'Lokasi pemakaian (IP)'], ['profile', 'Profil bisnis']] as const).map(([key, label]) => (
                 <button
+                  aria-pressed={regionSource === key}
                   key={key}
                   type="button"
                   onClick={() => setRegionSource(key)}
@@ -186,7 +162,7 @@ export default function DashboardPage() {
                 <RegionList title="10 Kota Teratas" rows={stats.geo_cities ?? []} total={stats.total_businesses} />
               </div>
               <p className="text-xs text-slate-400">
-                Warna tua = bisnis aktif. {stats.geo_located ?? 0} dari {stats.total_businesses} bisnis sudah terdeteksi
+                Warna tua = bisnis berstatus diaktifkan. Persentase dari seluruh bisnis. {formatNumber(stats.geo_located)} dari {stats.total_businesses} bisnis sudah terdeteksi
                 lokasinya{stats.geo_abroad ? ` (${stats.geo_abroad} di luar Indonesia)` : ''}; terisi otomatis saat aplikasi dipakai.
                 IP seluler sering terbaca di kota gateway operator, jadi kota kurang tepat dibanding provinsi.
                 Data lokasi IP: DB-IP.com.
@@ -195,11 +171,11 @@ export default function DashboardPage() {
           ) : (
             <>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <RegionList title="Per Provinsi" rows={stats.province_distribution} total={stats.total_businesses} />
+                <RegionList title="Per Provinsi" rows={stats.province_distribution ?? []} total={stats.total_businesses} />
                 <RegionList title="10 Kota/Kabupaten Teratas" rows={stats.top_cities ?? []} total={stats.total_businesses} />
               </div>
               <p className="text-xs text-slate-400">
-                Warna tua = bisnis aktif. {stats.unknown_region ?? 0} dari {stats.total_businesses} bisnis belum mengisi wilayah.
+                Warna tua = bisnis berstatus diaktifkan. Persentase dari seluruh bisnis. {formatNumber(stats.unknown_region)} dari {stats.total_businesses} bisnis belum mengisi wilayah.
               </p>
             </>
           )}
@@ -208,13 +184,13 @@ export default function DashboardPage() {
 
       {/* Membership breakdown table */}
       <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-5">
-        <h3 className="text-sm font-semibold text-slate-700 mb-3">Rincian Membership</h3>
+        <h3 className="text-sm font-semibold text-slate-700 mb-3">Rincian paket bisnis</h3>
         <div className="flex gap-4 flex-wrap">
-          {stats.membership_breakdown.map((m) => (
+          {(stats.membership_breakdown ?? []).map((m) => (
             <div key={m.type} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-50 border border-slate-200">
               <span className="w-2 h-2 rounded-full" style={{ background: MEMBERSHIP_COLORS[m.type] || '#94a3b8' }} />
-              <span className="text-sm font-medium text-slate-700 capitalize">{m.type}</span>
-              <span className="text-sm text-slate-500">{m.count} bisnis</span>
+              <span className="text-sm font-medium text-slate-700 capitalize">{m.type === 'free' ? 'Gratis' : m.type}</span>
+              <span className="text-sm text-slate-500">{formatNumber(m.count)} bisnis</span>
             </div>
           ))}
         </div>
