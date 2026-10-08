@@ -4,6 +4,8 @@ import { useAuthStore } from '../../store/authStore'
 const navItems = [
   { to: '/', label: 'Dashboard', icon: '📊' },
   { to: '/usage', label: 'Aktivitas & Pemakaian', icon: '🟢' },
+  { to: '/users', label: 'Pengguna', icon: '👥' },
+  { to: '/sales', label: 'Penjualan', icon: '💰' },
   { to: '/businesses', label: 'Bisnis', icon: '🏪' },
   { to: '/master-products', label: 'Katalog Produk', icon: '📦' },
   { to: '/reset-transactions', label: 'Reset Transaksi', icon: '🧹' },
@@ -47,7 +49,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
         </button>
       </div>
 
-      <nav className="flex-1 px-3 py-4 space-y-1">
+      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
         {navItems.map((item) => (
           <NavLink
             key={item.to}

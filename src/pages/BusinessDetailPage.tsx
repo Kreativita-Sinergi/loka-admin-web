@@ -264,6 +264,11 @@ export default function BusinessDetailPage() {
         </div>
       </div>
 
+      <div className="flex flex-wrap gap-2">
+        <button onClick={() => navigate(`/users?business_id=${business.id}`)} className="rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-700 hover:bg-indigo-100">👥 Lihat pengguna</button>
+        <button onClick={() => navigate(`/sales?business_id=${business.id}`)} className="rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-700 hover:bg-indigo-100">💰 Lihat penjualan</button>
+      </div>
+
       {/* Snapshot operasional agar super admin bisa menilai kesehatan tenant
           tanpa perlu membuka laporan milik pemilik bisnis. */}
       <section className="bg-white rounded-xl border border-slate-200 p-4 sm:p-6">
