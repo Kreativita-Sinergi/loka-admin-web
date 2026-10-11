@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { getBusinessById, getActiveUsers, updateOutletAdminNote, toggleBusinessActive, createMembership, updateMembership, deactivateMembership, deleteBusiness, updateBusiness, getBusinessTypes, getBusinessVerticals, resetUserPassword } from '../api/admin'
 import type { BusinessActiveUsers } from '../api/admin'
 import type { AdminBusiness, AdminBusinessType, AdminBusinessVertical } from '../types'
+import BusinessSubscriptionPrices from '../components/BusinessSubscriptionPrices'
 import Badge from '../components/ui/Badge'
 import Modal from '../components/ui/Modal'
 import DeleteConfirmModal from '../components/ui/DeleteConfirmModal'
@@ -550,6 +551,8 @@ export default function BusinessDetailPage() {
           <p className="text-sm text-slate-400">Tidak ada membership aktif</p>
         )}
       </div>
+
+      <BusinessSubscriptionPrices key={business.id} businessId={business.id} businessName={business.business_name} />
 
       {/* Edit Business Profile Modal */}
       <Modal title="Edit Profil Bisnis" open={editBusinessModal} onClose={() => setEditBusinessModal(false)}>

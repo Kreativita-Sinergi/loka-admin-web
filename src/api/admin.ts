@@ -238,3 +238,14 @@ export const getSecurityLogs = (
   params: SecurityLogsParams = {}
 ): Promise<SingleResponse<SecurityLogsData>> =>
   axios.get('/admin/security-logs', { params }).then((r) => r.data)
+
+export interface BusinessSubscriptionPrice {
+  plan: 'pro' | 'pro-yearly' | 'pro-3year'
+  normal_price: number
+  custom_price: number | null
+  effective_price: number
+}
+export const getBusinessSubscriptionPrices = (id: string): Promise<SingleResponse<BusinessSubscriptionPrice[]>> =>
+  axios.get(`/admin/businesses/${id}/subscription-prices`).then((r) => r.data)
+export const saveBusinessSubscriptionPrices = (id: string, prices: Record<BusinessSubscriptionPrice['plan'], number | null>): Promise<SingleResponse<null>> =>
+  axios.put(`/admin/businesses/${id}/subscription-prices`, { prices }).then((r) => r.data)
