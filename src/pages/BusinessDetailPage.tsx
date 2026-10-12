@@ -498,7 +498,7 @@ export default function BusinessDetailPage() {
             <div>
               <p className="text-slate-400 text-xs">Sisa Hari</p>
               <p className="text-slate-700 mt-0.5 font-semibold">
-                {membership.days_remaining > 0 ? `${membership.days_remaining} hari` : 'Sudah berakhir'}
+                {membership.type === 'free' ? 'Tanpa batas masa aktif' : membership.is_active && membership.days_remaining > 0 ? `${membership.days_remaining} hari` : 'Sudah berakhir'}
               </p>
             </div>
             <div>
@@ -510,7 +510,7 @@ export default function BusinessDetailPage() {
             <div>
               <p className="text-slate-400 text-xs">Berakhir</p>
               <p className={`mt-0.5 font-medium ${isExpired ? 'text-red-600' : 'text-slate-700'}`}>
-                {format(new Date(membership.end_date), 'dd MMM yyyy', { locale: localeId })}
+                {membership.type === 'free' ? 'Tidak berlaku untuk paket Free' : format(new Date(membership.end_date), 'dd MMM yyyy', { locale: localeId })}
               </p>
             </div>
             {membership.scheduled_downgrade_to && (
@@ -697,6 +697,7 @@ export default function BusinessDetailPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Atau Perpanjang (hari)</label>
+            <p className="text-xs text-slate-500 mb-2">Ditambahkan ke akhir masa aktif yang tersisa. Paket Free atau yang sudah berakhir dihitung mulai sekarang.</p>
             <input
               type="number"
               min={0}

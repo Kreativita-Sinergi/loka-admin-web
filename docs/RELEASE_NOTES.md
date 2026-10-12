@@ -7,3 +7,5 @@ Memerlukan backend 1.8.0.
 - Harga berlaku pada tagihan baru dan divalidasi server. Form menampilkan status memuat, kegagalan, perubahan, dan hasil penyimpanan.
 
 Deploy backend sebelum dashboard admin agar katalog dan endpoint pengaturan tersedia.
+
+- Paket Free ditampilkan tanpa hitung mundur Pro; form perpanjangan admin menjelaskan penambahan durasi dari akhir masa aktif.
