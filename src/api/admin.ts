@@ -249,3 +249,24 @@ export const getBusinessSubscriptionPrices = (id: string): Promise<SingleRespons
   axios.get(`/admin/businesses/${id}/subscription-prices`).then((r) => r.data)
 export const saveBusinessSubscriptionPrices = (id: string, prices: Record<BusinessSubscriptionPrice['plan'], number | null>): Promise<SingleResponse<null>> =>
   axios.put(`/admin/businesses/${id}/subscription-prices`, { prices }).then((r) => r.data)
+
+// ── Tagihan langganan (Duitku) ───────────────────────────────────────────────
+
+export interface AdminPaymentOrder {
+  id: string
+  type: 'membership_upgrade' | 'outlet_addon'
+  plan: string | null
+  amount: number
+  status: 'pending' | 'paid' | 'expired' | 'cancelled'
+  is_prorata: boolean
+  expired_at: string
+  paid_at: string | null
+  created_at: string
+}
+
+export const getBusinessPaymentOrders = (businessId: string): Promise<SingleResponse<AdminPaymentOrder[]>> =>
+  axios.get(`/admin/businesses/${businessId}/payment-orders`).then((r) => r.data)
+
+/** Menanyakan status ke Duitku; bila sudah dibayar, server memprosesnya seperti callback. */
+export const reconcilePaymentOrder = (orderId: string): Promise<SingleResponse<{ order: AdminPaymentOrder; duitku_status: string }>> =>
+  axios.post(`/admin/payment-orders/${orderId}/reconcile`).then((r) => r.data)

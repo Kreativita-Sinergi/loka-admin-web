@@ -4,6 +4,7 @@ import { getBusinessById, getActiveUsers, updateOutletAdminNote, toggleBusinessA
 import type { BusinessActiveUsers } from '../api/admin'
 import type { AdminBusiness, AdminBusinessType, AdminBusinessVertical } from '../types'
 import BusinessSubscriptionPrices from '../components/BusinessSubscriptionPrices'
+import BusinessPaymentOrders from '../components/BusinessPaymentOrders'
 import Badge from '../components/ui/Badge'
 import Modal from '../components/ui/Modal'
 import DeleteConfirmModal from '../components/ui/DeleteConfirmModal'
@@ -552,6 +553,7 @@ export default function BusinessDetailPage() {
         )}
       </div>
 
+      <BusinessPaymentOrders key={`orders-${business.id}`} businessId={business.id} onSettled={refetch} />
       <BusinessSubscriptionPrices key={business.id} businessId={business.id} businessName={business.business_name} />
 
       {/* Edit Business Profile Modal */}
@@ -678,7 +680,15 @@ export default function BusinessDetailPage() {
             <label className="block text-sm font-medium text-slate-700 mb-1">Paket</label>
             <select
               value={editForm.type}
-              onChange={(e) => setEditForm((f) => ({ ...f, type: e.target.value }))}
+              onChange={(e) => {
+                const type = e.target.value
+                // Free→berbayar: tanggal berakhir Free (~99 tahun) tidak boleh
+                // ikut terbawa; mulai masa paket dari hari ini.
+                const fromFree = business?.membership?.type === 'free' && type !== 'free'
+                setEditForm((f) => fromFree
+                  ? { type, end_date: '', extend_days: f.extend_days > 0 ? f.extend_days : 30 }
+                  : { ...f, type })
+              }}
               className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               <option value="free">Gratis</option>
