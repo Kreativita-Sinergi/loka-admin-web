@@ -6,6 +6,7 @@ import Badge from '../components/ui/Badge'
 import Pagination from '../components/ui/Pagination'
 import DeleteConfirmModal from '../components/ui/DeleteConfirmModal'
 import { formatDate } from '../lib/analytics'
+import { membershipLabel, membershipVariant } from '../lib/membership'
 
 const STATUS_OPTIONS = [
   { value: '', label: 'Semua' },
@@ -20,11 +21,7 @@ function membershipBadge(membership: AdminBusiness['membership']) {
   if (membership.type === 'free') return <Badge variant="neutral">GRATIS</Badge>
   const expired = new Date(membership.end_date) < new Date() || !membership.is_active
   if (expired) return <Badge variant="danger">Expired</Badge>
-  const map: Record<string, 'warning' | 'info' | 'success'> = {
-    trial: 'warning',
-    pro: 'success',
-  }
-  return <Badge variant={map[membership.type] ?? 'neutral'}>{membership.type.toUpperCase()}</Badge>
+  return <Badge variant={membershipVariant(membership.type)}>{membershipLabel(membership.type)}</Badge>
 }
 
 export default function BusinessesPage() {

@@ -6,6 +6,7 @@ import type { AdminBusiness, AdminBusinessType, AdminBusinessVertical } from '..
 import BusinessSubscriptionPrices from '../components/BusinessSubscriptionPrices'
 import BusinessPaymentOrders from '../components/BusinessPaymentOrders'
 import Badge from '../components/ui/Badge'
+import { quickMembershipPlans, membershipLabel, membershipVariant, membershipDefaultDays, membershipUpdate } from '../lib/membership'
 import Modal from '../components/ui/Modal'
 import DeleteConfirmModal from '../components/ui/DeleteConfirmModal'
 import { format } from 'date-fns'
@@ -134,11 +135,10 @@ export default function BusinessDetailPage() {
     if (!business?.membership) return
     setSubmitting(true)
     try {
-      await updateMembership(business.membership.id, {
-        type: editForm.type || undefined,
-        extend_days: editForm.extend_days > 0 ? editForm.extend_days : undefined,
-        end_date: editForm.end_date || undefined,
-      })
+      await updateMembership(business.membership.id, membershipUpdate(editForm, {
+        type: business.membership.type,
+        end_date: format(new Date(business.membership.end_date), 'yyyy-MM-dd'),
+      }))
       setEditMembershipModal(false)
       refetch()
     } catch (err) {
@@ -153,7 +153,7 @@ export default function BusinessDetailPage() {
   // Untuk paket Gratis pakai durasi sangat panjang agar tidak pernah expired.
   const handleChangePlan = async (type: string, days: number, actionKey: string) => {
     if (!business?.membership) return
-    const typeLabel = type === 'pro' ? 'Pro' : 'Gratis'
+    const typeLabel = type === 'free' ? 'Gratis' : 'Pro'
     const durationLabel =
       type === 'free'
         ? ''
@@ -490,8 +490,8 @@ export default function BusinessDetailPage() {
                 ) : isExpired ? (
                   <Badge variant="danger">Expired</Badge>
                 ) : (
-                  <Badge variant={membership.type === 'pro' ? 'success' : 'warning'}>
-                    {membership.type.toUpperCase()}
+                  <Badge variant={membershipVariant(membership.type)}>
+                    {membershipLabel(membership.type)}
                   </Badge>
                 )}
               </div>
@@ -523,13 +523,7 @@ export default function BusinessDetailPage() {
             <div className="col-span-2 pt-3 mt-1 border-t border-slate-100">
               <p className="text-slate-400 text-xs mb-2">Ubah Paket Cepat</p>
               <div className="flex flex-wrap gap-2">
-                {[
-                  { key: 'pro-30', type: 'pro', days: 30, label: 'Pro Bulanan', cls: 'bg-emerald-600 hover:bg-emerald-700 text-white' },
-                  { key: 'pro-365', type: 'pro', days: 365, label: 'Pro Tahunan', cls: 'bg-emerald-700 hover:bg-emerald-800 text-white' },
-                  { key: 'pro-1095', type: 'pro', days: 1095, label: 'Pro 3 Tahun', cls: 'bg-emerald-800 hover:bg-emerald-900 text-white' },
-                  // Gratis: durasi sangat panjang (≈100 tahun) agar tidak pernah expired.
-                  { key: 'free', type: 'free', days: 36500, label: 'Gratis', cls: 'bg-slate-200 hover:bg-slate-300 text-slate-700' },
-                ].map((p) => (
+                {quickMembershipPlans.map((p) => (
                   <button
                     key={p.key}
                     onClick={() => handleChangePlan(p.type, p.days, p.key)}
@@ -642,12 +636,14 @@ export default function BusinessDetailPage() {
             <label className="block text-sm font-medium text-slate-700 mb-1">Paket</label>
             <select
               value={form.type}
-              onChange={(e) => setForm((f) => ({ ...f, type: e.target.value }))}
+              onChange={(e) => setForm((f) => ({ ...f, type: e.target.value, days: membershipDefaultDays(e.target.value) }))}
               className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               <option value="free">Gratis</option>
               <option value="trial">Trial</option>
-              <option value="pro">Pro</option>
+              <option value="pro">Pro Bulanan</option>
+              <option value="pro-yearly">Pro Tahunan</option>
+              <option value="pro-3year">Pro 3 Tahun</option>
             </select>
           </div>
           <div>
@@ -693,7 +689,9 @@ export default function BusinessDetailPage() {
             >
               <option value="free">Gratis</option>
               <option value="trial">Trial</option>
-              <option value="pro">Pro</option>
+              <option value="pro">Pro Bulanan</option>
+              <option value="pro-yearly">Pro Tahunan</option>
+              <option value="pro-3year">Pro 3 Tahun</option>
             </select>
           </div>
           <div>
