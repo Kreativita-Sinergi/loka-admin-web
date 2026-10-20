@@ -34,6 +34,7 @@ const VERTICALS = [
   { value: 'FASHION', label: 'Fashion / Pakaian' },
   { value: 'APOTEK', label: 'Apotek / Toko Obat' },
   { value: 'KONTER_PULSA', label: 'Konter Pulsa & Kuota' },
+  { value: 'TOKO_BANGUNAN', label: 'Toko Bangunan / Material' },
   { value: 'RETAIL_LAINNYA', label: 'Ritel Lainnya' },
   { value: 'BENGKEL', label: 'Bengkel Kendaraan' },
   { value: 'KONTER_HP', label: 'Konter & Servis HP' },
