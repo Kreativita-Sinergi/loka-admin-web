@@ -17,6 +17,10 @@ const ProspectsPage = lazy(() => import('./pages/ProspectsPage'))
 const ThreadsBotPage = lazy(() => import('./pages/ThreadsBotPage'))
 const MasterProductsPage = lazy(() => import('./pages/MasterProductsPage'))
 const ResetTransactionsPage = lazy(() => import('./pages/ResetTransactionsPage'))
+const SalesAgentsPage = lazy(() => import('./pages/SalesAgentsPage'))
+const SalesAgentDetailPage = lazy(() => import('./pages/SalesAgentDetailPage'))
+const SalesPayoutsPage = lazy(() => import('./pages/SalesPayoutsPage'))
+const PaymentFeesPage = lazy(() => import('./pages/PaymentFeesPage'))
 
 function PageFallback() {
   return (
@@ -49,6 +53,10 @@ export default function App() {
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/security-logs" element={<SecurityLogsPage />} />
             <Route path="/prospects" element={<ProspectsPage />} />
+            <Route path="/sales-agents" element={<SalesAgentsPage />} />
+            <Route path="/sales-agents/:id" element={<SalesAgentDetailPage />} />
+            <Route path="/sales-payouts" element={<SalesPayoutsPage />} />
+            <Route path="/payment-fees" element={<PaymentFeesPage />} />
             <Route path="/threads-bot" element={<ThreadsBotPage />} />
             <Route path="/master-products" element={<MasterProductsPage />} />
             <Route path="/reset-transactions" element={<ResetTransactionsPage />} />
