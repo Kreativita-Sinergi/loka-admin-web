@@ -141,7 +141,7 @@ export default function SalesPayoutsPage() {
               </table>
             </div>
           )}
-          <p className="text-xs text-slate-400">Sales berstatus ditangguhkan tidak ikut dan tidak tercantum di sini. Saldo di bawah minimum terbawa ke pencairan berikutnya.</p>
+          <p className="text-xs text-slate-400">Saldo yang dilewati tetap tersimpan dan ikut di pencairan berikutnya.</p>
         </section>
       )}
 
@@ -312,7 +312,7 @@ function BatchForm({ onCancel, onDone }: { onCancel: () => void; onDone: (r: { c
   return (
     <form onSubmit={submit} className="space-y-4">
       <ul className="text-sm text-slate-600 space-y-1.5 list-disc pl-5">
-        <li>Hanya sales berstatus <strong>aktif</strong>.</li>
+        <li>Hanya sales berstatus <strong>aktif</strong>; sales yang ditangguhkan tercantum sebagai dilewati.</li>
         <li>Menjumlahkan komisi yang sudah lewat masa tahan 30 hari dan belum dicairkan, termasuk pembatalan (nilai negatif).</li>
         <li>Saldo di bawah Rp100.000 atau rekening yang belum lengkap dilewati — alasannya ditampilkan setelah ini.</li>
         <li>Rekening disalin ke draf saat ini juga. Bila rekening sales berubah, batalkan draf lalu buat ulang.</li>

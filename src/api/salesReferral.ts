@@ -115,7 +115,7 @@ export const getSalesAgent = (id: string) =>
 export const createSalesAgent = (data: SalesAgentInput & { password: string }) =>
   axios.post<SingleResponse<SalesAgent>>('/admin/sales', data).then((r) => r.data)
 
-/** NIK dan nomor rekening yang dikirim kosong tidak menghapus nilai lama. */
+/** Mengganti seluruh data: kolom KYC/rekening yang dikirim kosong ikut terhapus. */
 export const updateSalesAgent = (id: string, data: SalesAgentInput) =>
   axios.patch<SingleResponse<SalesAgent>>(`/admin/sales/${id}`, data).then((r) => r.data)
 
@@ -125,8 +125,9 @@ export const resetSalesPassword = (id: string, password: string) =>
 export const getSalesCustomers = (id: string) =>
   axios.get<SingleResponse<SalesCustomer[]>>(`/admin/sales/${id}/customers`).then((r) => r.data)
 
-/** Ledger terbaru dulu; `before` = created_at baris terakhir untuk halaman berikutnya. */
-export const getSalesCommissions = (id: string, params: { before?: string; limit?: number } = {}) =>
+/** Ledger terbaru dulu. Halaman berikutnya: `before` + `before_id` = created_at
+ *  dan id baris terakhir (keyset), supaya baris bertimestamp sama tidak terlewat. */
+export const getSalesCommissions = (id: string, params: { before?: string; before_id?: string; limit?: number } = {}) =>
   axios.get<SingleResponse<SalesCommission[]>>(`/admin/sales/${id}/commissions`, { params }).then((r) => r.data)
 
 export const revokeSalesCommission = (orderId: string, reason: string) =>

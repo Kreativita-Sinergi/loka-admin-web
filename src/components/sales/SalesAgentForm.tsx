@@ -30,8 +30,9 @@ const fromAgent = (a?: SalesAgent): SalesAgentInput => ({
 /**
  * Formulir tambah/ubah sales, termasuk KYC. Dipakai di dalam `Modal`.
  *
- * Saat mengubah, NIK dan nomor rekening yang dikosongkan TIDAK menghapus nilai
- * lama (server memakai COALESCE), jadi petunjuknya ditampilkan apa adanya.
+ * Saat mengubah, PATCH mengganti seluruh data: form memuat nilai terdekripsi
+ * dari GET dan mengirim semuanya kembali, sehingga kolom yang dikosongkan
+ * ikut terhapus.
  */
 export default function SalesAgentForm({ agent, onSaved, onCancel }: {
   agent?: SalesAgent
@@ -74,8 +75,10 @@ export default function SalesAgentForm({ agent, onSaved, onCancel }: {
     }
   }
 
-  const clearedHint = (key: 'nik' | 'bank_account_no') =>
-    agent?.[key] && !form[key] ? 'Kolom kosong tidak menghapus nilai lama — nilai sebelumnya tetap tersimpan.' : undefined
+  const KYC_FIELDS = { nik: 'NIK', npwp: 'NPWP', bank_name: 'bank', bank_account_no: 'nomor rekening', bank_account_name: 'nama rekening' } as const
+  const cleared = agent
+    ? (Object.keys(KYC_FIELDS) as (keyof typeof KYC_FIELDS)[]).filter((k) => agent[k] && !form[k].trim()).map((k) => KYC_FIELDS[k])
+    : []
 
   return (
     <form onSubmit={submit} className="space-y-5">
@@ -117,16 +120,21 @@ export default function SalesAgentForm({ agent, onSaved, onCancel }: {
           <p className="text-xs text-slate-500 mt-1">Rekening harus atas nama yang sama dengan KTP. Sales tanpa rekening lengkap dilewati saat draf pencairan dibuat.</p>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
-          <Field label="NIK (KTP)" hint={clearedHint('nik')}><input inputMode="numeric" {...text('nik')} /></Field>
+          <Field label="NIK (KTP)"><input inputMode="numeric" {...text('nik')} /></Field>
           <Field label="NPWP"><input {...text('npwp')} /></Field>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
           <Field label="Bank"><input {...text('bank_name')} placeholder="mis. BCA" /></Field>
-          <Field label="No. rekening" hint={clearedHint('bank_account_no')}><input inputMode="numeric" {...text('bank_account_no')} /></Field>
+          <Field label="No. rekening"><input inputMode="numeric" {...text('bank_account_no')} /></Field>
         </div>
         <Field label="Nama pemilik rekening"><input {...text('bank_account_name')} /></Field>
       </div>
 
+      {cleared.length > 0 && (
+        <p className="text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+          Data {cleared.join(', ')} yang sebelumnya tersimpan akan dihapus saat disimpan.
+        </p>
+      )}
       {willActivate && (
         <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
           KYC belum lengkap. Sales tetap bisa diaktifkan, tetapi pencairannya dilewati sampai NIK dan rekening lengkap.

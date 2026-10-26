@@ -327,7 +327,8 @@ function CommissionsTab({ salesId, onChanged }: { salesId: string; onChanged: ()
     if (!rows?.length) return
     setLoadingMore(true)
     try {
-      const res = await getSalesCommissions(salesId, { before: rows[rows.length - 1].created_at, limit: PAGE })
+      const last = rows[rows.length - 1]
+      const res = await getSalesCommissions(salesId, { before: last.created_at, before_id: last.id, limit: PAGE })
       const data = res.data ?? []
       setRows([...rows, ...data]); setHasMore(data.length === PAGE)
     } catch (err) {
@@ -453,6 +454,16 @@ function OrderSummary({ row }: { row: SalesCommission }) {
   )
 }
 
+/** Server menolak pembatalan/koreksi komisi yang masih ada di draf pencairan. */
+function DraftNotice() {
+  return (
+    <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+      Komisi ini ada di draf pencairan yang belum dibayar. Batalkan drafnya dulu di halaman{' '}
+      <Link to="/sales-payouts" className="font-semibold underline">Pencairan Sales</Link>, lalu buat ulang draf setelah koreksi.
+    </p>
+  )
+}
+
 function FormButtons({ saving, label, danger, onCancel }: { saving: boolean; label: string; danger?: boolean; onCancel: () => void }) {
   return (
     <div className="flex gap-3">
@@ -487,10 +498,11 @@ function RevokeForm({ row, onCancel, onDone }: { row: SalesCommission; onCancel:
   return (
     <form onSubmit={submit} className="space-y-4">
       <OrderSummary row={row} />
+      {row.status === 'processing' && <DraftNotice />}
       <p className="text-sm text-slate-600">
         Dipakai untuk refund atau penyalahgunaan. Seluruh komisi pembayaran ini (termasuk koreksi) dibalik dengan baris negatif.
         {row.status === 'paid' && ' Komisi ini sudah dicairkan, jadi nilainya memotong pencairan berikutnya.'}
-        {row.status === 'processing' && ' Komisi ini ada di draf pencairan yang belum dibayar: batalkan draf itu lalu buat ulang supaya tidak ikut ditransfer. Bila tidak, nilainya memotong pencairan berikutnya.'}
+        {row.status === 'held' && ' Pembatalan ikut ditahan sampai tanggal cair komisinya.'}
         {' '}Tidak bisa diurungkan.
       </p>
       <label className="block">
@@ -531,6 +543,7 @@ function FeeForm({ row, onCancel, onDone }: { row: SalesCommission; onCancel: ()
   return (
     <form onSubmit={submit} className="space-y-4">
       <OrderSummary row={row} />
+      {row.status === 'processing' && <DraftNotice />}
       <p className="text-sm text-slate-600">
         Isi biaya Duitku yang sebenarnya untuk transaksi ini (lihat dashboard Duitku). Selisih komisi dicatat sebagai baris koreksi.
       </p>
