@@ -24,7 +24,6 @@ const STAGE_OPTIONS = [
   { value: '', label: 'Semua tahap' },
   { value: 'trial', label: STAGE_LABEL.trial },
   { value: 'paid', label: STAGE_LABEL.paid },
-  { value: 'free', label: STAGE_LABEL.free },
   { value: 'expired', label: STAGE_LABEL.expired },
 ]
 

@@ -19,7 +19,7 @@ export const STAGE_LABEL: Record<HealthStage, string> = {
   paid: 'Pro',
   // Data lama (paket Gratis sudah dihapus): usaha tanpa langganan berlaku.
   free: 'Tanpa langganan',
-  expired: 'Kedaluwarsa',
+  expired: 'Berakhir / tanpa langganan',
 }
 
 const REASONS: Record<string, string> = {
