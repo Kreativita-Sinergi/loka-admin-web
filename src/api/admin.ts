@@ -30,7 +30,7 @@ export interface BusinessActiveUsers {
   last_seen_at: string | null
   /** Transaksi 7 hari terakhir — ukuran "masih berjualan atau tidak". */
   trx_this_week?: number
-  /** Paket aktif: free | trial | pro. */
+  /** Paket berlaku: trial | pro | pro-yearly | pro-3year; `free` = tanpa langganan berlaku. */
   plan?: string
   created_at?: string | null
 }
@@ -120,9 +120,6 @@ export const updateMembership = (
 
 export const deactivateMembership = (id: string): Promise<SingleResponse<null>> =>
   axios.delete(`/admin/memberships/${id}`).then((r) => r.data)
-
-export const processDowngrades = (): Promise<SingleResponse<null>> =>
-  axios.post('/admin/memberships/process-downgrades').then((r) => r.data)
 
 export const loginAdmin = (
   username: string,

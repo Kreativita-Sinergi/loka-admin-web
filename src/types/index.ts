@@ -18,7 +18,8 @@ export interface AdminBusinessVertical {
 
 export interface AdminMembership {
   id: string
-  type: 'free' | 'trial' | 'pro'
+  /** trial | pro | pro-yearly | pro-3year. `free` hanya data lama dari sebelum paket Gratis dihapus. */
+  type: 'trial' | 'pro' | 'pro-yearly' | 'pro-3year' | 'free'
   start_date: string
   end_date: string
   is_active: boolean

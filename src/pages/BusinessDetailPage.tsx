@@ -6,7 +6,7 @@ import type { AdminBusiness, AdminBusinessType, AdminBusinessVertical } from '..
 import BusinessSubscriptionPrices from '../components/BusinessSubscriptionPrices'
 import BusinessPaymentOrders from '../components/BusinessPaymentOrders'
 import Badge from '../components/ui/Badge'
-import { quickMembershipPlans, membershipLabel, membershipVariant, membershipDefaultDays, membershipUpdate } from '../lib/membership'
+import { quickMembershipPlans, trialExtensionDays, TRIAL_DEFAULT_DAYS, membershipLabel, membershipVariant, membershipDefaultDays, membershipUpdate } from '../lib/membership'
 import Modal from '../components/ui/Modal'
 import DeleteConfirmModal from '../components/ui/DeleteConfirmModal'
 import { format } from 'date-fns'
@@ -122,11 +122,14 @@ export default function BusinessDetailPage() {
 
   const openEditMembership = () => {
     if (!business?.membership) return
-    setEditForm({
-      type: business.membership.type,
-      extend_days: 0,
-      end_date: format(new Date(business.membership.end_date), 'yyyy-MM-dd'),
-    })
+    // Data Gratis lama tidak punya pilihan lagi: mulai dari perpanjangan trial.
+    setEditForm(business.membership.type === 'free'
+      ? { type: 'trial', extend_days: TRIAL_DEFAULT_DAYS, end_date: '' }
+      : {
+        type: business.membership.type,
+        extend_days: 0,
+        end_date: format(new Date(business.membership.end_date), 'yyyy-MM-dd'),
+      })
     setEditMembershipModal(true)
   }
 
@@ -148,23 +151,15 @@ export default function BusinessDetailPage() {
     }
   }
 
-  // days: durasi paket berbayar dari sekarang (30 = bulanan, 365 = tahunan,
-  // 1095 = tiga tahun).
-  // Untuk paket Gratis pakai durasi sangat panjang agar tidak pernah expired.
+  // days: durasi yang ditambahkan (30 = bulanan, 365 = tahunan, 1095 = tiga
+  // tahun; trial: +7/+14 hari). Server menambahkannya ke sisa masa aktif, atau
+  // mulai sekarang bila sudah berakhir.
   const handleChangePlan = async (type: string, days: number, actionKey: string) => {
     if (!business?.membership) return
-    const typeLabel = type === 'free' ? 'Gratis' : 'Pro'
-    const durationLabel =
-      type === 'free'
-        ? ''
-        : days === 30
-          ? ' bulanan'
-          : days === 365
-            ? ' tahunan'
-            : days === 1095
-              ? ' 3 tahun'
-              : ` ${days} hari`
-    if (!confirm(`Ubah paket bisnis ini ke ${typeLabel}${durationLabel}?`)) return
+    const message = type === 'trial'
+      ? `Perpanjang trial bisnis ini ${days} hari?`
+      : `Ubah paket bisnis ini ke Pro${days === 30 ? ' bulanan' : days === 365 ? ' tahunan' : days === 1095 ? ' 3 tahun' : ` ${days} hari`}?`
+    if (!confirm(message)) return
     setUpgrading(actionKey)
     try {
       await updateMembership(business.membership.id, { type, extend_days: days })
@@ -224,7 +219,9 @@ export default function BusinessDetailPage() {
   if (!business) return null
 
   const membership = business.membership
-  const isExpired = membership && new Date(membership.end_date) < new Date()
+  const isExpired = membership && (!membership.is_active || new Date(membership.end_date) < new Date())
+  // Trial tidak ditawarkan di atas Pro yang masih berjalan — itu menurunkan paket.
+  const hasRunningPro = !!membership && !isExpired && membershipVariant(membership.type) === 'success'
   const backTo = (location.state as { from?: string } | null)?.from === '/usage' ? '/usage' : '/businesses'
   const usageState = !usage?.last_seen_at
     ? { label: 'Belum pernah aktif', tone: 'text-slate-500 bg-slate-100' }
@@ -485,10 +482,10 @@ export default function BusinessDetailPage() {
             <div>
               <p className="text-slate-400 text-xs">Paket</p>
               <div className="mt-0.5">
-                {membership.type === 'free' ? (
-                  <Badge variant="neutral">GRATIS</Badge>
-                ) : isExpired ? (
-                  <Badge variant="danger">Expired</Badge>
+                {/* `free` = data lama dari sebelum paket Gratis dihapus: diperlakukan
+                    sebagai berakhir (usaha terkunci, lihat saja). */}
+                {membership.type === 'free' || isExpired ? (
+                  <Badge variant="danger">Berakhir</Badge>
                 ) : (
                   <Badge variant={membershipVariant(membership.type)}>
                     {membershipLabel(membership.type)}
@@ -499,7 +496,7 @@ export default function BusinessDetailPage() {
             <div>
               <p className="text-slate-400 text-xs">Sisa Hari</p>
               <p className="text-slate-700 mt-0.5 font-semibold">
-                {membership.type === 'free' ? 'Tanpa batas masa aktif' : membership.is_active && membership.days_remaining > 0 ? `${membership.days_remaining} hari` : 'Sudah berakhir'}
+                {membership.type !== 'free' && membership.is_active && membership.days_remaining > 0 ? `${membership.days_remaining} hari` : 'Sudah berakhir — mode lihat saja'}
               </p>
             </div>
             <div>
@@ -511,7 +508,7 @@ export default function BusinessDetailPage() {
             <div>
               <p className="text-slate-400 text-xs">Berakhir</p>
               <p className={`mt-0.5 font-medium ${isExpired ? 'text-red-600' : 'text-slate-700'}`}>
-                {membership.type === 'free' ? 'Tidak berlaku untuk paket Free' : format(new Date(membership.end_date), 'dd MMM yyyy', { locale: localeId })}
+                {membership.type === 'free' ? '—' : format(new Date(membership.end_date), 'dd MMM yyyy', { locale: localeId })}
               </p>
             </div>
             {membership.scheduled_downgrade_to && (
@@ -527,18 +524,31 @@ export default function BusinessDetailPage() {
                   <button
                     key={p.key}
                     onClick={() => handleChangePlan(p.type, p.days, p.key)}
-                    // Hanya Gratis yang dinonaktifkan saat sudah aktif. Pro tetap bisa
-                    // diklik untuk ganti durasi (bulanan↔tahunan) atau perpanjang.
-                    disabled={(p.type === 'free' && membership.type === 'free') || upgrading !== null}
+                    // Pro tetap bisa diklik saat aktif untuk ganti durasi
+                    // (bulanan↔tahunan) atau perpanjang.
+                    disabled={upgrading !== null}
                     className={`px-3 py-1.5 text-xs rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${p.cls}`}
                   >
-                    {upgrading === p.key
-                      ? 'Memproses...'
-                      : membership.type === p.type && p.type === 'free'
-                        ? 'Gratis (aktif)'
-                        : p.label}
+                    {upgrading === p.key ? 'Memproses...' : p.label}
                   </button>
                 ))}
+              </div>
+              <p className="text-slate-400 text-xs mt-3 mb-2">Perpanjang Trial</p>
+              <div className="flex flex-wrap gap-2">
+                {trialExtensionDays.map((days) => {
+                  const key = `trial-${days}`
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => handleChangePlan('trial', days, key)}
+                      disabled={upgrading !== null || hasRunningPro}
+                      title={hasRunningPro ? 'Pro masih aktif' : undefined}
+                      className="px-3 py-1.5 text-xs rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed bg-amber-100 hover:bg-amber-200 text-amber-800"
+                    >
+                      {upgrading === key ? 'Memproses...' : `+${days} hari`}
+                    </button>
+                  )
+                })}
               </div>
             </div>
           </div>
@@ -639,7 +649,6 @@ export default function BusinessDetailPage() {
               onChange={(e) => setForm((f) => ({ ...f, type: e.target.value, days: membershipDefaultDays(e.target.value) }))}
               className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
-              <option value="free">Gratis</option>
               <option value="trial">Trial</option>
               <option value="pro">Pro Bulanan</option>
               <option value="pro-yearly">Pro Tahunan</option>
@@ -678,8 +687,8 @@ export default function BusinessDetailPage() {
               value={editForm.type}
               onChange={(e) => {
                 const type = e.target.value
-                // Free→berbayar: tanggal berakhir Free (~99 tahun) tidak boleh
-                // ikut terbawa; mulai masa paket dari hari ini.
+                // Dari data Gratis lama: tanggal berakhirnya (~99 tahun) tidak
+                // boleh ikut terbawa; mulai masa paket dari hari ini.
                 const fromFree = business?.membership?.type === 'free' && type !== 'free'
                 setEditForm((f) => fromFree
                   ? { type, end_date: '', extend_days: f.extend_days > 0 ? f.extend_days : 30 }
@@ -687,7 +696,6 @@ export default function BusinessDetailPage() {
               }}
               className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
-              <option value="free">Gratis</option>
               <option value="trial">Trial</option>
               <option value="pro">Pro Bulanan</option>
               <option value="pro-yearly">Pro Tahunan</option>
@@ -705,7 +713,7 @@ export default function BusinessDetailPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Atau Perpanjang (hari)</label>
-            <p className="text-xs text-slate-500 mb-2">Ditambahkan ke akhir masa aktif yang tersisa. Paket Free atau yang sudah berakhir dihitung mulai sekarang.</p>
+            <p className="text-xs text-slate-500 mb-2">Ditambahkan ke akhir masa aktif yang tersisa; yang sudah berakhir dihitung mulai sekarang. Pilih paket Trial untuk memperpanjang trial.</p>
             <input
               type="number"
               min={0}

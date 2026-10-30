@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getBusinesses, toggleBusinessActive, deleteBusiness, processDowngrades } from '../api/admin'
+import { getBusinesses, toggleBusinessActive, deleteBusiness } from '../api/admin'
 import type { AdminBusiness } from '../types'
 import Badge from '../components/ui/Badge'
 import Pagination from '../components/ui/Pagination'
@@ -10,17 +10,17 @@ import { membershipLabel, membershipVariant } from '../lib/membership'
 
 const STATUS_OPTIONS = [
   { value: '', label: 'Semua' },
-  { value: 'free', label: 'Gratis' },
   { value: 'trial', label: 'Trial' },
   { value: 'pro', label: 'Pro' },
-  { value: 'expired', label: 'Expired' },
+  { value: 'expired', label: 'Berakhir / tanpa langganan' },
 ]
 
+// Tidak ada paket Gratis: tanpa membership atau `free` lama berarti usaha
+// terkunci (lihat saja) sampai berlangganan.
 function membershipBadge(membership: AdminBusiness['membership']) {
-  if (!membership) return <Badge variant="neutral">GRATIS</Badge>
-  if (membership.type === 'free') return <Badge variant="neutral">GRATIS</Badge>
-  const expired = new Date(membership.end_date) < new Date() || !membership.is_active
-  if (expired) return <Badge variant="danger">Expired</Badge>
+  if (!membership) return <Badge variant="danger">Tanpa langganan</Badge>
+  const expired = membership.type === 'free' || new Date(membership.end_date) < new Date() || !membership.is_active
+  if (expired) return <Badge variant="danger">Berakhir</Badge>
   return <Badge variant={membershipVariant(membership.type)}>{membershipLabel(membership.type)}</Badge>
 }
 
@@ -35,8 +35,6 @@ export default function BusinessesPage() {
   const [loading, setLoading] = useState(true)
   const [toggling, setToggling] = useState<string | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<AdminBusiness | null>(null)
-  const [processingDowngrade, setProcessingDowngrade] = useState(false)
-  const [downgradeResult, setDowngradeResult] = useState<string | null>(null)
   const navigate = useNavigate()
 
   const limit = 15
@@ -110,24 +108,6 @@ export default function BusinessesPage() {
     load()
   }
 
-  const handleProcessDowngrades = async () => {
-    if (!confirm('Jalankan downgrade massal semua trial/pro yang expired ke paket Gratis?')) return
-    setProcessingDowngrade(true)
-    setDowngradeResult(null)
-    try {
-      const res = await processDowngrades()
-      await load()
-      setDowngradeResult(res.message ?? 'Downgrade berhasil dijalankan')
-      setTimeout(() => setDowngradeResult(null), 5000)
-    } catch (err) {
-      console.error(err)
-      setDowngradeResult('Gagal menjalankan downgrade')
-      setTimeout(() => setDowngradeResult(null), 5000)
-    } finally {
-      setProcessingDowngrade(false)
-    }
-  }
-
   return (
     <div className="space-y-4">
       <DeleteConfirmModal
@@ -137,24 +117,11 @@ export default function BusinessesPage() {
         onConfirm={handleDelete}
       />
 
-      {downgradeResult && (
-        <div className="px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-xl text-sm text-emerald-700">
-          {downgradeResult}
-        </div>
-      )}
-
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-bold text-slate-800">Bisnis</h2>
           <p className="text-sm text-slate-500 mt-0.5">{loading ? 'Memuat daftar bisnis…' : error ? 'Daftar bisnis gagal dimuat' : `${total.toLocaleString('id-ID')} bisnis sesuai filter`}</p>
         </div>
-        <button
-          onClick={handleProcessDowngrades}
-          disabled={processingDowngrade}
-          className="w-full sm:w-auto px-4 py-2.5 sm:py-2 bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition"
-        >
-          {processingDowngrade ? 'Memproses...' : 'Proses Downgrade ke Gratis'}
-        </button>
       </div>
 
       {error && <div role="alert" className="flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"><span>{error}</span><button type="button" onClick={load} disabled={loading} className="font-semibold underline disabled:opacity-50">Coba lagi</button></div>}
@@ -246,11 +213,9 @@ export default function BusinessesPage() {
                     <td className="px-4 py-3">
                       <div className="flex flex-col gap-1">
                         {membershipBadge(b.membership)}
-                        {b.membership && b.membership.type !== 'free' && (
+                        {b.membership && b.membership.type !== 'free' && b.membership.is_active && new Date(b.membership.end_date) > new Date() && b.membership.days_remaining > 0 && (
                           <span className="text-xs text-slate-400">
-                            {b.membership.is_active && new Date(b.membership.end_date) > new Date() && b.membership.days_remaining > 0
-                              ? `${b.membership.days_remaining} hari lagi`
-                              : 'Sudah berakhir'}
+                            {`${b.membership.days_remaining} hari lagi`}
                           </span>
                         )}
                       </div>

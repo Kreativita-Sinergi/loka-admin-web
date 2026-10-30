@@ -9,9 +9,12 @@ import {
 import { AnalyticsHeader, AnalyticsState, MetricCard } from '../components/analytics/AnalyticsUI'
 import { useAnalytics } from '../hooks/useAnalytics'
 import { dailySeries, formatNumber, percentage } from '../lib/analytics'
+import { planBucketLabel } from '../lib/membership'
 
+// `free` dari server = usaha tanpa langganan berlaku (trial/Pro berakhir).
 const MEMBERSHIP_COLORS: Record<string, string> = {
   free: '#94a3b8',
+  expired: '#94a3b8',
   trial: '#f59e0b',
   pro: '#10b981',
 }
@@ -58,7 +61,7 @@ export default function DashboardPage() {
   if (!stats) return <div className="space-y-6">{header}<AnalyticsState loading={loading} error={error} hasData={false} /></div>
 
   const pieData = (stats.membership_breakdown ?? []).map((m) => ({
-    name: m.type === 'free' ? 'Gratis' : m.type.charAt(0).toUpperCase() + m.type.slice(1),
+    name: planBucketLabel(m.type),
     color: MEMBERSHIP_COLORS[m.type] || '#94a3b8',
     value: m.count,
   }))
@@ -189,7 +192,7 @@ export default function DashboardPage() {
           {(stats.membership_breakdown ?? []).map((m) => (
             <div key={m.type} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-50 border border-slate-200">
               <span className="w-2 h-2 rounded-full" style={{ background: MEMBERSHIP_COLORS[m.type] || '#94a3b8' }} />
-              <span className="text-sm font-medium text-slate-700 capitalize">{m.type === 'free' ? 'Gratis' : m.type}</span>
+              <span className="text-sm font-medium text-slate-700">{planBucketLabel(m.type)}</span>
               <span className="text-sm text-slate-500">{formatNumber(m.count)} bisnis</span>
             </div>
           ))}

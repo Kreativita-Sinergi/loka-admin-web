@@ -17,7 +17,8 @@ export const RISK_VARIANT: Record<HealthRisk, Variant> = {
 export const STAGE_LABEL: Record<HealthStage, string> = {
   trial: 'Trial',
   paid: 'Pro',
-  free: 'Gratis',
+  // Data lama (paket Gratis sudah dihapus): usaha tanpa langganan berlaku.
+  free: 'Tanpa langganan',
   expired: 'Kedaluwarsa',
 }
 

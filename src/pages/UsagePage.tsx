@@ -7,11 +7,13 @@ import { AnalyticsHeader, AnalyticsState, MetricCard } from '../components/analy
 import Pagination from '../components/ui/Pagination'
 import { useAnalytics } from '../hooks/useAnalytics'
 import { dailySeries, formatDate, formatHours, formatNumber, percentage } from '../lib/analytics'
+import { planBucketLabel } from '../lib/membership'
 
 function PlanBadge({ plan }: { plan?: string }) {
   const key = plan?.toLowerCase()
-  const label = key === 'free' ? 'Gratis' : key === 'pro-yearly' ? 'Pro tahunan' : key === 'pro-3year' ? 'Pro 3 tahun' : plan || '—'
-  return <span className={`inline-flex rounded-md px-2 py-1 text-xs font-medium capitalize ${key?.startsWith('pro') ? 'bg-indigo-50 text-indigo-700' : key === 'trial' ? 'bg-amber-50 text-amber-700' : 'bg-slate-100 text-slate-500'}`}>{label}</span>
+  // `free` dari server = tanpa langganan berlaku (trial/Pro sudah berakhir).
+  const label = plan ? planBucketLabel(plan) : '—'
+  return <span className={`inline-flex rounded-md px-2 py-1 text-xs font-medium ${key?.startsWith('pro') ? 'bg-indigo-50 text-indigo-700' : key === 'trial' ? 'bg-amber-50 text-amber-700' : 'bg-slate-100 text-slate-500'}`}>{label}</span>
 }
 
 type Filter = 'all' | 'selling' | 'active' | 'quiet'
