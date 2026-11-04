@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import {
-  checkImageDims, checkVideoMeta, countHashtags, mediaPoster, monthGrid, monthRange, nextSlot, pollDelay, validateSocialDraft, wibDateKey, wibToISO,
+  checkImageDims, checkVideoMeta, countHashtags, mediaPoster, monthGrid, monthRange, nextSlot, pollDelay, statusChanged, validateSocialDraft, wibDateKey, wibToISO,
 } from '../src/lib/social.ts'
 
 const now = new Date('2026-11-04T03:02:00Z') // 10:02 WIB
@@ -81,4 +81,10 @@ test('video thumbnails use the Cloudinary poster frame', () => {
   assert.equal(mediaPoster('https://res.cloudinary.com/demo/video/upload/v1/loka-social/a.MOV'), 'https://res.cloudinary.com/demo/video/upload/so_0/v1/loka-social/a.jpg')
   const img = 'https://res.cloudinary.com/demo/image/upload/v1/loka-social/a.jpg'
   assert.equal(mediaPoster(img), img)
+})
+
+test('statusChanged: polling halaman ubah hanya menimpa form saat status berubah', () => {
+  assert.equal(statusChanged({ status: 'scheduled', threads_status: 'waiting' }, { status: 'scheduled', threads_status: 'waiting' }), false)
+  assert.equal(statusChanged({ status: 'scheduled', threads_status: 'waiting' }, { status: 'publishing', threads_status: 'waiting' }), true)
+  assert.equal(statusChanged({ status: 'published', threads_status: 'waiting' }, { status: 'published', threads_status: 'published' }), true)
 })

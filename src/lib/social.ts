@@ -168,6 +168,11 @@ export const THREADS_STATUS: Record<ThreadsStatus, { label: string; variant: Var
 }
 
 /** Jeda polling halaman detail: cepat saat sedang terbit. */
+/** Status posting berubah sejak terakhir dimuat (dipakai polling halaman ubah). */
+export function statusChanged(a: Pick<SocialPost, 'status' | 'threads_status'>, b: Pick<SocialPost, 'status' | 'threads_status'>) {
+  return a.status !== b.status || a.threads_status !== b.threads_status
+}
+
 export function pollDelay(p: Pick<SocialPost, 'status' | 'threads_status'>): number | null {
   if (p.status === 'publishing' || p.threads_status === 'publishing') return 5000
   if (p.status === 'scheduled' || (p.status === 'published' && p.threads_status === 'waiting')) return 30000

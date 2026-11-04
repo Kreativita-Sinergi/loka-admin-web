@@ -17,7 +17,7 @@ import {
 } from '../api/social'
 import {
   POST_STATUS, SOCIAL_LIMITS, THREADS_STATUS, charCount, countHashtags, nextSlot, pollDelay,
-  validateSocialDraft, wibParts, wibToISO,
+  statusChanged, validateSocialDraft, wibParts, wibToISO,
 } from '../lib/social'
 import { formatDate } from '../lib/analytics'
 
@@ -123,14 +123,28 @@ export default function SocialPostPage() {
   useEffect(() => { void load() }, [load])
   useEffect(() => { getSocialStatus().then((r) => setAccount(r.data)).catch(() => {}) }, [])
 
-  // Selama terjadwal/terbit, perbarui status otomatis.
+  // Selama terjadwal/terbit, perbarui status otomatis. Isian form (media,
+  // caption, jadwal) hanya ditimpa bila statusnya berubah — misalnya posting
+  // mulai terbit dan tidak bisa diedit lagi. Kalau tidak, perubahan yang belum
+  // disimpan (gambar/video yang baru diunggah, caption yang sedang diketik)
+  // hilang setiap 30 detik.
+  const refresh = useCallback(async (prev: SocialPost) => {
+    try {
+      const r = await getSocialPost(prev.id)
+      if (statusChanged(prev, r.data)) fill(r.data)
+      else setPost(r.data)
+    } catch {
+      // Biarkan; polling berikutnya mencoba lagi.
+    }
+  }, [])
+
   useEffect(() => {
     if (!post) return
     const delay = pollDelay(post)
     if (!delay) return
-    const t = setTimeout(() => void load(), delay)
+    const t = setTimeout(() => void refresh(post), delay)
     return () => clearTimeout(t)
-  }, [post, load])
+  }, [post, refresh])
 
   const editable = isNew || !!post?.allowed_actions.includes('edit')
   const draft = { caption, mediaCount: media.length, media, schedule, date, time, threadsEnabled, threadsText }
