@@ -44,7 +44,7 @@ const INTENT_CFG: Record<string, { label: string; cls: string }> = {
   tidak_relevan: { label: 'Tidak relevan', cls: 'bg-slate-50 text-slate-500 border-slate-200' },
 }
 
-type Tab = 'queue' | 'history' | 'settings'
+type Tab = 'queue' | 'replies' | 'history' | 'settings'
 
 function SettingsToggle({ label, desc, val, onChange }: { label: string; desc: string; val: boolean; onChange: (v: boolean) => void }) {
   return (
@@ -96,7 +96,7 @@ export default function ThreadsBotPage() {
       <BotConnection refreshKey={refreshKey} />
 
       <div className="flex gap-1.5 flex-wrap">
-        {([['queue', 'Antrian ACC'], ['history', 'Riwayat'], ['settings', 'Pengaturan']] as [Tab, string][]).map(([v, label]) => (
+        {([['queue', 'Antrian ACC'], ['replies', 'Riwayat Balasan'], ['history', 'Riwayat'], ['settings', 'Pengaturan']] as [Tab, string][]).map(([v, label]) => (
           <button key={v} onClick={() => setTab(v)}
             className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all ${tab === v ? 'bg-indigo-600 text-white border-indigo-600' : 'border-slate-200 text-slate-700 bg-white hover:bg-slate-50'}`}>
             {label}
@@ -105,6 +105,7 @@ export default function ThreadsBotPage() {
       </div>
 
       {tab === 'queue' && <DraftList key="queue" status="pending" refreshKey={refreshKey} editable onAction={flash} />}
+      {tab === 'replies' && <ReplyHistory />}
       {tab === 'history' && <DraftList key="history" status="history" refreshKey={refreshKey} historyView onAction={flash} />}
       {tab === 'settings' && <SettingsPanel onSaved={() => flash('Pengaturan disimpan.')} />}
     </div>
@@ -235,6 +236,137 @@ function DraftCard({ draft, editable, onChanged, onAction }: {
         Dibuat {format(new Date(draft.created_at), 'dd MMM yyyy HH:mm', { locale: localeId })}
         {draft.posted_at && ` · Tayang ${format(new Date(draft.posted_at), 'dd MMM HH:mm', { locale: localeId })}`}
       </p>
+    </div>
+  )
+}
+
+// ── Riwayat balasan ──────────────────────────────────────────────────────────
+
+type SourceFilter = 'all' | 'keyword' | 'own_reply' | 'mention'
+
+const REPLY_SOURCE_LABEL: Record<string, string> = {
+  keyword: 'Postingan orang lain',
+  own_reply: 'Komentar di postingan kita',
+  mention: 'Mention',
+}
+
+const PAGE_SIZE = 100
+
+function ReplyHistory() {
+  const [rows, setRows] = useState<ThreadsDraft[]>([])
+  const [page, setPage] = useState(1)
+  const [total, setTotal] = useState(0)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [source, setSource] = useState<SourceFilter>('all')
+  const [onlyPosted, setOnlyPosted] = useState(true)
+
+  const load = useCallback((p: number) => {
+    setLoading(true)
+    setError('')
+    getDrafts({ kind: 'reply', status: onlyPosted ? 'posted' : '', page: p, limit: PAGE_SIZE })
+      .then((r) => {
+        const data = (r.data ?? []).filter((d) => d.status !== 'pending')
+        setRows((prev) => (p === 1 ? data : [...prev, ...data]))
+        setTotal(r.pagination?.total ?? 0)
+        setPage(p)
+      })
+      .catch((e) => setError(errMsg(e)))
+      .finally(() => setLoading(false))
+  }, [onlyPosted])
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { load(1) }, [load])
+
+  const shown = rows.filter((d) => source === 'all' || d.source === source)
+  const posted = rows.filter((d) => d.status === 'posted')
+  const count = (src: string) => posted.filter((d) => d.source === src).length
+  const appQuestions = posted.filter((d) => ['tanya_aplikasi', 'tanya_harga', 'tanya_fitur'].includes(d.intent)).length
+  const loadedAll = rows.length >= total || total === 0
+
+  const stats: [string, number, string][] = [
+    ['Balasan tayang', posted.length, 'text-slate-900'],
+    ['Ke postingan orang lain', count('keyword'), 'text-indigo-700'],
+    ['Ke komentar di postingan kita', count('own_reply'), 'text-slate-900'],
+    ['Ke mention', count('mention'), 'text-slate-900'],
+    ['Pertanyaan aplikasi kasir', appQuestions, 'text-emerald-700'],
+  ]
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+        {stats.map(([label, n, cls]) => (
+          <div key={label} className="card p-4">
+            <p className="text-xs text-slate-500">{label}</p>
+            <p className={`text-2xl font-bold tabular-nums mt-1 ${cls}`}>{n}</p>
+          </div>
+        ))}
+      </div>
+      {!loadedAll && <p className="text-xs text-slate-400">Angka di atas dihitung dari {rows.length} balasan terbaru yang sudah dimuat (dari {total}).</p>}
+
+      <div className="flex flex-wrap items-center gap-2">
+        {(['all', 'keyword', 'own_reply', 'mention'] as SourceFilter[]).map((v) => (
+          <button key={v} onClick={() => setSource(v)}
+            className={`px-3 py-1.5 rounded-full text-xs font-medium border ${source === v ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}>
+            {v === 'all' ? 'Semua' : REPLY_SOURCE_LABEL[v]}
+          </button>
+        ))}
+        <label className="ml-auto flex items-center gap-2 text-xs text-slate-600 cursor-pointer">
+          <input type="checkbox" checked={onlyPosted} onChange={(e) => setOnlyPosted(e.target.checked)} className="w-4 h-4 accent-indigo-600" />
+          Hanya yang sudah tayang
+        </label>
+      </div>
+
+      {error && <div className="card p-4 text-sm text-red-600">{error}</div>}
+
+      {loading && rows.length === 0 ? (
+        <div className="card py-16 text-center text-slate-400 text-sm">Memuat…</div>
+      ) : shown.length === 0 ? (
+        <div className="card py-16 text-center text-sm text-slate-400">
+          {source === 'keyword'
+            ? 'Belum ada balasan ke postingan orang lain. Nyalakan "Pantau kata kunci" di Pengaturan supaya bot mencari postingan yang relevan.'
+            : 'Belum ada balasan yang tayang.'}
+        </div>
+      ) : (
+        <div className="card divide-y divide-slate-100">
+          {shown.map((d) => <ReplyRow key={d.id} d={d} />)}
+        </div>
+      )}
+
+      {!loadedAll && !loading && (
+        <button onClick={() => load(page + 1)} className="w-full py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 text-sm font-medium rounded-xl">
+          Muat lebih banyak
+        </button>
+      )}
+    </div>
+  )
+}
+
+function ReplyRow({ d }: { d: ThreadsDraft }) {
+  const cfg = STATUS_CFG[d.status]
+  const intent = d.intent ? INTENT_CFG[d.intent] : undefined
+  const when = d.posted_at ?? d.updated_at
+  return (
+    <div className="p-4 space-y-2.5">
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">{REPLY_SOURCE_LABEL[d.source] ?? d.source}</span>
+        {intent && <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${intent.cls}`}>{intent.label}</span>}
+        {d.keyword && <span className="text-xs text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">“{d.keyword}”</span>}
+        <span className="ml-auto text-xs text-slate-400">{format(new Date(when), 'dd MMM yyyy HH:mm', { locale: localeId })}</span>
+        <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${cfg.cls}`}>{cfg.label}</span>
+      </div>
+      <div className="grid md:grid-cols-2 gap-2.5">
+        <div className="bg-slate-50 border border-slate-100 rounded-xl px-3 py-2">
+          <p className="text-xs text-slate-500">{d.target_author ? <b>@{d.target_author}</b> : 'Seseorang'} menulis:</p>
+          <p className="text-sm text-slate-700 mt-0.5 whitespace-pre-wrap">{d.target_text || '—'}</p>
+          {d.target_permalink && <a href={d.target_permalink} target="_blank" rel="noopener" className="text-xs text-blue-500 hover:underline">Lihat di Threads<ButtonIcon icon={ExternalLink} side="end" size={12} /></a>}
+        </div>
+        <div className="bg-indigo-50/60 border border-indigo-100 rounded-xl px-3 py-2">
+          <p className="text-xs text-indigo-600 font-medium">Balasan kita:</p>
+          <p className="text-sm text-slate-800 mt-0.5 whitespace-pre-wrap">{d.generated_text}</p>
+        </div>
+      </div>
+      {d.error && <p className="text-xs text-red-500"><ButtonIcon icon={AlertTriangle} size={13} />{d.error}</p>}
     </div>
   )
 }
