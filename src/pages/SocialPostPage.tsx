@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Calendar, CalendarClock, ExternalLink, FileText, RotateCcw, Trash2, XCircle } from 'lucide-react'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { AlertTriangle, ArrowLeft, Calendar, CalendarClock, CircleCheck, Loader2, X, ExternalLink, FileText, RotateCcw, Trash2, XCircle } from 'lucide-react'
 import type { AxiosError } from 'axios'
 import ButtonIcon from '../components/ui/ButtonIcon'
 import { InstagramIcon, ThreadsIcon } from '../components/ui/BrandIcons'
@@ -46,10 +46,18 @@ function PlatformStatus({ name, icon, label, variant, at, link, error }: {
   )
 }
 
+/** "2 jam 5 menit" dari selisih milidetik. */
+function untilText(ms: number) {
+  const mins = Math.round(ms / 60_000)
+  const d = Math.floor(mins / 1440), h = Math.floor((mins % 1440) / 60), m = mins % 60
+  return [d && `${d} hari`, h && `${h} jam`, (m || (!d && !h)) && `${m} menit`].filter(Boolean).join(' ')
+}
+
 export default function SocialPostPage() {
   const { id } = useParams()
   const isNew = !id || id === 'new'
   const navigate = useNavigate()
+  const location = useLocation()
 
   const [post, setPost] = useState<SocialPost | null>(null)
   const [account, setAccount] = useState<SocialStatus | null>(null)
@@ -64,6 +72,23 @@ export default function SocialPostPage() {
   const [threadsText, setThreadsText] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  // Pesan sukses; ikut terbawa saat posting baru pindah ke URL detailnya.
+  const [notice, setNotice] = useState<string>(() => (location.state as { notice?: string } | null)?.notice ?? '')
+  // Jam sekarang diperbarui tiap 30 detik agar peringatan "minimal 5 menit" ikut berubah.
+  const [now, setNow] = useState(() => Date.now())
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 30_000)
+    return () => clearInterval(t)
+  }, [])
+  // Hapus pesan dari riwayat setelah dibaca, agar tidak muncul lagi saat dimuat ulang.
+  useEffect(() => {
+    if ((location.state as { notice?: string } | null)?.notice) navigate(location.pathname, { replace: true, state: null })
+  }, [location.state, location.pathname, navigate])
+  useEffect(() => {
+    if (!notice) return
+    const t = setTimeout(() => setNotice(''), 6000)
+    return () => clearTimeout(t)
+  }, [notice])
   const [confirm, setConfirm] = useState<'cancel' | 'delete' | null>(null)
 
   const fill = (p: SocialPost) => {
@@ -109,11 +134,14 @@ export default function SocialPostPage() {
 
   const editable = isNew || !!post?.allowed_actions.includes('edit')
   const draft = { caption, mediaCount: media.length, schedule, date, time, threadsEnabled, threadsText }
-  const scheduleIssue = validateSocialDraft({ ...draft, schedule: true })
+  const scheduledMs = date && time ? new Date(wibToISO(date, time)).getTime() : NaN
+  const earliest = nextSlot(new Date(now))
+  const tooSoon = Number.isFinite(scheduledMs) && scheduledMs < now + SOCIAL_LIMITS.minLeadMinutes * 60_000
+  const leadText = Number.isFinite(scheduledMs) && !tooSoon ? untilText(scheduledMs - now) : ''
 
   const save = async (asSchedule: boolean) => {
-    const problem = validateSocialDraft({ ...draft, schedule: asSchedule })
-    if (problem) { setError(problem); return }
+    const problem = validateSocialDraft({ ...draft, schedule: asSchedule }, new Date())
+    if (problem) { setNotice(''); setError(problem); return }
     const input: SocialPostInput = {
       caption,
       scheduled_at: asSchedule || (date && time) ? wibToISO(date, time) : null,
@@ -124,10 +152,15 @@ export default function SocialPostPage() {
     }
     setSaving(true)
     setError('')
+    setNotice('')
     try {
       const r = isNew ? await createSocialPost(input) : await updateSocialPost(id!, input)
       fill(r.data)
-      if (isNew) navigate(`/social/${r.data.id}`, { replace: true })
+      const msg = asSchedule
+        ? `Dijadwalkan untuk ${formatDate(r.data.scheduled_at, true)} WIB. Posting akan tayang otomatis.`
+        : 'Draf tersimpan.'
+      if (isNew) navigate(`/social/${r.data.id}`, { replace: true, state: { notice: msg } })
+      else setNotice(msg)
     } catch (err) {
       setError(apiMessage(err, 'Posting gagal disimpan.'))
     } finally {
@@ -142,6 +175,7 @@ export default function SocialPostPage() {
       const r = await socialPostAction(id!, action)
       fill(r.data)
       setConfirm(null)
+      setNotice(action === 'cancel' ? 'Jadwal dibatalkan.' : action === 'retry' ? 'Dijadwalkan ulang; akan dicoba dalam ±1 menit.' : 'Threads akan dicoba lagi dalam ±1 menit.')
     } catch (err) {
       setError(apiMessage(err, 'Tindakan gagal.'))
     } finally {
@@ -174,6 +208,13 @@ export default function SocialPostPage() {
         {st && <Badge variant={st.variant}>{st.label}</Badge>}
       </div>
 
+      {notice && (
+        <div role="status" className="flex items-start gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+          <CircleCheck size={16} className="mt-0.5 shrink-0" aria-hidden />
+          <p className="flex-1">{notice}</p>
+          <button type="button" onClick={() => setNotice('')} aria-label="Tutup pesan" className="-m-1 rounded p-1 hover:bg-emerald-100"><X size={14} aria-hidden /></button>
+        </div>
+      )}
       {error && <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
 
       <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_360px] gap-4 items-start">
@@ -235,6 +276,17 @@ export default function SocialPostPage() {
                 </div>
                 <TimePicker label="Jam tayang" value={time} onChange={setTime} />
               </div>
+              {tooSoon ? (
+                <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-amber-700">
+                  <AlertTriangle size={14} className="shrink-0" aria-hidden />
+                  <span>Jadwal minimal {SOCIAL_LIMITS.minLeadMinutes} menit dari sekarang. Paling cepat {earliest.time} WIB.</span>
+                  <button type="button" onClick={() => { setDate(earliest.date); setTime(earliest.time) }} className="rounded-md border border-amber-300 px-2 py-0.5 font-medium hover:bg-amber-100">
+                    Pakai {earliest.time}
+                  </button>
+                </div>
+              ) : leadText && (
+                <p className="mt-2 text-xs text-slate-500">Tayang {leadText} lagi.</p>
+              )}
               {account && !account.instagram.connected && <p className="mt-2 text-xs text-amber-700">Hubungkan akun Instagram di halaman Posting Sosial sebelum menjadwalkan.</p>}
             </Card>
           )}
@@ -258,15 +310,15 @@ export default function SocialPostPage() {
           <div className="card p-4 space-y-2">
             {editable && (
               <>
-                <button type="button" disabled={saving || !!scheduleIssue} onClick={() => void save(true)} className="h-10 w-full rounded-lg bg-indigo-600 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50 inline-flex items-center justify-center">
-                  <ButtonIcon icon={CalendarClock} />{post?.status === 'scheduled' ? 'Simpan jadwal' : 'Jadwalkan'}
+                {/* Tidak dinonaktifkan karena validasi: menekan tombol menjelaskan apa yang kurang. */}
+                <button type="button" disabled={saving} onClick={() => void save(true)} className="h-10 w-full rounded-lg bg-indigo-600 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50 inline-flex items-center justify-center">
+                  {saving ? <><Loader2 size={15} className="mr-1.5 animate-spin" aria-hidden />Menyimpan…</> : <><ButtonIcon icon={CalendarClock} />{post?.status === 'scheduled' ? 'Simpan jadwal' : 'Jadwalkan'}</>}
                 </button>
                 {(isNew || post?.status === 'draft') && (
                   <button type="button" disabled={saving} onClick={() => void save(false)} className="h-10 w-full rounded-lg border border-slate-200 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 inline-flex items-center justify-center">
                     <ButtonIcon icon={FileText} />Simpan sebagai draf
                   </button>
                 )}
-                {scheduleIssue && <p className="text-xs text-slate-500">{scheduleIssue}</p>}
               </>
             )}
             {actions.includes('retry') && (
