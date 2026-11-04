@@ -14,6 +14,8 @@ export interface ThreadsDraft {
   target_author: string | null
   target_permalink: string | null
   keyword: string | null
+  /** Maksud tulisan yang dibalas menurut AI; kosong untuk draf lama & postingan. */
+  intent: string
   generated_text: string
   posted_id: string | null
   error: string | null
@@ -31,6 +33,8 @@ export interface ThreadsSettings {
   keywords: string
   persona: string
   posts_per_day: number
+  /** Balasan pertanyaan seputar aplikasi kasir (komentar di postingan kita / mention) langsung tayang tanpa ACC. */
+  auto_send_app_questions: boolean
   updated_at: string
 }
 

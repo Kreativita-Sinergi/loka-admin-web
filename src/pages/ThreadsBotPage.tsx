@@ -31,6 +31,16 @@ const SOURCE_LABEL: Record<string, string> = {
   scheduled: 'Postingan terjadwal',
 }
 
+// Sama dengan helper.ThreadsIntent* di loka-kasir-service.
+const INTENT_CFG: Record<string, { label: string; cls: string }> = {
+  tanya_aplikasi: { label: 'Tanya aplikasi kasir', cls: 'bg-indigo-50 text-indigo-700 border-indigo-200' },
+  tanya_harga: { label: 'Tanya harga', cls: 'bg-indigo-50 text-indigo-700 border-indigo-200' },
+  tanya_fitur: { label: 'Tanya fitur', cls: 'bg-indigo-50 text-indigo-700 border-indigo-200' },
+  keluhan_kasir: { label: 'Keluhan soal kasir', cls: 'bg-amber-50 text-amber-700 border-amber-200' },
+  obrolan_usaha: { label: 'Obrolan usaha', cls: 'bg-slate-50 text-slate-600 border-slate-200' },
+  tidak_relevan: { label: 'Tidak relevan', cls: 'bg-slate-50 text-slate-500 border-slate-200' },
+}
+
 type Tab = 'queue' | 'history' | 'settings'
 
 function SettingsToggle({ label, desc, val, onChange }: { label: string; desc: string; val: boolean; onChange: (v: boolean) => void }) {
@@ -70,7 +80,7 @@ export default function ThreadsBotPage() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h2 className="text-2xl font-bold text-slate-900">Bot Threads</h2>
-          <p className="text-sm text-slate-500 mt-0.5">Bot membuat draf balasan &amp; postingan otomatis — kamu tinggal ACC. Tidak ada yang tayang tanpa persetujuanmu.</p>
+          <p className="text-sm text-slate-500 mt-0.5">Bot membuat draf balasan &amp; postingan otomatis — kamu tinggal ACC. Pertanyaan seputar aplikasi kasir didahulukan; hanya itu yang bisa diatur langsung tayang di Pengaturan.</p>
         </div>
         <div className="grid grid-cols-1 min-[430px]:grid-cols-2 sm:flex items-center gap-2 w-full sm:w-auto">
           <button onClick={handlePoll} disabled={busy} className="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-sm font-semibold rounded-xl disabled:opacity-50"><ButtonIcon icon={RefreshCw} />Cek Sekarang</button>
@@ -149,6 +159,7 @@ function DraftCard({ draft, editable, onChanged, onAction }: {
         <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">{draft.kind === 'post' ? 'Postingan' : 'Balasan'}</span>
         <span className="text-xs text-slate-500">{SOURCE_LABEL[draft.source] ?? draft.source}</span>
         {draft.keyword && <span className="text-xs text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">“{draft.keyword}”</span>}
+        {draft.intent && INTENT_CFG[draft.intent] && <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${INTENT_CFG[draft.intent].cls}`}>{INTENT_CFG[draft.intent].label}</span>}
         <span className={`ml-auto text-xs font-medium px-2 py-0.5 rounded-full border ${cfg.cls}`}>{cfg.label}</span>
       </div>
 
@@ -208,6 +219,7 @@ function SettingsPanel({ onSaved }: { onSaved: () => void }) {
       await updateThreadsSettings({
         enabled: s.enabled, auto_reply_own: s.auto_reply_own, reply_mentions: s.reply_mentions,
         keyword_enabled: s.keyword_enabled, keywords: s.keywords, persona: s.persona, posts_per_day: s.posts_per_day,
+        auto_send_app_questions: s.auto_send_app_questions,
       })
       onSaved()
     } finally { setSaving(false) }
@@ -219,6 +231,7 @@ function SettingsPanel({ onSaved }: { onSaved: () => void }) {
       <div className="h-px bg-slate-100" />
       <SettingsToggle label="Balas komentar di postingan bot" desc="Buat draf balasan untuk orang yang berkomentar di thread buatan bot." val={s.auto_reply_own} onChange={(v) => set('auto_reply_own', v)} />
       <SettingsToggle label="Balas mention" desc="Balas orang yang men-tag akun Threads-mu. (Butuh izin threads_manage_mentions.)" val={s.reply_mentions} onChange={(v) => set('reply_mentions', v)} />
+      <SettingsToggle label="Langsung balas pertanyaan aplikasi kasir" desc="Komentar di postingan bot atau mention yang menanyakan aplikasi kasir, harga, atau fitur langsung dibalas tanpa ACC. Balasan lain dan postingan orang lain (kata kunci) tetap menunggu ACC." val={s.auto_send_app_questions} onChange={(v) => set('auto_send_app_questions', v)} />
       <SettingsToggle label="Pantau kata kunci" desc="Cari postingan publik berisi kata kunci lalu buat draf balasan. (Butuh izin threads_keyword_search.)" val={s.keyword_enabled} onChange={(v) => set('keyword_enabled', v)} />
 
       <div>
