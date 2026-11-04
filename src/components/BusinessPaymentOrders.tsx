@@ -62,7 +62,7 @@ export default function BusinessPaymentOrders({ businessId, onSettled }: { busin
   }
 
   return (
-    <section className="bg-white rounded-xl border border-slate-200 p-4 sm:p-6">
+    <section className="card p-4 sm:p-6">
       <h3 className="font-semibold text-slate-700">Pembayaran Langganan</h3>
       <p className="text-sm text-slate-500 mt-1">Tagihan Duitku terbaru. Bila pelanggan sudah membayar tapi status masih menunggu, gunakan "Cek ke Duitku".</p>
       {error ? <p role="alert" className="text-sm text-red-600 mt-4">{error}</p>

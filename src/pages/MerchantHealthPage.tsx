@@ -1,3 +1,4 @@
+import Select from '../components/ui/Select'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Badge from '../components/ui/Badge'
@@ -124,7 +125,7 @@ export default function MerchantHealthPage() {
 
   const s = data?.summary
   const card = (label: string, value: number | string, tone: string, hint?: string) => (
-    <div className="bg-white rounded-xl border border-slate-200 p-4">
+    <div className="card p-4">
       <p className="text-xs font-medium text-slate-500">{label}</p>
       <p className={`mt-1 text-2xl font-bold tabular-nums ${tone}`}>{value}</p>
       {hint && <p className="text-xs text-slate-400 mt-0.5">{hint}</p>}
@@ -155,24 +156,24 @@ export default function MerchantHealthPage() {
         {card('Siap ditawari Pro', s?.ready_convert ?? 0, 'text-emerald-600', 'trial sehat, hampir habis')}
       </div>
 
-      <div className="bg-white rounded-xl border border-slate-200 p-3 sm:p-4 flex flex-col sm:flex-row sm:flex-wrap gap-3">
+      <div className="card p-3 sm:p-4 flex flex-col sm:flex-row sm:flex-wrap gap-3">
         <form onSubmit={(e) => { e.preventDefault(); setLoading(true); setSearch(searchInput) }} className="flex gap-2 flex-1 min-w-0 sm:min-w-60">
           <input type="text" placeholder="Cari bisnis, pemilik, nomor, email..." value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             className="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
           <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700">Cari</button>
         </form>
-        <select value={risk} onChange={(e) => { setLoading(true); setRisk(e.target.value) }}
+        <Select value={risk} onChange={(e) => { setLoading(true); setRisk(e.target.value) }}
           className="w-full sm:w-auto px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
           {RISK_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-        </select>
-        <select value={stage} onChange={(e) => { setLoading(true); setStage(e.target.value) }}
+        </Select>
+        <Select value={stage} onChange={(e) => { setLoading(true); setStage(e.target.value) }}
           className="w-full sm:w-auto px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
           {STAGE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-        </select>
+        </Select>
       </div>
 
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+      <div className="card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-slate-50 border-b border-slate-200">

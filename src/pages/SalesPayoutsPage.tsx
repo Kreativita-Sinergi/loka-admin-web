@@ -1,3 +1,5 @@
+import { Download, X } from 'lucide-react'
+import ButtonIcon from '../components/ui/ButtonIcon'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { format } from 'date-fns'
@@ -107,7 +109,7 @@ export default function SalesPayoutsPage() {
       {notice && <p role="status" className="text-sm text-emerald-700">{notice}</p>}
 
       {batchResult && (
-        <section className="bg-white rounded-xl border border-slate-200 p-4 sm:p-5 space-y-3">
+        <section className="card p-4 sm:p-5 space-y-3">
           <div className="flex items-start justify-between gap-3">
             <div>
               <h3 className="font-semibold text-slate-700">Hasil pembuatan draf</h3>
@@ -117,7 +119,7 @@ export default function SalesPayoutsPage() {
                 {' · '}{batchResult.skipped.length} sales dilewati
               </p>
             </div>
-            <button onClick={() => setBatchResult(null)} className="text-slate-400 hover:text-slate-600 text-xl leading-none" aria-label="Tutup hasil">×</button>
+            <button onClick={() => setBatchResult(null)} className="text-slate-400 hover:text-slate-600 " aria-label="Tutup hasil"><X size={18} aria-hidden /></button>
           </div>
           {batchResult.skipped.length > 0 && (
             <div className="overflow-x-auto">
@@ -145,7 +147,7 @@ export default function SalesPayoutsPage() {
         </section>
       )}
 
-      <div className="bg-white rounded-xl border border-slate-200 p-3 sm:p-4 flex flex-col lg:flex-row lg:items-center gap-3">
+      <div className="card p-3 sm:p-4 flex flex-col lg:flex-row lg:items-center gap-3">
         <div className="flex gap-1.5 flex-wrap">
           {FILTERS.map((f) => (
             <button key={f.value || 'all'} onClick={() => changeStatus(f.value)}
@@ -161,7 +163,7 @@ export default function SalesPayoutsPage() {
               className="flex-1 sm:flex-none px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
             <button onClick={exportCsv} disabled={exporting}
               className="px-3 py-2 text-sm border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 whitespace-nowrap">
-              {exporting ? 'Mengunduh…' : '⬇ Ekspor CSV'}
+              {exporting ? 'Mengunduh…' : <><ButtonIcon icon={Download} />Ekspor CSV</>}
             </button>
           </div>
         </div>
@@ -181,7 +183,7 @@ export default function SalesPayoutsPage() {
         </p>
       )}
 
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+      <div className="card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-slate-50 border-b border-slate-200">

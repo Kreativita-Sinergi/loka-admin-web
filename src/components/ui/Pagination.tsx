@@ -1,3 +1,4 @@
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 interface PaginationProps {
   page: number
   total: number
@@ -19,8 +20,9 @@ export default function Pagination({ page, total, limit, onChange }: PaginationP
           disabled={page <= 1}
           onClick={() => onChange(page - 1)}
           className="px-3 py-1.5 rounded border border-slate-200 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed"
+          aria-label="Halaman sebelumnya"
         >
-          ←
+          <ChevronLeft size={16} aria-hidden />
         </button>
         {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
           const p = i + 1
@@ -42,8 +44,9 @@ export default function Pagination({ page, total, limit, onChange }: PaginationP
           disabled={page >= totalPages}
           onClick={() => onChange(page + 1)}
           className="px-3 py-1.5 rounded border border-slate-200 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed"
+          aria-label="Halaman berikutnya"
         >
-          →
+          <ChevronRight size={16} aria-hidden />
         </button>
       </div>
     </div>

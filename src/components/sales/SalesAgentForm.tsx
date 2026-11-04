@@ -1,3 +1,4 @@
+import Select from '../ui/Select'
 import { useState } from 'react'
 import { createSalesAgent, updateSalesAgent, type SalesAgent, type SalesAgentInput, type SalesAgentStatus } from '../../api/salesReferral'
 import { SALES_STATUS, apiErrorText, generatePassword, kycComplete, validateSalesInput } from '../../lib/salesReferral'
@@ -95,9 +96,9 @@ export default function SalesAgentForm({ agent, onSaved, onCancel }: {
               className={`${input} font-mono tracking-wide`} placeholder="mis. BUDIJKT" />
           </Field>
           <Field label="Status" hint={SALES_STATUS[form.status].hint}>
-            <select value={form.status} disabled={saving} onChange={(e) => set('status', e.target.value as SalesAgentStatus)} className={input}>
+            <Select value={form.status} disabled={saving} onChange={(e) => set('status', e.target.value as SalesAgentStatus)} className={input}>
               {(Object.keys(SALES_STATUS) as SalesAgentStatus[]).map((s) => <option key={s} value={s}>{SALES_STATUS[s].label}</option>)}
-            </select>
+            </Select>
           </Field>
         </div>
         {!agent && (

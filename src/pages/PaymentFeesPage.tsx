@@ -1,3 +1,5 @@
+import { AlertTriangle } from 'lucide-react'
+import ButtonIcon from '../components/ui/ButtonIcon'
 import { useEffect, useMemo, useState } from 'react'
 import { format } from 'date-fns'
 import { id as localeId } from 'date-fns/locale'
@@ -60,7 +62,7 @@ export default function PaymentFeesPage() {
       </div>
 
       <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-900 space-y-1">
-        <p className="font-semibold">⚠️ Cocokkan dengan dashboard Duitku</p>
+        <p className="font-semibold"><ButtonIcon icon={AlertTriangle} />Cocokkan dengan dashboard Duitku</p>
         <p>
           Tarif awal diambil dari halaman harga <strong>publik</strong> Duitku, belum tentu sama dengan kontrak akun Loka.
           Bandingkan dengan biaya yang tercatat per transaksi di dashboard Duitku, lalu perbarui di sini.
@@ -83,7 +85,7 @@ export default function PaymentFeesPage() {
         Tampilkan riwayat & tarif terjadwal
       </label>
 
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+      <div className="card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-slate-50 border-b border-slate-200">

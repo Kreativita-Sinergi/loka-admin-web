@@ -1,3 +1,4 @@
+import Select from '../components/ui/Select'
 import { useState, useEffect, useCallback } from 'react'
 import { getSecurityLogs, type SecurityEventLog, type SecurityLogsParams } from '../api/admin'
 
@@ -95,8 +96,8 @@ export default function SecurityLogsPage() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl border border-slate-200 p-3 sm:p-4 grid grid-cols-1 sm:flex sm:flex-wrap gap-3">
-        <select
+      <div className="card p-3 sm:p-4 grid grid-cols-1 sm:flex sm:flex-wrap gap-3">
+        <Select
           value={params.action ?? ''}
           onChange={(e) => setParams((p) => ({ ...p, action: e.target.value, page: 1 }))}
           className="border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -104,8 +105,8 @@ export default function SecurityLogsPage() {
           {ACTION_OPTIONS.map((o) => (
             <option key={o.value} value={o.value}>{o.label}</option>
           ))}
-        </select>
-        <select
+        </Select>
+        <Select
           value={params.status ?? ''}
           onChange={(e) => setParams((p) => ({ ...p, status: e.target.value, page: 1 }))}
           className="border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -113,7 +114,7 @@ export default function SecurityLogsPage() {
           {STATUS_OPTIONS.map((o) => (
             <option key={o.value} value={o.value}>{o.label}</option>
           ))}
-        </select>
+        </Select>
         <button
           onClick={fetchLogs}
           className="sm:ml-auto px-4 py-2.5 sm:py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
@@ -128,7 +129,7 @@ export default function SecurityLogsPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+      <div className="card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>

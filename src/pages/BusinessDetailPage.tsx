@@ -1,3 +1,6 @@
+import Select from '../components/ui/Select'
+import { ArrowLeft, Pencil, Trash2, TrendingUp, Users } from 'lucide-react'
+import ButtonIcon from '../components/ui/ButtonIcon'
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { getBusinessById, getActiveUsers, updateOutletAdminNote, toggleBusinessActive, createMembership, updateMembership, deactivateMembership, deleteBusiness, updateBusiness, getBusinessTypes, getBusinessVerticals, resetUserPassword } from '../api/admin'
@@ -245,7 +248,7 @@ export default function BusinessDetailPage() {
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-start sm:items-center gap-3 min-w-0">
-          <button onClick={() => navigate(backTo)} className="text-slate-400 hover:text-slate-600" aria-label="Kembali">←</button>
+          <button onClick={() => navigate(backTo)} className="text-slate-400 hover:text-slate-600" aria-label="Kembali"><ArrowLeft size={20} aria-hidden /></button>
           <div className="min-w-0">
             <h2 className="text-xl font-bold text-slate-800 break-words">{business.business_name}</h2>
             <p className="text-xs sm:text-sm text-slate-500 break-all">{business.id}</p>
@@ -254,23 +257,23 @@ export default function BusinessDetailPage() {
         <div className="grid grid-cols-2 sm:flex sm:items-center gap-2">
           <button onClick={openEditBusiness}
             className="justify-center flex items-center gap-1.5 px-3 py-2 text-sm text-slate-700 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
-            ✏️ Edit Profil Bisnis
+            <Pencil size={15} aria-hidden />Edit Profil Bisnis
           </button>
           <button onClick={() => setDeleteModal(true)}
             className="justify-center flex items-center gap-1.5 px-3 py-2 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors">
-            🗑️ Hapus Bisnis
+            <Trash2 size={15} aria-hidden />Hapus Bisnis
           </button>
         </div>
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <button onClick={() => navigate(`/users?business_id=${business.id}`)} className="rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-700 hover:bg-indigo-100">👥 Lihat pengguna</button>
-        <button onClick={() => navigate(`/sales?business_id=${business.id}`)} className="rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-700 hover:bg-indigo-100">💰 Lihat penjualan</button>
+        <button onClick={() => navigate(`/users?business_id=${business.id}`)} className="rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-700 hover:bg-indigo-100"><ButtonIcon icon={Users} />Lihat pengguna</button>
+        <button onClick={() => navigate(`/sales?business_id=${business.id}`)} className="rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-700 hover:bg-indigo-100"><ButtonIcon icon={TrendingUp} />Lihat penjualan</button>
       </div>
 
       {/* Snapshot operasional agar super admin bisa menilai kesehatan tenant
           tanpa perlu membuka laporan milik pemilik bisnis. */}
-      <section className="bg-white rounded-xl border border-slate-200 p-4 sm:p-6">
+      <section className="card p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
           <div>
             <h3 className="font-semibold text-slate-700">Kesehatan Operasional</h3>
@@ -290,7 +293,7 @@ export default function BusinessDetailPage() {
         </div>
       </section>
 
-      <section className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+      <section className="card overflow-hidden">
         <div className="px-4 sm:px-6 py-4 border-b border-slate-200">
           <h3 className="font-semibold text-slate-700">Outlet ({business.outlets?.length ?? 0})</h3>
           <p className="text-xs text-slate-400 mt-0.5">Semua cabang tercatat terpisah, termasuk yang belum pernah bertransaksi.</p>
@@ -342,7 +345,7 @@ export default function BusinessDetailPage() {
       </section>
 
       {/* Business info */}
-      <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-6">
+      <div className="card p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
           <div className="flex items-center gap-3 sm:gap-4 min-w-0">
             {business.image ? (
@@ -397,7 +400,7 @@ export default function BusinessDetailPage() {
 
       {/* Owner info */}
       {business.owner && (
-        <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-6">
+        <div className="card p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
             <div>
               <h3 className="font-semibold text-slate-700">Pemilik Akun</h3>
@@ -446,7 +449,7 @@ export default function BusinessDetailPage() {
       )}
 
       {/* Membership info */}
-      <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-6">
+      <div className="card p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <h3 className="font-semibold text-slate-700">Membership</h3>
           <div className="flex gap-2">
@@ -585,7 +588,7 @@ export default function BusinessDetailPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Jenis Bisnis</label>
-            <select
+            <Select
               required
               value={businessForm.business_type_id || ''}
               onChange={(e) => {
@@ -604,11 +607,11 @@ export default function BusinessDetailPage() {
               {businessTypes.map((t) => (
                 <option key={t.id} value={t.id}>{t.name}</option>
               ))}
-            </select>
+            </Select>
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Bidang Usaha</label>
-            <select
+            <Select
               value={businessForm.business_vertical_id || ''}
               onChange={(e) => setBusinessForm((f) => ({ ...f, business_vertical_id: parseInt(e.target.value) || 0 }))}
               disabled={!businessForm.business_type_id}
@@ -618,7 +621,7 @@ export default function BusinessDetailPage() {
               {verticals.map((v) => (
                 <option key={v.id} value={v.id}>{v.name}</option>
               ))}
-            </select>
+            </Select>
             <p className="mt-1 text-xs text-slate-500">
               Menentukan kolom isian tiap transaksi dan istilah di aplikasi kasir.
             </p>
@@ -644,7 +647,7 @@ export default function BusinessDetailPage() {
           </p>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Paket</label>
-            <select
+            <Select
               value={form.type}
               onChange={(e) => setForm((f) => ({ ...f, type: e.target.value, days: membershipDefaultDays(e.target.value) }))}
               className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -653,7 +656,7 @@ export default function BusinessDetailPage() {
               <option value="pro">Pro Bulanan</option>
               <option value="pro-yearly">Pro Tahunan</option>
               <option value="pro-3year">Pro 3 Tahun</option>
-            </select>
+            </Select>
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Durasi (hari)</label>
@@ -683,7 +686,7 @@ export default function BusinessDetailPage() {
         <form onSubmit={handleUpdateMembership} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Paket</label>
-            <select
+            <Select
               value={editForm.type}
               onChange={(e) => {
                 const type = e.target.value
@@ -700,7 +703,7 @@ export default function BusinessDetailPage() {
               <option value="pro">Pro Bulanan</option>
               <option value="pro-yearly">Pro Tahunan</option>
               <option value="pro-3year">Pro 3 Tahun</option>
-            </select>
+            </Select>
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Tanggal Berakhir</label>

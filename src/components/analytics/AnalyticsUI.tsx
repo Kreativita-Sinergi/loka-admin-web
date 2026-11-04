@@ -1,3 +1,5 @@
+import { RefreshCw } from 'lucide-react'
+import ButtonIcon from '../../components/ui/ButtonIcon'
 import type { ReactNode } from 'react'
 import { formatDate } from '../../lib/analytics'
 
@@ -11,7 +13,7 @@ export function MetricCard({ label, value, detail, accent = false }: { label: st
 export function AnalyticsHeader({ title, description, loading, updatedAt, refresh }: { title: string; description: string; loading: boolean; updatedAt: string | null; refresh: () => void }) {
   return <div className="flex flex-wrap items-start justify-between gap-4">
     <div><h2 className="text-2xl font-bold tracking-tight text-slate-900">{title}</h2><p className="mt-1 text-sm text-slate-500">{description}</p></div>
-    <div className="flex items-center gap-3"><span className="text-xs text-slate-400">{updatedAt ? `Dimuat ${formatDate(updatedAt, true)} WIB` : ''}</span><button type="button" disabled={loading} onClick={refresh} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-50">{loading ? 'Memuat…' : '↻ Perbarui'}</button></div>
+    <div className="flex items-center gap-3"><span className="text-xs text-slate-400">{updatedAt ? `Dimuat ${formatDate(updatedAt, true)} WIB` : ''}</span><button type="button" disabled={loading} onClick={refresh} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-50">{loading ? 'Memuat…' : <><ButtonIcon icon={RefreshCw} />Perbarui</>}</button></div>
   </div>
 }
 export function AnalyticsState({ loading, error, hasData }: { loading: boolean; error: string | null; hasData: boolean }) {

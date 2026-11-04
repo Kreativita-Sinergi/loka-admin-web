@@ -3,7 +3,12 @@ import {
   sendEmail, sendPush, uploadNotificationImage, getNotificationLogs, getNotificationStats,
   type NotifyResult, type NotificationLog, type NotificationStats,
 } from '../api/admin'
+import {
+  AlertTriangle, ArrowLeft, Bell, Check, CircleCheck, CircleX, Hand, ImagePlus, Inbox, Loader2, Mail,
+  Megaphone, MessageSquare, Minus, PenLine, Smartphone, User, Users, X,
+} from 'lucide-react'
 import RecipientPicker from '../components/ui/RecipientPicker'
+import ButtonIcon from '../components/ui/ButtonIcon'
 import { formatDistanceToNow, format } from 'date-fns'
 import { id as localeId } from 'date-fns/locale'
 
@@ -13,7 +18,7 @@ const TEMPLATES = [
   {
     id: 'app_download',
     label: 'Undangan Download App',
-    icon: '📱',
+    icon: Smartphone,
     color: 'bg-indigo-50 border-indigo-300 text-indigo-700',
     activeColor: 'bg-indigo-600 text-white border-indigo-600',
     message: (name: string) =>
@@ -22,7 +27,7 @@ const TEMPLATES = [
   {
     id: 'promo',
     label: 'Promosi & Update',
-    icon: '🎉',
+    icon: Megaphone,
     color: 'bg-orange-50 border-orange-300 text-orange-700',
     activeColor: 'bg-orange-500 text-white border-orange-500',
     message: (name: string) =>
@@ -31,7 +36,7 @@ const TEMPLATES = [
   {
     id: 'inactive_7d',
     label: 'Cek Kabar (7 Hari Vakum)',
-    icon: '👋',
+    icon: Hand,
     color: 'bg-amber-50 border-amber-300 text-amber-700',
     activeColor: 'bg-amber-500 text-white border-amber-500',
     message: (name: string) =>
@@ -40,7 +45,7 @@ const TEMPLATES = [
   {
     id: 'custom',
     label: 'Pesan Kustom',
-    icon: '✏️',
+    icon: PenLine,
     color: 'bg-slate-50 border-slate-300 text-slate-700',
     activeColor: 'bg-slate-700 text-white border-slate-700',
     message: () => '',
@@ -55,7 +60,7 @@ const PUSH_TEMPLATES = [
   {
     id: 'feedback_push',
     label: 'Minta Feedback',
-    icon: '💬',
+    icon: MessageSquare,
     activeColor: 'bg-emerald-600 text-white border-emerald-600',
     title: 'Bagaimana Pengalaman Anda dengan Loka Kasir?',
     message: (name: string) =>
@@ -64,7 +69,7 @@ const PUSH_TEMPLATES = [
   {
     id: 'promo_push',
     label: 'Promosi & Update',
-    icon: '🎉',
+    icon: Megaphone,
     activeColor: 'bg-orange-500 text-white border-orange-500',
     title: 'Ada Fitur Baru di Loka Kasir',
     message: (name: string) =>
@@ -73,7 +78,7 @@ const PUSH_TEMPLATES = [
   {
     id: 'inactive_7d_push',
     label: 'Cek Kabar (7 Hari Vakum)',
-    icon: '👋',
+    icon: Hand,
     activeColor: 'bg-amber-500 text-white border-amber-500',
     title: 'Semuanya Baik-baik Saja?',
     message: (name: string) =>
@@ -82,7 +87,7 @@ const PUSH_TEMPLATES = [
   {
     id: 'custom_push',
     label: 'Pesan Kustom',
-    icon: '✏️',
+    icon: PenLine,
     activeColor: 'bg-slate-700 text-white border-slate-700',
     title: '',
     message: () => '',
@@ -253,21 +258,21 @@ export default function NotificationsPage() {
           ) : (
             <>
               {/* Kanal pengiriman */}
-              <div className="bg-white rounded-2xl border border-slate-200 p-1.5 flex gap-1.5">
-                {([['email', '📧 Email'], ['push', '🔔 Push ke Aplikasi']] as const).map(([c, label]) => (
+              <div className="card p-1.5 flex gap-1.5">
+                {([['email', 'Email', Mail], ['push', 'Push ke Aplikasi', Bell]] as const).map(([c, label, icon]) => (
                   <button key={c} onClick={() => handleChannelChange(c)}
                     className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
                       channel === c
                         ? (c === 'push' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-indigo-600 text-white shadow-sm')
                         : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
                     }`}>
-                    {label}
+                    <ButtonIcon icon={icon} />{label}
                   </button>
                 ))}
               </div>
 
               {/* Tab */}
-              <div className="bg-white rounded-2xl border border-slate-200 p-1.5 flex gap-1.5">
+              <div className="card p-1.5 flex gap-1.5">
                 {(['single', 'bulk'] as Tab[]).map((t) => (
                   <button key={t} onClick={() => { setTab(t); setError('') }}
                     className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
@@ -275,13 +280,13 @@ export default function NotificationsPage() {
                         ? 'bg-indigo-600 text-white shadow-sm'
                         : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
                     }`}>
-                    {t === 'single' ? '👤 Satu Pengguna' : '👥 Semua Pengguna'}
+                    <ButtonIcon icon={t === 'single' ? User : Users} />{t === 'single' ? 'Satu Pengguna' : 'Semua Pengguna'}
                   </button>
                 ))}
               </div>
 
               {/* Recipient */}
-              <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5">
+              <div className="card p-4 sm:p-5">
                 <div className="flex items-center gap-2 mb-4">
                   <span className="w-6 h-6 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xs font-bold">1</span>
                   <h3 className="text-sm font-semibold text-slate-700">Penerima</h3>
@@ -291,7 +296,7 @@ export default function NotificationsPage() {
                     onChange={(e, b) => { setEmail(e); setBusinessName(b) }} />
                 ) : (
                   <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl p-4">
-                    <span className="text-2xl">⚠️</span>
+                    <AlertTriangle size={20} className="mt-0.5 shrink-0 text-amber-600" aria-hidden />
                     <div>
                       <p className="text-sm font-semibold text-amber-800">Kirim ke semua owner aktif</p>
                       <p className="text-xs text-amber-600 mt-1 leading-relaxed">
@@ -306,7 +311,7 @@ export default function NotificationsPage() {
               </div>
 
               {/* Template */}
-              <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5">
+              <div className="card p-4 sm:p-5">
                 <div className="flex items-center gap-2 mb-4">
                   <span className="w-6 h-6 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xs font-bold">2</span>
                   <h3 className="text-sm font-semibold text-slate-700">Template Pesan</h3>
@@ -317,7 +322,7 @@ export default function NotificationsPage() {
                       className={`flex flex-col items-center gap-1.5 px-3 py-3 rounded-xl border text-sm font-medium transition-all ${
                         templateId === t.id ? t.activeColor + ' shadow-sm' : 'border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50'
                       }`}>
-                      <span className="text-xl">{t.icon}</span>
+                      <t.icon size={20} strokeWidth={1.8} aria-hidden />
                       <span className="text-xs text-center leading-tight">{t.label}</span>
                     </button>
                   ))}
@@ -349,7 +354,7 @@ export default function NotificationsPage() {
                       <label className={`flex items-center justify-center gap-2 px-3 py-3 border border-dashed border-slate-300 rounded-xl text-sm text-slate-500 ${imageUploading ? 'opacity-60' : 'cursor-pointer hover:bg-slate-50'}`}>
                         <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" disabled={imageUploading}
                           onChange={(e) => { handleImagePick(e.target.files?.[0]); e.target.value = '' }} />
-                        {imageUploading ? 'Mengunggah...' : '🖼️ Pilih gambar (JPG/PNG/WebP, maks. 2 MB)'}
+                        {imageUploading ? 'Mengunggah...' : <><ImagePlus size={16} aria-hidden />Pilih gambar (JPG/PNG/WebP, maks. 2 MB)</>}
                       </label>
                     )}
                     <p className="text-[11px] text-slate-400 mt-1.5">
@@ -361,20 +366,20 @@ export default function NotificationsPage() {
 
               {error && (
                 <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
-                  <span>❌</span>
+                  <CircleX size={16} className="shrink-0 text-red-600" aria-hidden />
                   <p className="text-sm text-red-700">{error}</p>
                 </div>
               )}
 
               {/* Preview + Send */}
-              <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5">
+              <div className="card p-4 sm:p-5">
                 <div className="flex items-center gap-2 mb-4">
                   <span className="w-6 h-6 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xs font-bold">3</span>
                   <h3 className="text-sm font-semibold text-slate-700">Preview & Kirim</h3>
                 </div>
                 {isPush ? (
                   /* Push preview — meniru kartu notifikasi di perangkat */
-                  <div className="bg-slate-800 rounded-xl p-4 mb-4">
+                  <div className="bg-slate-800 dark:bg-black/40 rounded-xl p-4 mb-4">
                     <p className="text-xs text-slate-400 mb-2">
                       Ke: {tab === 'bulk' ? 'semua owner aktif' : (email || 'penerima')}
                     </p>
@@ -424,10 +429,10 @@ export default function NotificationsPage() {
                       : 'bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800'
                   }`}>
                   {sendState === 'sending' ? (
-                    <><span className="animate-spin inline-block">⏳</span> Mengirim...</>
+                    <><Loader2 size={16} className="animate-spin" aria-hidden /> Mengirim...</>
                   ) : (
                     <>
-                      <span>{isPush ? '🔔' : '📧'}</span>
+                      {isPush ? <Bell size={16} aria-hidden /> : <Mail size={16} aria-hidden />}
                       {tab === 'bulk'
                         ? 'Kirim ke Semua Pengguna'
                         : (isPush ? 'Kirim Push Notification' : 'Kirim Email')}
@@ -441,7 +446,7 @@ export default function NotificationsPage() {
 
         {/* === History panel (2/5) === */}
         <div className="xl:col-span-2">
-          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden xl:sticky xl:top-6">
+          <div className="card overflow-hidden xl:sticky xl:top-6">
             <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
               <h3 className="text-sm font-semibold text-slate-700">Riwayat Pengiriman</h3>
               <button onClick={refreshHistory}
@@ -455,7 +460,7 @@ export default function NotificationsPage() {
                 <div className="py-12 text-center text-slate-400 text-sm">Memuat riwayat...</div>
               ) : logs.length === 0 ? (
                 <div className="py-12 text-center">
-                  <p className="text-3xl mb-2">📭</p>
+                  <Inbox size={32} strokeWidth={1.5} className="mx-auto mb-2 text-slate-300" aria-hidden />
                   <p className="text-sm text-slate-400">Belum ada notifikasi yang terkirim</p>
                 </div>
               ) : (
@@ -482,10 +487,10 @@ function LogItem({ log }: { log: NotificationLog }) {
     <div className="px-5 py-4 hover:bg-slate-50 transition-colors cursor-pointer" onClick={() => setExpanded(v => !v)}>
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-3 min-w-0">
-          <div className={`mt-0.5 w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-base ${
-            log.is_bulk ? 'bg-purple-100' : 'bg-indigo-100'
+          <div className={`mt-0.5 w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+            log.is_bulk ? 'bg-purple-100 text-purple-700' : 'bg-indigo-100 text-indigo-700'
           }`}>
-            {log.is_bulk ? '👥' : '👤'}
+            {log.is_bulk ? <Users size={16} aria-hidden /> : <User size={16} aria-hidden />}
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 flex-wrap">
@@ -511,7 +516,7 @@ function LogItem({ log }: { log: NotificationLog }) {
             : allFailed ? 'bg-red-100 text-red-700'
             : 'bg-amber-100 text-amber-700'
           }`}>
-            {allSuccess ? '✓' : allFailed ? '✗' : '~'}
+            {allSuccess ? <Check size={12} strokeWidth={3} aria-hidden /> : allFailed ? <X size={12} strokeWidth={3} aria-hidden /> : <Minus size={12} strokeWidth={3} aria-hidden />}
             {log.is_bulk ? ` ${log.sent}/${log.total}` : (allSuccess ? ' Terkirim' : ' Gagal')}
           </div>
           <p className="text-xs text-slate-400 mt-1">
@@ -574,7 +579,9 @@ function SendResultCard({
       {/* Result banner */}
       <div className={`rounded-2xl p-5 border ${allSuccess ? 'bg-emerald-50 border-emerald-200' : 'bg-amber-50 border-amber-200'}`}>
         <div className="flex items-center gap-3">
-          <span className="text-3xl">{allSuccess ? '🎉' : '⚠️'}</span>
+          {allSuccess
+            ? <CircleCheck size={28} strokeWidth={1.8} className="shrink-0 text-emerald-600" aria-hidden />
+            : <AlertTriangle size={28} strokeWidth={1.8} className="shrink-0 text-amber-600" aria-hidden />}
           <div>
             <p className={`font-semibold text-base ${allSuccess ? 'text-emerald-800' : 'text-amber-800'}`}>
               {allSuccess ? 'Semua notifikasi terkirim!' : 'Sebagian tidak terkirim'}
@@ -587,7 +594,7 @@ function SendResultCard({
       </div>
 
       {/* Progress bar */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-4">
+      <div className="card p-4">
         <div className="flex justify-between text-xs text-slate-500 mb-2">
           <span>Sukses</span>
           <span>{result.total > 0 ? Math.round(result.sent / result.total * 100) : 0}%</span>
@@ -612,7 +619,7 @@ function SendResultCard({
 
       {/* Detail list */}
       {result.results.length > 0 && (
-        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+        <div className="card overflow-hidden">
           <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
             <p className="text-sm font-semibold text-slate-700">Detail Pengiriman</p>
           </div>
@@ -623,7 +630,7 @@ function SendResultCard({
                   <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs ${
                     r.success ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'
                   }`}>
-                    {r.success ? '✓' : '✗'}
+                    {r.success ? <Check size={14} strokeWidth={2.5} aria-hidden /> : <X size={14} strokeWidth={2.5} aria-hidden />}
                   </div>
                   <div>
                     <p className="text-sm font-medium text-slate-700">{r.name}</p>
@@ -649,7 +656,7 @@ function SendResultCard({
 
       <button onClick={onReset}
         className="w-full py-3 border-2 border-indigo-200 hover:border-indigo-400 text-indigo-600 font-medium rounded-xl text-sm transition-colors">
-        ← Kirim Notifikasi Baru
+        <ButtonIcon icon={ArrowLeft} />Kirim Notifikasi Baru
       </button>
     </div>
   )

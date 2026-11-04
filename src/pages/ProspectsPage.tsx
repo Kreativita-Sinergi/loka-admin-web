@@ -1,3 +1,4 @@
+import Select from '../components/ui/Select'
 import { useState, useEffect, useCallback } from 'react'
 import { format } from 'date-fns'
 import { id as localeId } from 'date-fns/locale'
@@ -15,6 +16,11 @@ import {
   type CreateProspectPayload,
 } from '../api/prospects'
 import { searchGooglePlaces, type GooglePlaceResult } from '../lib/googlePlaces'
+import {
+  ArrowLeft, ArrowRight, Building2, Globe, Mail, MapPin, MessageCircle, Phone, Pencil, Search, Send, Star,
+  StickyNote, Tag, Trash2,
+} from 'lucide-react'
+import ButtonIcon from '../components/ui/ButtonIcon'
 
 // Pesan WhatsApp default — dikirim saat admin klik "Chat WA". {nama} otomatis diisi.
 const waMessage = (name: string) =>
@@ -45,25 +51,25 @@ const FILTER_TABS = [
 const LIMIT = 20
 
 // Kategori usaha umum (kata kunci ramah Google Places) — untuk pilih cepat saat impor.
-const BUSINESS_CATEGORIES: { emoji: string; label: string; q: string }[] = [
-  { emoji: '☕', label: 'Kafe', q: 'kafe' },
-  { emoji: '🍜', label: 'Rumah Makan', q: 'rumah makan' },
-  { emoji: '🍱', label: 'Restoran', q: 'restoran' },
-  { emoji: '🛒', label: 'Toko Kelontong', q: 'toko kelontong' },
-  { emoji: '🏪', label: 'Minimarket', q: 'minimarket' },
-  { emoji: '🥖', label: 'Toko Roti', q: 'toko roti' },
-  { emoji: '🍰', label: 'Toko Kue', q: 'toko kue' },
-  { emoji: '👕', label: 'Toko Baju', q: 'toko pakaian' },
-  { emoji: '💈', label: 'Barbershop', q: 'barbershop' },
-  { emoji: '💇', label: 'Salon', q: 'salon kecantikan' },
-  { emoji: '🧺', label: 'Laundry', q: 'laundry' },
-  { emoji: '💊', label: 'Apotek', q: 'apotek' },
-  { emoji: '🔧', label: 'Bengkel', q: 'bengkel motor' },
-  { emoji: '📱', label: 'Konter HP', q: 'konter hp' },
-  { emoji: '🐠', label: 'Pet Shop', q: 'pet shop' },
-  { emoji: '🌸', label: 'Toko Bunga', q: 'toko bunga' },
-  { emoji: '🧊', label: 'Frozen Food', q: 'frozen food' },
-  { emoji: '🏬', label: 'Toko Bangunan', q: 'toko bangunan' },
+const BUSINESS_CATEGORIES: { label: string; q: string }[] = [
+  { label: 'Kafe', q: 'kafe' },
+  { label: 'Rumah Makan', q: 'rumah makan' },
+  { label: 'Restoran', q: 'restoran' },
+  { label: 'Toko Kelontong', q: 'toko kelontong' },
+  { label: 'Minimarket', q: 'minimarket' },
+  { label: 'Toko Roti', q: 'toko roti' },
+  { label: 'Toko Kue', q: 'toko kue' },
+  { label: 'Toko Baju', q: 'toko pakaian' },
+  { label: 'Barbershop', q: 'barbershop' },
+  { label: 'Salon', q: 'salon kecantikan' },
+  { label: 'Laundry', q: 'laundry' },
+  { label: 'Apotek', q: 'apotek' },
+  { label: 'Bengkel', q: 'bengkel motor' },
+  { label: 'Konter HP', q: 'konter hp' },
+  { label: 'Pet Shop', q: 'pet shop' },
+  { label: 'Toko Bunga', q: 'toko bunga' },
+  { label: 'Frozen Food', q: 'frozen food' },
+  { label: 'Toko Bangunan', q: 'toko bangunan' },
 ]
 
 const COMMON_CITIES = [
@@ -142,13 +148,13 @@ export default function ProspectsPage() {
             onClick={() => setImportOpen(true)}
             className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl"
           >
-            🗺️ Impor dari Google
+            <ButtonIcon icon={MapPin} />Impor dari Google
           </button>
           <button
             onClick={() => setSendTarget({ mode: 'all' })}
             className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl"
           >
-            📣 Kirim ke Semua
+            <ButtonIcon icon={Send} />Kirim ke Semua
           </button>
           <button
             onClick={() => setFormModal('new')}
@@ -199,7 +205,7 @@ export default function ProspectsPage() {
               onClick={() => setSendTarget({ mode: 'selected', ids: selectedIds })}
               className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg"
             >
-              📧 Kirim ke Terpilih
+              <ButtonIcon icon={Mail} />Kirim ke Terpilih
             </button>
             <button onClick={() => setSelected(new Set())} className="px-3 py-1.5 text-xs text-slate-500 hover:text-slate-700">
               Batal pilih
@@ -209,10 +215,10 @@ export default function ProspectsPage() {
       )}
 
       {loading ? (
-        <div className="bg-white rounded-2xl border border-slate-200 py-20 text-center text-slate-400 text-sm">Memuat data...</div>
+        <div className="card py-20 text-center text-slate-400 text-sm">Memuat data...</div>
       ) : rows.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-slate-200 py-20 px-6 text-center">
-          <div className="text-4xl mb-3">🗺️</div>
+        <div className="card py-20 px-6 text-center">
+          <MapPin size={32} strokeWidth={1.5} className="mx-auto mb-3 text-slate-300" aria-hidden />
           <h3 className="text-base font-semibold text-slate-800">Mulai cari calon pelanggan</h3>
           <p className="text-sm text-slate-500 mt-1 max-w-md mx-auto">
             Pilih jenis usaha (kafe, toko, laundry…) &amp; kota, lalu impor bisnis dari Google Maps. Tinggal klik <b>Chat WA</b> untuk promosikan aplikasi kasirmu.
@@ -222,7 +228,7 @@ export default function ProspectsPage() {
               onClick={() => setImportOpen(true)}
               className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl"
             >
-              🗺️ Impor dari Google
+              <ButtonIcon icon={MapPin} />Impor dari Google
             </button>
             <button
               onClick={() => setFormModal('new')}
@@ -257,9 +263,9 @@ export default function ProspectsPage() {
               </p>
               <div className="flex gap-1.5">
                 <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}
-                  className="px-3 py-1.5 text-xs border border-slate-200 rounded-xl disabled:opacity-40 hover:bg-slate-50">← Sebelumnya</button>
+                  className="px-3 py-1.5 text-xs border border-slate-200 rounded-xl disabled:opacity-40 hover:bg-slate-50"><ButtonIcon icon={ArrowLeft} size={13} />Sebelumnya</button>
                 <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages}
-                  className="px-3 py-1.5 text-xs border border-slate-200 rounded-xl disabled:opacity-40 hover:bg-slate-50">Berikutnya →</button>
+                  className="px-3 py-1.5 text-xs border border-slate-200 rounded-xl disabled:opacity-40 hover:bg-slate-50">Berikutnya<ButtonIcon icon={ArrowRight} side="end" size={13} /></button>
               </div>
             </div>
           )}
@@ -306,26 +312,26 @@ function ProspectRow({
 }) {
   const cfg = STATUS_CONFIG[row.status] ?? STATUS_CONFIG.new
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-4">
+    <div className="card p-4">
       <div className="flex items-start gap-3 flex-wrap sm:flex-nowrap">
         <input type="checkbox" checked={checked} onChange={onToggle} className="mt-1 w-4 h-4 accent-indigo-600" />
         <div className="flex-1 min-w-0 space-y-1">
           <div className="flex items-center gap-2 flex-wrap">
             <h4 className="text-sm font-semibold text-slate-800">{row.name}</h4>
             {row.business_type && <span className="text-xs bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full border border-emerald-100">{row.business_type}</span>}
-            {row.company && <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">🏢 {row.company}</span>}
-            {typeof row.rating === 'number' && <span className="text-xs bg-amber-50 text-amber-600 px-2 py-0.5 rounded-full">⭐ {row.rating}</span>}
+            {row.company && <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full inline-flex items-center gap-1"><Building2 size={13} className="shrink-0" aria-hidden />{row.company}</span>}
+            {typeof row.rating === 'number' && <span className="text-xs bg-amber-50 text-amber-600 px-2 py-0.5 rounded-full inline-flex items-center gap-1"><Star size={13} className="shrink-0" aria-hidden />{row.rating}</span>}
             {row.unsubscribed && <span className="text-xs bg-red-50 text-red-500 px-2 py-0.5 rounded-full border border-red-100">unsubscribed</span>}
           </div>
           <div className="flex items-center gap-3 flex-wrap text-xs text-slate-600">
-            {row.phone && <span className="font-medium flex items-center gap-1 text-emerald-700">📱 {row.phone}</span>}
-            {row.email && <span className="flex items-center gap-1">📧 {row.email}</span>}
-            {row.website && <a href={row.website} target="_blank" rel="noopener" className="flex items-center gap-1 text-blue-500 hover:underline truncate max-w-[200px]">🌐 {row.website}</a>}
-            {row.source && <span className="flex items-center gap-1">🔖 {row.source}</span>}
+            {row.phone && <span className="font-medium flex items-center gap-1 text-emerald-700"><Phone size={13} className="shrink-0" aria-hidden />{row.phone}</span>}
+            {row.email && <span className="flex items-center gap-1"><Mail size={13} className="shrink-0" aria-hidden />{row.email}</span>}
+            {row.website && <a href={row.website} target="_blank" rel="noopener" className="flex items-center gap-1 text-blue-500 hover:underline truncate max-w-[200px]"><Globe size={13} className="shrink-0" aria-hidden />{row.website}</a>}
+            {row.source && <span className="flex items-center gap-1"><Tag size={13} className="shrink-0" aria-hidden />{row.source}</span>}
           </div>
-          {row.address && <p className="text-xs text-slate-400 flex items-start gap-1">📍 {row.address}</p>}
+          {row.address && <p className="text-xs text-slate-400 flex items-start gap-1"><MapPin size={13} className="shrink-0 mt-0.5" aria-hidden />{row.address}</p>}
           {row.notes && (
-            <p className="text-xs text-slate-500 italic bg-amber-50 border border-amber-100 rounded-lg px-2 py-1">📝 {row.notes}</p>
+            <p className="text-xs text-slate-500 italic bg-amber-50 border border-amber-100 rounded-lg px-2 py-1 flex items-start gap-1"><StickyNote size={13} className="shrink-0 mt-0.5" aria-hidden />{row.notes}</p>
           )}
           <div className="flex items-center gap-2 pt-0.5 text-xs text-slate-400 flex-wrap">
             <span>Dibuat {format(new Date(row.created_at), 'dd MMM yyyy', { locale: localeId })}</span>
@@ -336,7 +342,7 @@ function ProspectRow({
         </div>
 
         <div className="w-full sm:w-auto shrink-0 flex flex-row sm:flex-col items-center sm:items-end gap-2 pl-7 sm:pl-0">
-          <select
+          <Select
             value={row.status}
             onChange={(e) => onStatusChange(e.target.value as ProspectStatus)}
             className={`text-xs font-medium px-2.5 py-1.5 rounded-xl border cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 ${cfg.bg} ${cfg.color} ${cfg.border}`}
@@ -344,14 +350,14 @@ function ProspectRow({
             {Object.entries(STATUS_CONFIG).map(([v, c]) => (
               <option key={v} value={v}>{c.label}</option>
             ))}
-          </select>
+          </Select>
           <div className="flex gap-1.5 ml-auto sm:ml-0">
             <button onClick={onWhatsApp} disabled={!row.phone} title="Chat WhatsApp"
-              className="p-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 rounded-xl text-sm disabled:opacity-40">💬</button>
+              className="p-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 rounded-xl text-sm disabled:opacity-40"><MessageCircle size={16} aria-hidden /></button>
             <button onClick={onSend} disabled={row.unsubscribed || !row.email} title="Kirim email"
-              className="p-2 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-xl text-sm disabled:opacity-40">📧</button>
-            <button onClick={onEdit} title="Edit" className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-sm">✏️</button>
-            <button onClick={onDelete} title="Hapus" className="p-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-xl text-sm">🗑️</button>
+              className="p-2 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-xl text-sm disabled:opacity-40"><Mail size={16} aria-hidden /></button>
+            <button onClick={onEdit} title="Edit" className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-sm"><Pencil size={16} aria-hidden /></button>
+            <button onClick={onDelete} title="Hapus" className="p-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-xl text-sm"><Trash2 size={16} aria-hidden /></button>
           </div>
         </div>
       </div>
@@ -447,11 +453,11 @@ function SendEmailModal({ target, onClose, onSent }: { target: SendTarget; onClo
             : { all: true, subject, body_html: body }
       const r = await sendOutreach(payload)
       const s = r.data
-      setResult(`✅ Terkirim ${s.sent}, gagal ${s.failed}, dilewati ${s.skipped} (total ${s.total}).`)
+      setResult(`Terkirim ${s.sent}, gagal ${s.failed}, dilewati ${s.skipped} (total ${s.total}).`)
       setTimeout(onSent, 1200)
     } catch (e) {
       const err = e as { response?: { data?: { message?: string } } }
-      setResult('❌ ' + (err.response?.data?.message ?? 'Gagal mengirim'))
+      setResult(err.response?.data?.message ?? 'Gagal mengirim')
     } finally {
       setSending(false)
     }
@@ -541,7 +547,7 @@ function ImportGoogleModal({ onClose, onImported }: { onClose: () => void; onImp
           phone: it.phone, website: it.website, rating: it.rating,
         })),
       })
-      setInfo(`✅ Diimpor ${r.data.imported}, dilewati ${r.data.skipped} (sudah ada).`)
+      setInfo(`Diimpor ${r.data.imported}, dilewati ${r.data.skipped} (sudah ada).`)
       setTimeout(onImported, 1000)
     } catch (e) {
       const err = e as { response?: { data?: { message?: string } } }
@@ -574,7 +580,7 @@ function ImportGoogleModal({ onClose, onImported }: { onClose: () => void; onImp
                     active ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-700 border-slate-200 hover:border-emerald-300 hover:bg-emerald-50'
                   }`}
                 >
-                  {c.emoji} {c.label}
+                  {c.label}
                 </button>
               )
             })}
@@ -603,13 +609,13 @@ function ImportGoogleModal({ onClose, onImported }: { onClose: () => void; onImp
 
           {/* Langkah 3: jumlah + cari */}
           <div className="flex gap-2 mt-4">
-            <select className={input} value={maxResults} onChange={(e) => setMaxResults(Number(e.target.value))}>
+            <Select className={input} value={maxResults} onChange={(e) => setMaxResults(Number(e.target.value))}>
               <option value={20}>20 hasil</option>
               <option value={40}>40 hasil</option>
               <option value={60}>60 hasil</option>
-            </select>
+            </Select>
             <button onClick={handleSearch} disabled={searching} className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl disabled:opacity-50">
-              {searching ? 'Mencari di Google…' : '🔍 Cari Bisnis'}
+              {searching ? 'Mencari di Google…' : <><ButtonIcon icon={Search} />Cari Bisnis</>}
             </button>
           </div>
           {error && <p className="text-xs text-red-500 mt-2">{error}</p>}
@@ -628,13 +634,13 @@ function ImportGoogleModal({ onClose, onImported }: { onClose: () => void; onImp
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-sm font-semibold text-slate-800">{r.name}</span>
-                      {typeof r.rating === 'number' && <span className="text-xs text-amber-600">⭐ {r.rating}</span>}
+                      {typeof r.rating === 'number' && <span className="text-xs text-amber-600 inline-flex items-center gap-1"><Star size={13} className="shrink-0" aria-hidden />{r.rating}</span>}
                       {!r.phone && <span className="text-xs text-red-400">tanpa nomor</span>}
                     </div>
-                    {r.address && <p className="text-xs text-slate-500 mt-0.5">📍 {r.address}</p>}
+                    {r.address && <p className="text-xs text-slate-500 mt-0.5 flex items-start gap-1"><MapPin size={13} className="shrink-0 mt-0.5" aria-hidden />{r.address}</p>}
                     <div className="flex gap-3 flex-wrap text-xs text-slate-500 mt-0.5">
-                      {r.phone && <span className="text-emerald-700">📱 {r.phone}</span>}
-                      {r.website && <span className="truncate max-w-[220px]">🌐 {r.website}</span>}
+                      {r.phone && <span className="text-emerald-700 inline-flex items-center gap-1"><Phone size={13} className="shrink-0" aria-hidden />{r.phone}</span>}
+                      {r.website && <span className="truncate max-w-[220px] inline-flex items-center gap-1"><Globe size={13} className="shrink-0" aria-hidden />{r.website}</span>}
                     </div>
                   </div>
                 </label>

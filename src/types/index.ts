@@ -118,6 +118,26 @@ export interface AdminStats {
   geo_cities?: RegionCount[]
   geo_located?: number
   geo_abroad?: number
+  /** Opsional: service sebelum pembaruan dasbor belum mengirimnya. */
+  growth?: AdminGrowthStats
+}
+
+/** Lihat loka-kasir-service repository/admin_growth_stats.go. Jendela 30 hari. */
+export interface AdminGrowthStats {
+  registrations_prev_30d: number
+  subscription_revenue_30d: number
+  subscription_revenue_prev_30d: number
+  subscription_orders_30d: number
+  paying_businesses_30d: number
+  subscription_monthly: { month: string; amount: number; orders: number }[]
+  trials_ended_30d: number
+  trials_converted_30d: number
+  pro_ended_30d: number
+  pro_not_renewed_30d: number
+  /** Opsional: ditambahkan setelah growth pertama. */
+  mrr?: number
+  active_pro?: number
+  active_pro_paid?: number
 }
 
 export interface RegionCount {

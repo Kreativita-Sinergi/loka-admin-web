@@ -1,3 +1,4 @@
+import Select from '../components/ui/Select'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { format } from 'date-fns'
@@ -50,7 +51,7 @@ export default function SalesAgentsPage() {
   }), { active: 0, customers: 0, available: 0, paid: 0 }), [agents])
 
   const card = (label: string, value: string, hint?: string) => (
-    <div className="bg-white rounded-xl border border-slate-200 p-4">
+    <div className="card p-4">
       <p className="text-xs font-medium text-slate-500">{label}</p>
       <p className="mt-1 text-2xl font-bold tabular-nums text-slate-800">{value}</p>
       {hint && <p className="text-xs text-slate-400 mt-0.5">{hint}</p>}
@@ -86,16 +87,16 @@ export default function SalesAgentsPage() {
         {card('Total dibayar', agents ? formatMoney(totals.paid) : '—')}
       </div>
 
-      <div className="bg-white rounded-xl border border-slate-200 p-3 sm:p-4 flex flex-col sm:flex-row sm:flex-wrap gap-3">
+      <div className="card p-3 sm:p-4 flex flex-col sm:flex-row sm:flex-wrap gap-3">
         <input type="search" placeholder="Cari nama, kode, email, HP…" value={search} onChange={(e) => setSearch(e.target.value)}
           className="flex-1 min-w-0 sm:min-w-60 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-        <select value={status} onChange={(e) => setStatus(e.target.value as '' | SalesAgentStatus)}
+        <Select value={status} onChange={(e) => setStatus(e.target.value as '' | SalesAgentStatus)}
           className="w-full sm:w-auto px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
           {STATUS_FILTERS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-        </select>
+        </Select>
       </div>
 
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+      <div className="card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-slate-50 border-b border-slate-200">

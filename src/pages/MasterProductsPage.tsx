@@ -1,3 +1,6 @@
+import Select from '../components/ui/Select'
+import { Download, ListPlus, Upload } from 'lucide-react'
+import ButtonIcon from '../components/ui/ButtonIcon'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Modal from '../components/ui/Modal'
 import Pagination from '../components/ui/Pagination'
@@ -408,7 +411,7 @@ export default function MasterProductsPage() {
             className="px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 disabled:opacity-50"
             title="Mengisi katalog dengan 267 barang kelontong dan apotek bawaan"
           >
-            {seeding ? 'Memuat…' : '✨ Muat daftar awal'}
+            {seeding ? 'Memuat…' : <><ButtonIcon icon={ListPlus} />Muat daftar awal</>}
           </button>
           <button
             onClick={() => fileRef.current?.click()}
@@ -416,14 +419,14 @@ export default function MasterProductsPage() {
             className="px-4 py-2 border border-slate-200 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-100 disabled:opacity-50"
             title="Unggah berkas CSV berisi daftar barang baku"
           >
-            {importing ? 'Mengimpor…' : '⬆️ Impor CSV'}
+            {importing ? 'Mengimpor…' : <><ButtonIcon icon={Upload} />Impor CSV</>}
           </button>
           <button
             onClick={harvest}
             disabled={harvesting}
             className="px-4 py-2 border border-slate-200 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-100 disabled:opacity-50"
           >
-            {harvesting ? 'Memanen…' : '🌾 Panen dari toko'}
+            {harvesting ? 'Memanen…' : <><ButtonIcon icon={Download} />Panen dari toko</>}
           </button>
           <button
             onClick={openCreate}
@@ -456,7 +459,7 @@ export default function MasterProductsPage() {
             foto. Rapikan namanya di spreadsheet, lalu unggah lewat Impor CSV.
           </p>
         </div>
-        <select
+        <Select
           value={sourceBusiness}
           onChange={(e) => setSourceBusiness(e.target.value)}
           className="border border-slate-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 min-w-56"
@@ -465,7 +468,7 @@ export default function MasterProductsPage() {
           {businesses.map((b) => (
             <option key={b.id} value={b.id}>{b.business_name}</option>
           ))}
-        </select>
+        </Select>
         <button
           onClick={downloadCandidates}
           disabled={!sourceBusiness}
@@ -485,7 +488,7 @@ export default function MasterProductsPage() {
           placeholder="Cari nama barang…"
           className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
-        <select
+        <Select
           value={params.sort_by ?? ''}
           onChange={(e) => {
             setLoading(true)
@@ -495,8 +498,8 @@ export default function MasterProductsPage() {
         >
           <option value="">Semua status</option>
           <option value="pending">Menunggu tinjau</option>
-        </select>
-        <select
+        </Select>
+        <Select
           value={params.vertical ?? ''}
           onChange={(e) => {
             setLoading(true)
@@ -508,14 +511,14 @@ export default function MasterProductsPage() {
           {VERTICALS.filter((v) => v.value).map((v) => (
             <option key={v.value} value={v.value}>{v.label}</option>
           ))}
-        </select>
+        </Select>
       </div>
 
       <div className="text-sm text-slate-500">
         {total > 0 ? `${total.toLocaleString('id-ID')} barang di katalog` : 'Katalog masih kosong'}
       </div>
 
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+      <div className="card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -704,7 +707,7 @@ export default function MasterProductsPage() {
               hanya bisa diselesaikan manusia yang memeriksa kemasannya. */}
           <div className="grid grid-cols-2 gap-3">
             <Field label="Golongan obat" hint="Kosongkan bila barang ini bukan obat.">
-              <select
+              <Select
                 value={form.drug_class ?? ''}
                 onChange={(e) => setForm((f) => ({ ...f, drug_class: e.target.value }))}
                 className={inputClass}
@@ -712,7 +715,7 @@ export default function MasterProductsPage() {
                 {DRUG_CLASSES.map((d) => (
                   <option key={d.value} value={d.value}>{d.label}</option>
                 ))}
-              </select>
+              </Select>
             </Field>
             <Field label="Zat aktif">
               <input
@@ -732,7 +735,7 @@ export default function MasterProductsPage() {
             />
           </Field>
           <Field label="Sub-jenis usaha">
-            <select
+            <Select
               value={form.vertical_code}
               onChange={(e) => setForm((f) => ({ ...f, vertical_code: e.target.value }))}
               className={inputClass}
@@ -740,7 +743,7 @@ export default function MasterProductsPage() {
               {VERTICALS.map((v) => (
                 <option key={v.value} value={v.value}>{v.label}</option>
               ))}
-            </select>
+            </Select>
           </Field>
           <label className="flex items-center gap-2 text-sm text-slate-700">
             <input

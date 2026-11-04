@@ -1,3 +1,5 @@
+import { AlertTriangle, Trash2 } from 'lucide-react'
+import ButtonIcon from '../../components/ui/ButtonIcon'
 import { useState } from 'react'
 
 /** Pesan kegagalan dari server, bukan "Coba lagi" generik.
@@ -56,8 +58,8 @@ export default function DeleteConfirmModal({ open, businessName, onClose, onConf
       <div className="absolute inset-0 bg-black/50" onClick={handleClose} />
       <div className="relative bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-md sm:mx-4 p-4 sm:p-6 max-h-[92dvh] overflow-y-auto">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-xl shrink-0">
-            🗑️
+          <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 shrink-0">
+            <Trash2 size={18} aria-hidden />
           </div>
           <div>
             <h2 className="text-base font-bold text-slate-800">Hapus Bisnis</h2>
@@ -66,7 +68,7 @@ export default function DeleteConfirmModal({ open, businessName, onClose, onConf
         </div>
 
         <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-5 space-y-1">
-          <p className="text-sm font-semibold text-red-700">⚠️ Data berikut akan terhapus permanen:</p>
+          <p className="text-sm font-semibold text-red-700"><ButtonIcon icon={AlertTriangle} />Data berikut akan terhapus permanen:</p>
           <ul className="text-xs text-red-600 space-y-0.5 mt-1 ml-1">
             <li>• Akun pemilik & semua karyawan</li>
             <li>• Data bisnis & semua outlet</li>

@@ -1,3 +1,4 @@
+import { X } from 'lucide-react'
 import { useEffect } from 'react'
 
 interface ModalProps {
@@ -22,7 +23,7 @@ export default function Modal({ title, open, onClose, children }: ModalProps) {
       <div className="relative bg-white rounded-t-2xl sm:rounded-xl shadow-xl w-full max-w-lg sm:mx-4 p-4 sm:p-6 max-h-[90dvh] overflow-y-auto">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-base font-semibold text-slate-800">{title}</h2>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 text-xl leading-none">×</button>
+          <button onClick={onClose} aria-label="Tutup" className="-m-1.5 p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600"><X size={18} aria-hidden /></button>
         </div>
         {children}
       </div>

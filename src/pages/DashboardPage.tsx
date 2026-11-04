@@ -1,14 +1,17 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { getStats } from '../api/admin'
+import { getStats, getActiveUsers } from '../api/admin'
+import { getSales } from '../api/adminData'
+import { getMerchantHealth } from '../api/merchantHealth'
 import type { RegionCount } from '../types'
 import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, Legend,
+  AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts'
-import { AnalyticsHeader, AnalyticsState, MetricCard } from '../components/analytics/AnalyticsUI'
+import { AnalyticsHeader, AnalyticsState } from '../components/analytics/AnalyticsUI'
+import { Card, DeltaBadge, SectionLabel, StatCard } from '../components/ui/Card'
 import { useAnalytics } from '../hooks/useAnalytics'
-import { dailySeries, formatNumber, percentage } from '../lib/analytics'
+import { dailySeries, formatHours, formatNumber, percentage } from '../lib/analytics'
+import { delta, formatMoneyShort, monthToDateRanges, monthlySeries, rate } from '../lib/dashboard'
+import { formatMoney } from '../lib/sales'
 import { planBucketLabel } from '../lib/membership'
 
 // `free` dari server = usaha tanpa langganan berlaku (trial/Pro berakhir).
@@ -19,14 +22,33 @@ const MEMBERSHIP_COLORS: Record<string, string> = {
   pro: '#10b981',
 }
 
+const REGION_PREVIEW = 8
+
+// Pengambil data di tingkat modul agar referensinya stabil untuk useAnalytics.
+// Tiap sumber dimuat sendiri: bila satu gagal, bagian lain tetap tampil.
+const fetchHealth = () => getMerchantHealth({})
+const fetchSalesThisMonth = () => getSales({ ...monthToDateRanges().current, limit: 1 })
+const fetchSalesLastMonth = () => getSales({ ...monthToDateRanges().previous, limit: 1 })
+
+/** Teks pengganti saat service belum mengirim angka baru. */
+const NEEDS_SERVICE = 'Menunggu pembaruan service'
+
 function RegionList({ title, rows, total }: { title: string; rows: RegionCount[]; total: number }) {
+  const [expanded, setExpanded] = useState(false)
   const max = Math.max(1, ...rows.map((r) => r.count))
+  const shown = expanded ? rows : rows.slice(0, REGION_PREVIEW)
   return (
-    <div className="min-w-0 bg-white rounded-xl border border-slate-200 p-4 sm:p-5">
-      <h3 className="text-sm font-semibold text-slate-700 mb-3">{title}</h3>
+    <Card
+      title={title}
+      action={rows.length > REGION_PREVIEW && (
+        <button type="button" onClick={() => setExpanded((v) => !v)} className="shrink-0 text-xs font-medium text-indigo-600 hover:underline">
+          {expanded ? 'Ringkas' : `Lihat semua (${rows.length})`}
+        </button>
+      )}
+    >
       {rows.length > 0 ? (
-        <ul className="space-y-2.5 max-h-80 overflow-y-auto pr-1">
-          {rows.map((r) => (
+        <ul className="space-y-2.5">
+          {shown.map((r) => (
             <li key={`${r.parent ?? ''}|${r.name}`}>
               <div className="flex items-baseline justify-between gap-3 text-sm">
                 <span className="text-slate-700 truncate">
@@ -49,101 +71,281 @@ function RegionList({ title, rows, total }: { title: string; rows: RegionCount[]
       ) : (
         <div className="h-32 flex items-center justify-center text-slate-400 text-sm">Belum ada data wilayah</div>
       )}
-    </div>
+    </Card>
   )
 }
 
 export default function DashboardPage() {
-  const { data: stats, loading, error, updatedAt, refresh } = useAnalytics(getStats)
+  const statsQuery = useAnalytics(getStats)
+  const usageQuery = useAnalytics(getActiveUsers)
+  const healthQuery = useAnalytics(fetchHealth)
+  const salesNow = useAnalytics(fetchSalesThisMonth)
+  const salesPrev = useAnalytics(fetchSalesLastMonth)
   const [regionSource, setRegionSource] = useState<'ip' | 'profile'>('profile')
-  const trendData = dailySeries(stats?.registrations_trend, 30, point => point.count)
-  const header = <AnalyticsHeader title="Dashboard" description="Ringkasan bisnis, akun pemilik/admin, dan membership Loka Kasir." loading={loading} updatedAt={updatedAt} refresh={refresh} />
-  if (!stats) return <div className="space-y-6">{header}<AnalyticsState loading={loading} error={error} hasData={false} /></div>
 
-  const pieData = (stats.membership_breakdown ?? []).map((m) => ({
+  const stats = statsQuery.data
+  const usage = usageQuery.data
+  const health = healthQuery.data?.summary
+  const growth = stats?.growth
+
+  const anyLoading = [statsQuery, usageQuery, healthQuery, salesNow, salesPrev].some((q) => q.loading)
+  const refreshAll = () => [statsQuery, usageQuery, healthQuery, salesNow, salesPrev].forEach((q) => q.refresh())
+  const header = (
+    <AnalyticsHeader
+      title="Dashboard"
+      description="Yang perlu ditindak, pemakaian hari ini, dan pertumbuhan Loka Kasir."
+      loading={anyLoading}
+      updatedAt={statsQuery.updatedAt}
+      refresh={refreshAll}
+    />
+  )
+  if (!stats) return <div className="space-y-6">{header}<AnalyticsState loading={statsQuery.loading} error={statsQuery.error} hasData={false} /></div>
+
+  const trendData = dailySeries(stats.registrations_trend, 30, (point) => point.count)
+  const registrationTotal = trendData.reduce((sum, point) => sum + point.value, 0)
+
+  const plans = (stats.membership_breakdown ?? []).map((m) => ({
+    type: m.type,
     name: planBucketLabel(m.type),
     color: MEMBERSHIP_COLORS[m.type] || '#94a3b8',
     value: m.count,
   }))
+  const planTotal = plans.reduce((sum, p) => sum + p.value, 0)
 
-  const activeRate = percentage(stats.active_businesses, stats.total_businesses)
-  const verifiedRate = percentage(stats.verified_users, stats.total_users)
-  const registrationTotal = trendData.reduce((sum, point) => sum + point.value, 0)
-  const membershipTotal = pieData.reduce((sum, point) => sum + point.value, 0)
+  // Pemakaian: sama dengan definisi di halaman Aktivitas & Pemakaian.
+  const usageRows = usage?.businesses ?? []
+  const trxAvailable = usageRows.some((r) => r.trx_this_week != null)
+  const sellingBusinesses = usageRows.filter((r) => (r.trx_this_week ?? 0) > 0).length
+
+  const gmvNow = salesNow.data?.summary.total_sales
+  const gmvPrev = salesPrev.data?.summary.total_sales
+  const monthly = monthlySeries(growth?.subscription_monthly, 6)
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {header}
-      <AnalyticsState loading={loading} error={error} hasData />
-      <div className="rounded-xl border border-indigo-100 bg-indigo-50/50 px-4 py-3 text-sm leading-6 text-indigo-800">
-        Status bisnis di halaman ini menunjukkan izin akses akun. Aktivitas pemakaian dan transaksi bisa dilihat di <Link to="/usage" className="font-semibold underline underline-offset-2">Aktivitas & Pemakaian →</Link>
-      </div>
-      <div className="grid grid-cols-1 min-[380px]:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <MetricCard label="Bisnis terdaftar" value={formatNumber(stats.total_businesses)} detail="Seluruh bisnis, tanpa akun demo" />
-        <MetricCard label="Bisnis diaktifkan" value={formatNumber(stats.active_businesses)} detail={`${activeRate}% berstatus aktif; bukan aktivitas penggunaan`} />
-        <MetricCard label="Akun pemilik & admin" value={formatNumber(stats.total_users)} detail="Akun karyawan dihitung di halaman pemakaian" />
-        <MetricCard label="Akun terverifikasi" value={formatNumber(stats.verified_users)} detail={`${verifiedRate}% dari akun pemilik & admin`} />
+      <AnalyticsState loading={false} error={statsQuery.error} hasData />
+
+      {/* 1. Perlu tindakan */}
+      <div className="space-y-3">
+        <SectionLabel hint="Dari skor Kesehatan Merchant">Perlu tindakan</SectionLabel>
+        <div className="grid grid-cols-1 min-[420px]:grid-cols-3 gap-3">
+          <StatCard
+            to="/merchant-health"
+            label="Trial berisiko berhenti"
+            value={formatNumber(health?.trials_at_risk)}
+            tone={(health?.trials_at_risk ?? 0) > 0 ? 'danger' : 'default'}
+            detail="Trial dengan skor risiko tinggi"
+          />
+          <StatCard
+            to="/merchant-health"
+            label="Siap ditawari Pro"
+            value={formatNumber(health?.ready_convert)}
+            tone={(health?.ready_convert ?? 0) > 0 ? 'success' : 'default'}
+            detail="Trial sehat yang habis ≤ 5 hari"
+          />
+          <StatCard
+            to="/merchant-health"
+            label="Merchant risiko tinggi"
+            value={formatNumber(health?.by_risk.high)}
+            tone={(health?.by_risk.high ?? 0) > 0 ? 'warning' : 'default'}
+            detail={health ? `${percentage(health.by_risk.high ?? 0, health.total)}% dari ${formatNumber(health.total)} merchant` : healthQuery.error ?? 'Memuat…'}
+          />
+        </div>
       </div>
 
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Trend chart */}
-        <div className="lg:col-span-2 min-w-0 bg-white rounded-xl border border-slate-200 p-4 sm:p-5">
-          <h3 className="text-sm font-semibold text-slate-700 mb-4">Registrasi bisnis · 30 tanggal terakhir</h3>
-          <p className="mb-4 text-xs text-slate-500">{formatNumber(registrationTotal)} bisnis baru · UTC · hari tanpa registrasi ditampilkan nol</p>
+      {/* 2. Hari ini */}
+      <div className="space-y-3">
+        <SectionLabel hint="Pengguna & jam: tanggal UTC · transaksi: bulan berjalan WIB">Pemakaian</SectionLabel>
+        <div className="grid grid-cols-1 min-[420px]:grid-cols-2 xl:grid-cols-4 gap-3">
+          <StatCard
+            to="/usage"
+            label="Pengguna aktif hari ini"
+            value={formatNumber(usage?.active_today)}
+            detail={usage ? `${percentage(usage.active_today, usage.total_users)}% dari ${formatNumber(usage.total_users)} akun · ${formatNumber(usage.active_this_week)} aktif 7 hari` : usageQuery.error ?? 'Memuat…'}
+          />
+          <StatCard
+            to="/usage"
+            label="Bisnis berjualan · 7 hari"
+            value={usage ? (trxAvailable ? formatNumber(sellingBusinesses) : '—') : '—'}
+            detail={usage ? `${percentage(sellingBusinesses, usageRows.length)}% dari ${formatNumber(usageRows.length)} bisnis punya nota penjualan` : usageQuery.error ?? 'Memuat…'}
+          />
+          <StatCard
+            to="/usage"
+            label="Durasi sesi hari ini"
+            value={formatHours(usage?.hours_today)}
+            detail={usage ? `${formatHours(usage.hours_this_week)} dalam 7 hari` : usageQuery.error ?? 'Memuat…'}
+          />
+          <StatCard
+            to="/sales"
+            label="Nilai transaksi merchant"
+            value={formatMoneyShort(gmvNow)}
+            detail={salesNow.data ? `${formatNumber(salesNow.data.summary.transaction_count)} nota bulan ini` : salesNow.error ?? 'Memuat…'}
+            footer={<DeltaBadge value={delta(gmvNow, gmvPrev)} suffix="vs tanggal yang sama bulan lalu" />}
+          />
+        </div>
+      </div>
+
+      {/* 3. Pertumbuhan */}
+      <div className="space-y-3">
+        <SectionLabel hint="30 hari terakhir">Pertumbuhan</SectionLabel>
+        <div className="grid grid-cols-1 min-[420px]:grid-cols-2 xl:grid-cols-4 gap-3">
+          <StatCard
+            label="MRR"
+            value={growth?.mrr != null ? formatMoneyShort(growth.mrr) : '—'}
+            detail={growth?.mrr != null
+              ? `${formatNumber(growth.active_pro_paid)} Pro berbayar${(growth.active_pro ?? 0) > (growth.active_pro_paid ?? 0) ? ` · ${formatNumber((growth.active_pro ?? 0) - (growth.active_pro_paid ?? 0))} Pro tanpa pembayaran` : ''}`
+              : NEEDS_SERVICE}
+          />
+          <StatCard
+            label="Pendapatan langganan"
+            value={growth ? formatMoneyShort(growth.subscription_revenue_30d) : '—'}
+            detail={growth
+              ? `${formatNumber(growth.subscription_orders_30d)} pembayaran dari ${formatNumber(growth.paying_businesses_30d)} bisnis`
+              : NEEDS_SERVICE}
+            footer={growth && <DeltaBadge value={delta(growth.subscription_revenue_30d, growth.subscription_revenue_prev_30d)} />}
+          />
+          <StatCard
+            label="Konversi trial → Pro"
+            value={growth && rate(growth.trials_converted_30d, growth.trials_ended_30d) != null ? `${rate(growth.trials_converted_30d, growth.trials_ended_30d)}%` : '—'}
+            detail={growth
+              ? `${formatNumber(growth.trials_converted_30d)} dari ${formatNumber(growth.trials_ended_30d)} trial yang berakhir`
+              : NEEDS_SERVICE}
+          />
+          <StatCard
+            label="Pro tidak diperpanjang"
+            value={growth ? formatNumber(growth.pro_not_renewed_30d) : '—'}
+            tone={(growth?.pro_not_renewed_30d ?? 0) > 0 ? 'warning' : 'default'}
+            detail={growth
+              ? `dari ${formatNumber(growth.pro_ended_30d)} paket Pro yang berakhir${growth.pro_ended_30d > 0 ? ` (${rate(growth.pro_not_renewed_30d, growth.pro_ended_30d)}%)` : ''}`
+              : NEEDS_SERVICE}
+          />
+        </div>
+      </div>
+
+      {/* 4. Grafik */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <Card
+          className="lg:col-span-2"
+          title="Registrasi bisnis · 30 tanggal terakhir"
+          description={`${formatNumber(registrationTotal)} bisnis baru dari ${formatNumber(stats.total_businesses)} terdaftar · UTC · hari tanpa registrasi ditampilkan nol`}
+          action={growth && <DeltaBadge value={delta(registrationTotal, growth.registrations_prev_30d)} suffix="vs 30 hari sebelumnya" />}
+        >
           {trendData.length > 0 ? (
-            <ResponsiveContainer width="100%" height={200}>
-              <AreaChart data={trendData}>
+            <ResponsiveContainer width="100%" height={240}>
+              <AreaChart data={trendData} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorReg" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                    <stop offset="0%" stopColor="#0d5df3" stopOpacity={0.22} />
+                    <stop offset="100%" stopColor="#0d5df3" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                <XAxis dataKey="label" tick={{ fontSize: 11 }} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="label" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} minTickGap={16} tickMargin={8} />
                 <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={false} allowDecimals={false} />
-                <Tooltip formatter={value => [formatNumber(Number(value)), 'Bisnis']} />
-                <Area type="linear" dataKey="value" stroke="#6366f1" fill="url(#colorReg)" strokeWidth={2} />
+                <Tooltip formatter={(value) => [formatNumber(Number(value)), 'Bisnis']} />
+                <Area type="linear" dataKey="value" stroke="#0d5df3" fill="url(#colorReg)" strokeWidth={2} dot={false} activeDot={{ r: 4, strokeWidth: 2 }} />
               </AreaChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-48 flex items-center justify-center text-slate-400 text-sm">
-              Belum ada data registrasi
-            </div>
+            <div className="h-48 flex items-center justify-center text-slate-400 text-sm">Belum ada data registrasi</div>
           )}
-        </div>
+        </Card>
 
-        {/* Membership pie */}
-        <div className="min-w-0 bg-white rounded-xl border border-slate-200 p-4 sm:p-5">
-          <h3 className="text-sm font-semibold text-slate-700 mb-4">Paket bisnis</h3>
-          <p className="mb-4 text-xs text-slate-500">{formatNumber(membershipTotal)} bisnis · satu paket per bisnis</p>
-          {membershipTotal !== stats.total_businesses && <p className="mb-3 text-xs text-amber-700">Distribusi paket dari server belum mencakup seluruh bisnis.</p>}
-          {pieData.some((d) => d.value > 0) ? (
-            <ResponsiveContainer width="100%" height={200}>
-              <PieChart>
-                <Pie data={pieData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value" paddingAngle={3}>
-                  {pieData.map((entry) => (
-                    <Cell key={entry.name} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Legend iconSize={10} />
-                <Tooltip formatter={value => [formatNumber(Number(value)), 'Bisnis']} />
-              </PieChart>
-            </ResponsiveContainer>
+        <Card title="Paket bisnis" description={`${formatNumber(planTotal)} bisnis · satu paket per bisnis`}>
+          {planTotal !== stats.total_businesses && <p className="mb-3 text-xs text-amber-700">Distribusi paket dari server belum mencakup seluruh bisnis.</p>}
+          {planTotal > 0 ? (
+            <>
+              <div className="flex h-3 w-full overflow-hidden rounded-full bg-slate-100" role="img" aria-label="Proporsi paket bisnis">
+                {plans.filter((p) => p.value > 0).map((p) => (
+                  <div key={p.type} title={`${p.name}: ${formatNumber(p.value)}`} style={{ width: `${(p.value / planTotal) * 100}%`, background: p.color }} />
+                ))}
+              </div>
+              <ul className="mt-5 space-y-3">
+                {plans.map((p) => (
+                  <li key={p.type} className="flex items-center justify-between gap-3 text-sm">
+                    <span className="flex items-center gap-2 text-slate-700">
+                      <span className="w-2.5 h-2.5 rounded-full" style={{ background: p.color }} aria-hidden />
+                      {p.name}
+                    </span>
+                    <span className="tabular-nums text-slate-900 font-medium">
+                      {formatNumber(p.value)}
+                      <span className="ml-1.5 text-xs font-normal text-slate-400">{percentage(p.value, planTotal)}%</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <dl className="mt-5 grid grid-cols-2 gap-3 border-t border-slate-100 pt-4 text-xs">
+                <div>
+                  <dt className="text-slate-500">Bisnis diaktifkan</dt>
+                  <dd className="mt-0.5 text-sm font-semibold tabular-nums text-slate-900">{formatNumber(stats.active_businesses)}</dd>
+                </div>
+                <div>
+                  <dt className="text-slate-500">Akun terverifikasi</dt>
+                  <dd className="mt-0.5 text-sm font-semibold tabular-nums text-slate-900">
+                    {percentage(stats.verified_users, stats.total_users)}%
+                    <span className="ml-1 font-normal text-slate-400">dari {formatNumber(stats.total_users)}</span>
+                  </dd>
+                </div>
+              </dl>
+            </>
           ) : (
-            <div className="h-48 flex items-center justify-center text-slate-400 text-sm">
-              Belum ada data paket bisnis
-            </div>
+            <div className="h-48 flex items-center justify-center text-slate-400 text-sm">Belum ada data paket bisnis</div>
           )}
-        </div>
+        </Card>
       </div>
 
-      {/* Sebaran wilayah */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <Card
+          className="lg:col-span-2"
+          title="Pendapatan langganan · 6 bulan"
+          description={growth ? 'Pembayaran paket & add-on outlet yang lunas, per bulan kalender WIB' : NEEDS_SERVICE}
+        >
+          {growth ? (
+            <ResponsiveContainer width="100%" height={240}>
+              <BarChart data={monthly} margin={{ top: 8, right: 8, left: 0, bottom: 0 }} barCategoryGap="32%">
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="label" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} tickMargin={8} />
+                <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={false} width={76} tickFormatter={(v) => formatMoneyShort(Number(v))} />
+                <Tooltip
+                  formatter={(value, _name, item) => [`${formatMoney(Number(value))} · ${formatNumber(item.payload.orders)} pembayaran`, 'Pendapatan']}
+                />
+                <Bar dataKey="amount" fill="#0d5df3" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="h-32 flex items-center justify-center text-center text-slate-400 text-sm">
+              Grafik ini tampil setelah loka-kasir-service versi terbaru berjalan.
+            </div>
+          )}
+        </Card>
+
+        <Card title="Rincian per bulan" description="Nominal lunas dan jumlah pembayaran">
+          {growth ? (
+            <ul className="divide-y divide-slate-100">
+              {[...monthly].reverse().map((m) => (
+                <li key={m.month} className="flex items-baseline justify-between gap-3 py-2.5 first:pt-0 last:pb-0 text-sm">
+                  <span className="text-slate-600">
+                    {new Intl.DateTimeFormat('id-ID', { timeZone: 'UTC', month: 'long', year: 'numeric' }).format(new Date(`${m.month}-01T00:00:00Z`))}
+                  </span>
+                  <span className="text-right tabular-nums">
+                    <span className="font-medium text-slate-900">{formatMoney(m.amount)}</span>
+                    <span className="ml-2 text-xs text-slate-400">{formatNumber(m.orders)}×</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="h-32 flex items-center justify-center text-slate-400 text-sm">{NEEDS_SERVICE}</div>
+          )}
+        </Card>
+      </div>
+
+      {/* 5. Sebaran wilayah */}
       {(stats.province_distribution != null || stats.geo_provinces != null) && (
-        <div className="space-y-2">
+        <div className="space-y-3">
           <div className="flex items-center justify-between gap-3 flex-wrap">
-            <h3 className="text-sm font-semibold text-slate-700">Sebaran Bisnis</h3>
+            <SectionLabel>Sebaran bisnis</SectionLabel>
             <div className="inline-flex rounded-lg border border-slate-200 bg-white p-0.5 text-xs">
               {([['ip', 'Lokasi pemakaian (IP)'], ['profile', 'Profil bisnis']] as const).map(([key, label]) => (
                 <button
@@ -160,9 +362,9 @@ export default function DashboardPage() {
           </div>
           {regionSource === 'ip' ? (
             <>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <RegionList title="Per Provinsi" rows={stats.geo_provinces ?? []} total={stats.total_businesses} />
-                <RegionList title="10 Kota Teratas" rows={stats.geo_cities ?? []} total={stats.total_businesses} />
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <RegionList title="Per provinsi" rows={stats.geo_provinces ?? []} total={stats.total_businesses} />
+                <RegionList title="10 kota teratas" rows={stats.geo_cities ?? []} total={stats.total_businesses} />
               </div>
               <p className="text-xs text-slate-400">
                 Warna tua = bisnis berstatus diaktifkan. Persentase dari seluruh bisnis. {formatNumber(stats.geo_located)} dari {stats.total_businesses} bisnis sudah terdeteksi
@@ -173,9 +375,9 @@ export default function DashboardPage() {
             </>
           ) : (
             <>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <RegionList title="Per Provinsi" rows={stats.province_distribution ?? []} total={stats.total_businesses} />
-                <RegionList title="10 Kota/Kabupaten Teratas" rows={stats.top_cities ?? []} total={stats.total_businesses} />
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <RegionList title="Per provinsi" rows={stats.province_distribution ?? []} total={stats.total_businesses} />
+                <RegionList title="10 kota/kabupaten teratas" rows={stats.top_cities ?? []} total={stats.total_businesses} />
               </div>
               <p className="text-xs text-slate-400">
                 Warna tua = bisnis berstatus diaktifkan. Persentase dari seluruh bisnis. {formatNumber(stats.unknown_region)} dari {stats.total_businesses} bisnis belum mengisi wilayah.
@@ -185,19 +387,9 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Membership breakdown table */}
-      <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-5">
-        <h3 className="text-sm font-semibold text-slate-700 mb-3">Rincian paket bisnis</h3>
-        <div className="flex gap-4 flex-wrap">
-          {(stats.membership_breakdown ?? []).map((m) => (
-            <div key={m.type} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-50 border border-slate-200">
-              <span className="w-2 h-2 rounded-full" style={{ background: MEMBERSHIP_COLORS[m.type] || '#94a3b8' }} />
-              <span className="text-sm font-medium text-slate-700">{planBucketLabel(m.type)}</span>
-              <span className="text-sm text-slate-500">{formatNumber(m.count)} bisnis</span>
-            </div>
-          ))}
-        </div>
-      </div>
+      <p className="text-xs text-slate-400">
+        Status "diaktifkan" menunjukkan izin akses akun, bukan pemakaian. Pemakaian dan transaksi ada di Aktivitas &amp; Pemakaian.
+      </p>
     </div>
   )
 }

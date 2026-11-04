@@ -1,3 +1,5 @@
+import Select from '../components/ui/Select'
+import { FilterBar, SearchField, filterControl } from '../components/ui/FilterBar'
 import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getBusinesses, toggleBusinessActive, deleteBusiness } from '../api/admin'
@@ -7,6 +9,21 @@ import Pagination from '../components/ui/Pagination'
 import DeleteConfirmModal from '../components/ui/DeleteConfirmModal'
 import { formatDate } from '../lib/analytics'
 import { membershipLabel, membershipVariant } from '../lib/membership'
+
+// Pengurutan yang diterima server (/admin/businesses: sort_by + order_by).
+// Default "Terbaru": pendaftar baru paling sering dicari di halaman ini.
+const SORT_OPTIONS = [
+  { value: 'created_at:desc', label: 'Terbaru daftar' },
+  { value: 'created_at:asc', label: 'Terlama daftar' },
+  { value: 'updated_at:desc', label: 'Baru diperbarui' },
+  { value: 'name:asc', label: 'Nama A–Z' },
+  { value: 'name:desc', label: 'Nama Z–A' },
+] as const
+type SortValue = (typeof SORT_OPTIONS)[number]['value']
+const sortParams = (v: SortValue) => {
+  const [sort_by, order_by] = v.split(':') as ['created_at' | 'updated_at' | 'name', 'asc' | 'desc']
+  return { sort_by, order_by }
+}
 
 const STATUS_OPTIONS = [
   { value: '', label: 'Semua' },
@@ -30,8 +47,8 @@ export default function BusinessesPage() {
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
-  const [searchInput, setSearchInput] = useState('')
   const [status, setStatus] = useState('')
+  const [sort, setSort] = useState<SortValue>('created_at:desc')
   const [loading, setLoading] = useState(true)
   const [toggling, setToggling] = useState<string | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<AdminBusiness | null>(null)
@@ -43,16 +60,15 @@ export default function BusinessesPage() {
     setLoading(true)
     setError(null)
     try {
-      // Terbaru di atas. Pagination server memakai `created_at asc` sebagai
-      // bawaan, sehingga pendaftar baru — yang justru paling sering dicari di
-      // halaman ini — terkubur di halaman terakhir.
+      // Urutan selalu dikirim (bawaan "Terbaru daftar"). Pagination server
+      // memakai `created_at asc` sebagai bawaan, sehingga tanpa ini pendaftar
+      // baru — yang justru paling sering dicari — terkubur di halaman terakhir.
       const res = await getBusinesses({
         page,
         limit,
         search,
         status,
-        sort_by: 'created_at',
-        order_by: 'desc',
+        ...sortParams(sort),
       })
       if (!res.status) throw new Error(res.message)
       setError(null)
@@ -64,11 +80,11 @@ export default function BusinessesPage() {
     } finally {
       setLoading(false)
     }
-  }, [page, search, status])
+  }, [page, search, status, sort])
 
   useEffect(() => {
     let active = true
-    getBusinesses({ page, limit, search, status, sort_by: 'created_at', order_by: 'desc' })
+    getBusinesses({ page, limit, search, status, ...sortParams(sort) })
       .then((res) => {
         if (!active) return
         if (!res.status) throw new Error(res.message)
@@ -79,14 +95,9 @@ export default function BusinessesPage() {
       .catch(() => { if (active) setError('Gagal memuat daftar bisnis. Silakan coba lagi.') })
       .finally(() => { if (active) setLoading(false) })
     return () => { active = false }
-  }, [page, search, status])
+  }, [page, search, status, sort])
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (searchInput !== search || page !== 1) setLoading(true)
-    setSearch(searchInput)
-    setPage(1)
-  }
+
 
   const handleToggle = async (b: AdminBusiness) => {
     if (!confirm(`${b.is_active ? 'Nonaktifkan' : 'Aktifkan'} bisnis "${b.business_name}"?`)) return
@@ -127,33 +138,42 @@ export default function BusinessesPage() {
       {error && <div role="alert" className="flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"><span>{error}</span><button type="button" onClick={load} disabled={loading} className="font-semibold underline disabled:opacity-50">Coba lagi</button></div>}
 
       {/* Filters */}
-      <div className="bg-white rounded-xl border border-slate-200 p-3 sm:p-4 flex flex-col sm:flex-row sm:flex-wrap gap-3">
-        <form onSubmit={handleSearch} className="flex gap-2 flex-1 min-w-0 sm:min-w-60">
-          <input
-            type="text"
-            placeholder="Cari nama bisnis, pemilik, nama/email pengguna..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            className="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      <FilterBar
+        search={
+          <SearchField
+            label="Cari bisnis"
+            placeholder="Cari nama bisnis, pemilik, nama/email pengguna…"
+            value={search}
+            onSearch={(next) => { setLoading(true); setSearch(next); setPage(1) }}
           />
-          <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700">
-            Cari
-          </button>
-        </form>
-
-        <select
-          value={status}
-          onChange={(e) => { setLoading(true); setStatus(e.target.value); setPage(1) }}
-          className="w-full sm:w-auto px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        >
-          {STATUS_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>{o.label}</option>
-          ))}
-        </select>
-      </div>
+        }
+        controls={<>
+          <Select
+            aria-label="Status bisnis"
+            value={status}
+            onChange={(e) => { setLoading(true); setStatus(e.target.value); setPage(1) }}
+            className={filterControl}
+          >
+            {STATUS_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </Select>
+          <Select
+            aria-label="Urutkan bisnis"
+            value={sort}
+            onChange={(e) => { setLoading(true); setSort(e.target.value as SortValue); setPage(1) }}
+            className={filterControl}
+          >
+            {SORT_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </Select>
+          </>
+        }
+      />
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+      <div className="card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-slate-50 border-b border-slate-200">

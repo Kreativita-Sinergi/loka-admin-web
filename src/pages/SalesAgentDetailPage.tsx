@@ -1,3 +1,5 @@
+import { ArrowLeft, KeyRound, Pencil } from 'lucide-react'
+import ButtonIcon from '../components/ui/ButtonIcon'
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { format } from 'date-fns'
@@ -37,7 +39,7 @@ const inputCls = 'w-full px-3 py-2 border border-slate-200 rounded-lg text-sm fo
 
 function Metric({ label, value, hint, tone = 'text-slate-800' }: { label: string; value: string; hint?: string; tone?: string }) {
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-4">
+    <div className="card p-4">
       <p className="text-xs font-medium text-slate-500">{label}</p>
       <p className={`mt-1 text-xl font-bold tabular-nums ${tone}`}>{value}</p>
       {hint && <p className="text-xs text-slate-400 mt-0.5">{hint}</p>}
@@ -78,7 +80,7 @@ export default function SalesAgentDetailPage() {
   if (!agent) {
     return error ? (
       <div className="space-y-4">
-        <button onClick={() => navigate('/sales-agents')} className="text-sm text-slate-500 hover:text-slate-700">← Daftar sales</button>
+        <button onClick={() => navigate('/sales-agents')} className="text-sm text-slate-500 hover:text-slate-700"><ButtonIcon icon={ArrowLeft} />Daftar sales</button>
         <div role="alert" className="flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
           <span>{error}</span>
           <button type="button" onClick={() => { setError(''); refreshAgent() }} className="font-semibold underline">Coba lagi</button>
@@ -98,7 +100,7 @@ export default function SalesAgentDetailPage() {
     <div className="space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-start sm:items-center gap-3 min-w-0">
-          <button onClick={() => navigate('/sales-agents')} className="text-slate-400 hover:text-slate-600" aria-label="Kembali">←</button>
+          <button onClick={() => navigate('/sales-agents')} className="text-slate-400 hover:text-slate-600" aria-label="Kembali"><ArrowLeft size={20} aria-hidden /></button>
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <h2 className="text-xl font-bold text-slate-800 break-words">{agent.name}</h2>
@@ -110,11 +112,11 @@ export default function SalesAgentDetailPage() {
         <div className="grid grid-cols-2 sm:flex sm:items-center gap-2">
           <button onClick={() => setEditOpen(true)}
             className="justify-center flex items-center gap-1.5 px-3 py-2 text-sm text-slate-700 border border-slate-200 rounded-lg hover:bg-slate-50">
-            ✏️ Ubah data & status
+            <Pencil size={15} aria-hidden />Ubah data & status
           </button>
           <button onClick={() => setPasswordOpen(true)}
             className="justify-center flex items-center gap-1.5 px-3 py-2 text-sm text-amber-800 bg-amber-100 hover:bg-amber-200 rounded-lg">
-            🔑 Atur ulang kata sandi
+            <KeyRound size={15} aria-hidden />Atur ulang kata sandi
           </button>
         </div>
       </div>
@@ -129,7 +131,7 @@ export default function SalesAgentDetailPage() {
           hint={agent.terms_accepted_at ? `disetujui ${fmtDate(agent.terms_accepted_at)}` : 'disetujui sales dari portal'} />
       </div>
 
-      <section className="bg-white rounded-xl border border-slate-200 p-4 sm:p-6">
+      <section className="card p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
           <div>
             <h3 className="font-semibold text-slate-700">Data & KYC</h3>
@@ -253,7 +255,7 @@ function CustomersTab({ salesId }: { salesId: string }) {
   }
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+    <div className="card overflow-hidden">
       {error && (
         <div role="alert" className="flex items-center justify-between gap-3 border-b border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           <span>{error}</span>
@@ -356,7 +358,7 @@ function CommissionsTab({ salesId, onChanged }: { salesId: string; onChanged: ()
       )}
       {notice && <p role="status" className="text-sm text-emerald-700">{notice}</p>}
 
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+      <div className="card overflow-hidden">
         {error && (
           <div role="alert" className="flex items-center justify-between gap-3 border-b border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             <span>{error}</span>

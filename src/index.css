@@ -1,4 +1,176 @@
-@import "tailwindcss";
+/* theme(static): semua variabel warna selalu dikeluarkan, karena mode gelap di
+   bawah me-remap-nya dan sebagian dirujuk lewat color-mix(). */
+@import "tailwindcss" theme(static);
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  /* Warna utama = biru brand Loka (#0d5df3, sama dengan logo). Halaman memakai
+     kelas `indigo-*` sebagai warna utama, jadi skala itu yang diganti di sini. */
+  --color-indigo-50: #eef4ff;
+  --color-indigo-100: #dbe6fe;
+  --color-indigo-200: #bfd3fe;
+  --color-indigo-300: #93b4fd;
+  --color-indigo-400: #5d8df8;
+  --color-indigo-500: #3170f5;
+  --color-indigo-600: #0d5df3;
+  --color-indigo-700: #0a4bd1;
+  --color-indigo-800: #0e3fa8;
+  --color-indigo-900: #123884;
+  --color-indigo-950: #10234f;
+}
+
+/*
+ * Mode gelap
+ * ----------
+ * Halaman-halaman memakai kelas warna Tailwind langsung (bg-white, text-slate-700,
+ * bg-red-50, ...). Daripada menambah `dark:` di ratusan tempat, token warnanya
+ * di-remap di sini sehingga seluruh halaman ikut berganti dari satu tempat:
+ *  - skala slate dibalik (50 = latar paling gelap, 900 = teks paling terang);
+ *  - `white` menjadi permukaan kartu; teks putih dikembalikan ke putih asli;
+ *  - warna aksen: tint 50–200 jadi campuran gelap, 700–950 (teks di atas tint)
+ *    dibuat terang. Shade 300–600 tidak diubah, jadi tombol bg-*-600 tetap sama.
+ */
+.dark {
+  --surface: #111a2b;
+
+  --color-white: var(--surface);
+  --color-slate-50: #0b1220;
+  --color-slate-100: #172134;
+  --color-slate-200: #232e44;
+  --color-slate-300: #334058;
+  --color-slate-400: #64748b;
+  --color-slate-500: #8b98ad;
+  --color-slate-600: #a9b4c6;
+  --color-slate-700: #cbd3df;
+  --color-slate-800: #e2e8f0;
+  --color-slate-900: #f1f5f9;
+  --color-slate-950: #f8fafc;
+}
+
+/* Elemen bertulisan putih (tombol/chip gelap) memakai slate gelap asli,
+   bukan skala terbalik — kalau tidak, latarnya jadi terang dan teks hilang. */
+.dark .text-white,
+.dark .hover\:text-white:hover,
+.dark .border-white {
+  --color-white: #fff;
+  --color-slate-600: #5b6880;
+  --color-slate-700: #4a5670;
+  --color-slate-800: #3d4962;
+  --color-slate-900: #333f57;
+  --color-slate-950: #2a3549;
+}
+
+@layer base {
+  /* Tailwind v4 tidak lagi memberi cursor pointer bawaan pada tombol. Semua yang
+     bisa diklik memakai pointer; yang nonaktif memakai not-allowed. */
+  button,
+  [role="button"],
+  [role="radio"],
+  [role="tab"],
+  [role="option"],
+  [role="menuitem"],
+  summary,
+  select,
+  label:has(input[type="checkbox"], input[type="radio"], input[type="file"]),
+  input[type="checkbox"],
+  input[type="radio"],
+  input[type="file"],
+  input[type="color"],
+  input[type="range"],
+  input[type="submit"],
+  input[type="button"] {
+    cursor: pointer;
+  }
+
+  :is(button, select, input):disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+
+  /* Field tanpa kelas latar ikut permukaan tema, bukan putih bawaan browser. */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+  select,
+  textarea {
+    background-color: var(--color-white);
+    color: inherit;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-slate-400);
+  }
+}
+
+/* Satu blok per warna aksen yang dipakai di halaman. */
+.dark {
+  --color-indigo-50: color-mix(in oklab, var(--color-indigo-500) 14%, var(--surface));
+  --color-indigo-100: color-mix(in oklab, var(--color-indigo-500) 22%, var(--surface));
+  --color-indigo-200: color-mix(in oklab, var(--color-indigo-500) 38%, var(--surface));
+  --color-indigo-700: var(--color-indigo-400);
+  --color-indigo-800: var(--color-indigo-300);
+  --color-indigo-900: var(--color-indigo-300);
+
+  --color-red-50: color-mix(in oklab, var(--color-red-500) 14%, var(--surface));
+  --color-red-100: color-mix(in oklab, var(--color-red-500) 22%, var(--surface));
+  --color-red-200: color-mix(in oklab, var(--color-red-500) 38%, var(--surface));
+  --color-red-700: var(--color-red-400);
+  --color-red-800: var(--color-red-300);
+  --color-red-900: var(--color-red-300);
+
+  --color-emerald-50: color-mix(in oklab, var(--color-emerald-500) 14%, var(--surface));
+  --color-emerald-100: color-mix(in oklab, var(--color-emerald-500) 22%, var(--surface));
+  --color-emerald-200: color-mix(in oklab, var(--color-emerald-500) 38%, var(--surface));
+  --color-emerald-700: var(--color-emerald-400);
+  --color-emerald-800: var(--color-emerald-300);
+  --color-emerald-900: var(--color-emerald-300);
+
+  --color-amber-50: color-mix(in oklab, var(--color-amber-500) 14%, var(--surface));
+  --color-amber-100: color-mix(in oklab, var(--color-amber-500) 22%, var(--surface));
+  --color-amber-200: color-mix(in oklab, var(--color-amber-500) 38%, var(--surface));
+  --color-amber-700: var(--color-amber-400);
+  --color-amber-800: var(--color-amber-300);
+  --color-amber-900: var(--color-amber-300);
+
+  --color-blue-50: color-mix(in oklab, var(--color-blue-500) 14%, var(--surface));
+  --color-blue-100: color-mix(in oklab, var(--color-blue-500) 22%, var(--surface));
+  --color-blue-200: color-mix(in oklab, var(--color-blue-500) 38%, var(--surface));
+  --color-blue-700: var(--color-blue-400);
+  --color-blue-800: var(--color-blue-300);
+
+  --color-orange-50: color-mix(in oklab, var(--color-orange-500) 14%, var(--surface));
+  --color-orange-100: color-mix(in oklab, var(--color-orange-500) 22%, var(--surface));
+  --color-orange-200: color-mix(in oklab, var(--color-orange-500) 38%, var(--surface));
+  --color-orange-700: var(--color-orange-400);
+  --color-orange-800: var(--color-orange-300);
+
+  --color-rose-50: color-mix(in oklab, var(--color-rose-500) 14%, var(--surface));
+  --color-rose-100: color-mix(in oklab, var(--color-rose-500) 22%, var(--surface));
+  --color-rose-200: color-mix(in oklab, var(--color-rose-500) 38%, var(--surface));
+  --color-rose-700: var(--color-rose-400);
+  --color-rose-800: var(--color-rose-300);
+
+  --color-purple-50: color-mix(in oklab, var(--color-purple-500) 14%, var(--surface));
+  --color-purple-100: color-mix(in oklab, var(--color-purple-500) 22%, var(--surface));
+  --color-purple-200: color-mix(in oklab, var(--color-purple-500) 38%, var(--surface));
+  --color-purple-700: var(--color-purple-400);
+  --color-purple-800: var(--color-purple-300);
+
+  --color-green-50: color-mix(in oklab, var(--color-green-500) 14%, var(--surface));
+  --color-green-100: color-mix(in oklab, var(--color-green-500) 22%, var(--surface));
+  --color-green-200: color-mix(in oklab, var(--color-green-500) 38%, var(--surface));
+  --color-green-700: var(--color-green-400);
+  --color-green-800: var(--color-green-300);
+}
+
+/* Kartu standar panel. Ubah tampilan semua kartu dari sini. */
+@utility card {
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--color-slate-200);
+  background-color: var(--color-white);
+}
 
 * {
   box-sizing: border-box;
@@ -6,10 +178,12 @@
 
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, sans-serif;
-  background: #f8fafc;
-  color: #1e293b;
+  font-family: var(--font-sans);
+  background: var(--color-slate-50);
+  color: var(--color-slate-800);
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 #root {
@@ -27,10 +201,80 @@ table {
   min-width: max-content;
 }
 
+/* Scrollbar tipis yang mengikuti tema. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-slate-300) transparent;
+}
+
 @media (max-width: 640px) {
   input,
   select,
   textarea {
     font-size: 16px !important;
   }
+}
+
+/*
+ * Grafik (recharts)
+ * -----------------
+ * Warna grid, sumbu, tooltip, dan pemisah donut diatur di sini, bukan di prop
+ * tiap grafik, agar ikut mode terang/gelap. CSS mengalahkan atribut SVG bawaan.
+ */
+:root {
+  --chart-grid: var(--color-slate-200);
+  --chart-axis: var(--color-slate-300);
+  --chart-text: var(--color-slate-500);
+}
+
+.dark {
+  --chart-grid: #1f2a3e;
+  --chart-axis: #2b374d;
+}
+
+.recharts-cartesian-grid line {
+  stroke: var(--chart-grid);
+}
+
+.recharts-cartesian-axis-line {
+  stroke: var(--chart-axis);
+}
+
+.recharts-cartesian-axis-tick-value,
+.recharts-legend-item-text {
+  fill: var(--chart-text);
+  color: var(--chart-text) !important;
+}
+
+.recharts-tooltip-cursor {
+  stroke: var(--chart-axis);
+}
+
+.recharts-rectangle.recharts-tooltip-cursor {
+  fill: var(--color-slate-100);
+}
+
+.recharts-default-tooltip {
+  background-color: var(--color-white) !important;
+  border: 1px solid var(--color-slate-200) !important;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 16px rgb(15 23 42 / 0.08);
+  font-size: 12px;
+}
+
+.recharts-tooltip-label {
+  color: var(--color-slate-700);
+  font-weight: 600;
+}
+
+/* Celah antar irisan donut mengikuti warna kartu, bukan putih. */
+.recharts-pie-sector path,
+.recharts-active-dot circle {
+  stroke: var(--color-white);
+}
+
+.recharts-surface:focus,
+.recharts-wrapper:focus,
+.recharts-sector:focus {
+  outline: none;
 }

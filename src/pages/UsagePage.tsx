@@ -1,3 +1,6 @@
+import Select from '../components/ui/Select'
+import { ArrowRight } from 'lucide-react'
+import ButtonIcon from '../components/ui/ButtonIcon'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getActiveUsers } from '../api/admin'
@@ -64,25 +67,25 @@ export default function UsagePage() {
         <MetricCard label={period === 'day' ? 'API hari ini · UTC' : 'API · 7 hari kalender UTC'} value={formatNumber(stats[apiKey])} detail="Request aplikasi, termasuk sinkronisasi. Periode API mengikuti tanggal UTC." />
       </div>
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 lg:col-span-2">
+        <div className="card p-5 lg:col-span-2">
           <h3 className="font-semibold text-slate-800">Tren durasi sesi</h3><p className="mt-1 mb-5 text-xs text-slate-500">14 tanggal terakhir · UTC · tanggal tanpa sesi ditampilkan nol</p>
-          <ResponsiveContainer width="100%" height={240}><BarChart data={trend} margin={{ left: 0, right: 8 }}><CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} /><XAxis dataKey="label" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} minTickGap={24} /><YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={false} unit=" j" /><Tooltip labelFormatter={(_, payload) => `${payload[0]?.payload.date ?? ''} · UTC`} formatter={v => [formatHours(Number(v)), 'Durasi sesi']} /><Bar dataKey="value" fill="#6366f1" radius={[5, 5, 0, 0]} maxBarSize={32} /></BarChart></ResponsiveContainer>
+          <ResponsiveContainer width="100%" height={240}><BarChart data={trend} margin={{ left: 0, right: 8 }}><CartesianGrid strokeDasharray="3 3" vertical={false} /><XAxis dataKey="label" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} minTickGap={24} /><YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={false} unit=" j" /><Tooltip labelFormatter={(_, payload) => `${payload[0]?.payload.date ?? ''} · UTC`} formatter={v => [formatHours(Number(v)), 'Durasi sesi']} /><Bar dataKey="value" fill="#0d5df3" radius={[5, 5, 0, 0]} maxBarSize={32} /></BarChart></ResponsiveContainer>
           {!trend.some(point => point.value > 0) && <p className="text-center text-xs text-slate-400">Belum ada durasi sesi tercatat pada periode ini.</p>}
         </div>
         <div className="rounded-2xl border border-emerald-200 bg-emerald-50/50 p-5">
           <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Aktivitas penjualan · 7 hari</p><p className="mt-4 text-4xl font-semibold tracking-tight text-slate-900">{transactionsAvailable ? formatNumber(sellingBusinesses) : '—'} <span className="text-lg font-normal text-slate-500">bisnis</span></p>
           <p className="mt-2 text-sm text-slate-600">{transactionsAvailable ? `${formatNumber(transactions)} transaksi penjualan tercatat` : 'Data transaksi belum tersedia lengkap.'}</p>
           <p className="mt-5 text-xs leading-5 text-slate-500">Transaksi berstatus penjualan, tanpa pembatalan atau refund. Pengguna yang membuka aplikasi belum tentu melakukan penjualan.</p>
-          <button type="button" onClick={() => { setFilter('selling'); setSort('transactions'); setPage(1) }} className="mt-5 text-sm font-semibold text-emerald-700 hover:underline">Lihat bisnis bertransaksi →</button>
+          <button type="button" onClick={() => { setFilter('selling'); setSort('transactions'); setPage(1) }} className="mt-5 text-sm font-semibold text-emerald-700 hover:underline">Lihat bisnis bertransaksi<ButtonIcon icon={ArrowRight} side="end" /></button>
         </div>
       </div>
-      <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden">
+      <div className="card overflow-hidden">
         <div className="space-y-4 border-b border-slate-200 p-5">
           <div className="flex flex-wrap items-center justify-between gap-2"><h3 className="font-semibold text-slate-800">Aktivitas per bisnis</h3><span className="text-xs text-slate-500">{formatNumber(filtered.length)} dari {formatNumber(rows.length)} bisnis</span></div>
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <input type="search" aria-label="Cari bisnis" placeholder="Cari nama atau ID bisnis…" value={search} onChange={e => { setSearch(e.target.value); setPage(1) }} className="min-w-0 flex-1 rounded-lg border border-slate-200 px-3 py-2 text-sm sm:min-w-48" />
-            <select aria-label="Filter aktivitas" value={filter} onChange={e => { setFilter(e.target.value as Filter); setPage(1) }} className="rounded-lg border border-slate-200 px-3 py-2 text-sm"><option value="all">Semua aktivitas</option><option value="selling">Bertransaksi · 7 hari</option><option value="active">Ada pengguna aktif</option><option value="quiet">Tanpa pengguna aktif</option></select>
-            <select aria-label="Urutkan bisnis" value={sort} onChange={e => { setSort(e.target.value as Sort); setPage(1) }} className="rounded-lg border border-slate-200 px-3 py-2 text-sm"><option value="recent">Terakhir aktif</option><option value="transactions">Transaksi terbanyak</option><option value="users">Pengguna aktif terbanyak</option><option value="hours">Durasi sesi terbanyak</option></select>
+            <Select aria-label="Filter aktivitas" value={filter} onChange={e => { setFilter(e.target.value as Filter); setPage(1) }} className="rounded-lg border border-slate-200 px-3 py-2 text-sm"><option value="all">Semua aktivitas</option><option value="selling">Bertransaksi · 7 hari</option><option value="active">Ada pengguna aktif</option><option value="quiet">Tanpa pengguna aktif</option></Select>
+            <Select aria-label="Urutkan bisnis" value={sort} onChange={e => { setSort(e.target.value as Sort); setPage(1) }} className="rounded-lg border border-slate-200 px-3 py-2 text-sm"><option value="recent">Terakhir aktif</option><option value="transactions">Transaksi terbanyak</option><option value="users">Pengguna aktif terbanyak</option><option value="hours">Durasi sesi terbanyak</option></Select>
           </div>
         </div>
         <div className="overflow-x-auto"><table className="w-full text-sm">
@@ -103,7 +106,7 @@ export default function UsagePage() {
         </table></div>
         <div className="border-t border-slate-100 px-5 py-3"><Pagination page={currentPage} total={filtered.length} limit={15} onChange={setPage} /></div>
       </div>
-      <details className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600"><summary className="cursor-pointer font-medium">Cara membaca data</summary><div className="mt-3 space-y-2 text-xs leading-5"><p>Pengguna aktif adalah akun yang memiliki jejak request terautentikasi dalam 24 jam atau 7 hari terakhir, termasuk akun karyawan. Angka ini bukan jumlah pengguna yang sedang online.</p><p>Durasi sesi diperkirakan dari request pertama hingga terakhir. Jeda lebih dari 15 menit memulai sesi baru. Request tunggal tetap dihitung sebagai aktivitas meskipun durasinya nol; sinkronisasi latar belakang juga bisa tercatat.</p><p>API menggunakan hari kalender UTC (berganti pukul 07.00 WIB), sehingga berbeda dari jendela aktivitas 24 jam / 7 hari. Jam ditampilkan sebagai total sesi, bukan rata-rata waktu layar.</p><p>Tanda — berarti data belum tersedia. Kolom produk adalah jumlah produk yang belum dihapus.</p></div></details>
+      <details className="card p-4 text-sm text-slate-600"><summary className="cursor-pointer font-medium">Cara membaca data</summary><div className="mt-3 space-y-2 text-xs leading-5"><p>Pengguna aktif adalah akun yang memiliki jejak request terautentikasi dalam 24 jam atau 7 hari terakhir, termasuk akun karyawan. Angka ini bukan jumlah pengguna yang sedang online.</p><p>Durasi sesi diperkirakan dari request pertama hingga terakhir. Jeda lebih dari 15 menit memulai sesi baru. Request tunggal tetap dihitung sebagai aktivitas meskipun durasinya nol; sinkronisasi latar belakang juga bisa tercatat.</p><p>API menggunakan hari kalender UTC (berganti pukul 07.00 WIB), sehingga berbeda dari jendela aktivitas 24 jam / 7 hari. Jam ditampilkan sebagai total sesi, bukan rata-rata waktu layar.</p><p>Tanda — berarti data belum tersedia. Kolom produk adalah jumlah produk yang belum dihapus.</p></div></details>
     </>}
   </div>
 }

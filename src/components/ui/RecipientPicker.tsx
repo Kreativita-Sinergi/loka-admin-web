@@ -1,3 +1,5 @@
+import { Mail, X } from 'lucide-react'
+import ButtonIcon from '../../components/ui/ButtonIcon'
 import { useState, useEffect, useRef } from 'react'
 import { getBusinesses } from '../../api/admin'
 import type { AdminBusiness } from '../../types'
@@ -95,8 +97,9 @@ export default function RecipientPicker({ email, businessName, onChange }: Recip
             <button
               onClick={handleClear}
               className="absolute right-3 top-2 text-slate-400 hover:text-slate-600 text-sm leading-none"
+              aria-label="Hapus pilihan"
             >
-              ×
+              <X size={16} aria-hidden />
             </button>
           )}
 
@@ -141,7 +144,7 @@ export default function RecipientPicker({ email, businessName, onChange }: Recip
           <p className="text-sm text-slate-800 font-medium">{selected.business_name}</p>
           <p className="text-xs text-slate-500">{selected.owner_name}</p>
           <p className="text-xs font-mono text-indigo-600 break-all">
-            ✉️ {selected.owner?.email ?? '—'}
+            <ButtonIcon icon={Mail} size={13} />{selected.owner?.email ?? '—'}
           </p>
         </div>
       )}

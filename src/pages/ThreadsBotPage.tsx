@@ -1,3 +1,5 @@
+import { AlertTriangle, Check, ExternalLink, RefreshCw, RotateCcw, Trash2 } from 'lucide-react'
+import ButtonIcon from '../components/ui/ButtonIcon'
 import { useState, useEffect, useCallback } from 'react'
 import { format } from 'date-fns'
 import { id as localeId } from 'date-fns/locale'
@@ -23,10 +25,10 @@ const STATUS_CFG: Record<ThreadsDraftStatus, { label: string; cls: string }> = {
 }
 
 const SOURCE_LABEL: Record<string, string> = {
-  own_reply: '💬 Komentar di postingan bot',
-  mention: '🔔 Mention',
-  keyword: '🔎 Kata kunci',
-  scheduled: '🗓️ Postingan terjadwal',
+  own_reply: 'Komentar di postingan bot',
+  mention: 'Mention',
+  keyword: 'Kata kunci',
+  scheduled: 'Postingan terjadwal',
 }
 
 type Tab = 'queue' | 'history' | 'settings'
@@ -71,7 +73,7 @@ export default function ThreadsBotPage() {
           <p className="text-sm text-slate-500 mt-0.5">Bot membuat draf balasan &amp; postingan otomatis — kamu tinggal ACC. Tidak ada yang tayang tanpa persetujuanmu.</p>
         </div>
         <div className="grid grid-cols-1 min-[430px]:grid-cols-2 sm:flex items-center gap-2 w-full sm:w-auto">
-          <button onClick={handlePoll} disabled={busy} className="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-sm font-semibold rounded-xl disabled:opacity-50">🔄 Cek Sekarang</button>
+          <button onClick={handlePoll} disabled={busy} className="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-sm font-semibold rounded-xl disabled:opacity-50"><ButtonIcon icon={RefreshCw} />Cek Sekarang</button>
           <button onClick={handleGenerate} disabled={busy} className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-xl disabled:opacity-50">+ Buat Draf Postingan</button>
         </div>
       </div>
@@ -111,9 +113,9 @@ function DraftList({ status, editable, historyView, onAction }: {
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { load() }, [load])
 
-  if (loading) return <div className="bg-white rounded-2xl border border-slate-200 py-16 text-center text-slate-400 text-sm">Memuat…</div>
+  if (loading) return <div className="card py-16 text-center text-slate-400 text-sm">Memuat…</div>
   if (rows.length === 0) return (
-    <div className="bg-white rounded-2xl border border-slate-200 py-16 text-center">
+    <div className="card py-16 text-center">
       <p className="text-sm text-slate-400">{editable ? 'Belum ada draf menunggu ACC. Bot membuat draf otomatis tiap beberapa menit, atau klik "Cek Sekarang".' : 'Belum ada riwayat.'}</p>
     </div>
   )
@@ -142,9 +144,9 @@ function DraftCard({ draft, editable, onChanged, onAction }: {
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-4 space-y-3">
+    <div className="card p-4 space-y-3">
       <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">{draft.kind === 'post' ? '📣 Postingan' : '↩️ Balasan'}</span>
+        <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">{draft.kind === 'post' ? 'Postingan' : 'Balasan'}</span>
         <span className="text-xs text-slate-500">{SOURCE_LABEL[draft.source] ?? draft.source}</span>
         {draft.keyword && <span className="text-xs text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">“{draft.keyword}”</span>}
         <span className={`ml-auto text-xs font-medium px-2 py-0.5 rounded-full border ${cfg.cls}`}>{cfg.label}</span>
@@ -154,7 +156,7 @@ function DraftCard({ draft, editable, onChanged, onAction }: {
         <div className="bg-slate-50 border border-slate-100 rounded-xl px-3 py-2">
           <p className="text-xs text-slate-500">Membalas {draft.target_author ? <b>@{draft.target_author}</b> : 'komentar'}:</p>
           {draft.target_text && <p className="text-xs text-slate-600 mt-0.5 italic">“{draft.target_text}”</p>}
-          {draft.target_permalink && <a href={draft.target_permalink} target="_blank" rel="noopener" className="text-xs text-blue-500 hover:underline">Lihat di Threads ↗</a>}
+          {draft.target_permalink && <a href={draft.target_permalink} target="_blank" rel="noopener" className="text-xs text-blue-500 hover:underline">Lihat di Threads<ButtonIcon icon={ExternalLink} side="end" size={12} /></a>}
         </div>
       )}
 
@@ -166,17 +168,17 @@ function DraftCard({ draft, editable, onChanged, onAction }: {
       )}
       <div className="flex flex-col min-[400px]:flex-row min-[400px]:items-center justify-between gap-1 text-xs text-slate-400">
         <span>{text.length} karakter</span>
-        {draft.error && <span className="text-red-500">⚠ {draft.error}</span>}
+        {draft.error && <span className="text-red-500"><ButtonIcon icon={AlertTriangle} size={13} />{draft.error}</span>}
       </div>
 
       {editable && (
         <div className="flex gap-2 flex-wrap">
-          <button onClick={() => run(() => approveDraft(draft.id, text), 'Tayang ke Threads ✅')} disabled={busy}
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl disabled:opacity-50">✅ Tayangkan</button>
+          <button onClick={() => run(() => approveDraft(draft.id, text), 'Tayang ke Threads')} disabled={busy}
+            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl disabled:opacity-50"><ButtonIcon icon={Check} />Tayangkan</button>
           <button onClick={() => run(() => regenerateDraft(draft.id), 'Teks dibuat ulang oleh AI')} disabled={busy}
-            className="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 text-sm font-medium rounded-xl disabled:opacity-50">🔁 Buat Ulang</button>
+            className="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 text-sm font-medium rounded-xl disabled:opacity-50"><ButtonIcon icon={RotateCcw} />Buat Ulang</button>
           <button onClick={() => run(() => rejectDraft(draft.id), 'Draf ditolak')} disabled={busy}
-            className="px-4 py-2 bg-white border border-slate-200 hover:bg-red-50 text-red-600 text-sm font-medium rounded-xl disabled:opacity-50">🗑️ Tolak</button>
+            className="px-4 py-2 bg-white border border-slate-200 hover:bg-red-50 text-red-600 text-sm font-medium rounded-xl disabled:opacity-50"><ButtonIcon icon={Trash2} />Tolak</button>
         </div>
       )}
 
@@ -196,7 +198,7 @@ function SettingsPanel({ onSaved }: { onSaved: () => void }) {
     getThreadsSettings().then((r) => setS(r.data)).catch(() => {})
   }, [])
 
-  if (!s) return <div className="bg-white rounded-2xl border border-slate-200 py-16 text-center text-slate-400 text-sm">Memuat pengaturan…</div>
+  if (!s) return <div className="card py-16 text-center text-slate-400 text-sm">Memuat pengaturan…</div>
 
   const set = <K extends keyof ThreadsSettings>(k: K, v: ThreadsSettings[K]) => setS({ ...s, [k]: v })
 
@@ -212,7 +214,7 @@ function SettingsPanel({ onSaved }: { onSaved: () => void }) {
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-5 max-w-2xl">
+    <div className="card p-5 space-y-5 max-w-2xl">
       <SettingsToggle label="Aktifkan bot" desc="Saat aktif, bot otomatis membuat draf (tetap menunggu ACC). Matikan untuk menjeda total." val={s.enabled} onChange={(v) => set('enabled', v)} />
       <div className="h-px bg-slate-100" />
       <SettingsToggle label="Balas komentar di postingan bot" desc="Buat draf balasan untuk orang yang berkomentar di thread buatan bot." val={s.auto_reply_own} onChange={(v) => set('auto_reply_own', v)} />

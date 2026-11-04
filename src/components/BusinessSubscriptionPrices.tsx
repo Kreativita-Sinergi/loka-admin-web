@@ -46,7 +46,7 @@ export default function BusinessSubscriptionPrices({ businessId, businessName }:
       setInitial({ ...values }); setSuccess('Harga khusus tersimpan. Berlaku untuk tagihan baru akun ini.')
     } catch (e) { setError(errorText(e)) } finally { setSaving(false) }
   }
-  return <section className="bg-white rounded-xl border border-slate-200 p-4 sm:p-6">
+  return <section className="card p-4 sm:p-6">
     <h2 className="text-base font-semibold text-slate-800">Harga langganan khusus</h2>
     <p className="text-sm text-slate-500 mt-1">Khusus akun pemilik bisnis <strong className="text-slate-700">{businessName}</strong>. Kosongkan harga untuk memakai harga normal.</p>
     {loading ? <p className="text-sm text-slate-400 mt-4">Memuat harga…</p> : !rows ? <div className="mt-4"><p role="alert" className="text-sm text-red-600">{error}</p><button className="text-sm text-blue-600 mt-2" onClick={() => { setLoading(true); setError(''); setRetry((n) => n + 1) }}>Muat ulang harga</button></div> :

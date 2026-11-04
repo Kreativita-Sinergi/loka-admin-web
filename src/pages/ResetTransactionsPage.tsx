@@ -1,3 +1,5 @@
+import { AlertTriangle, X } from 'lucide-react'
+import ButtonIcon from '../components/ui/ButtonIcon'
 import { useEffect, useState } from 'react'
 import { format } from 'date-fns'
 import { id as localeId } from 'date-fns/locale'
@@ -106,18 +108,18 @@ export default function ResetTransactionsPage() {
       </div>
 
       <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-800">
-        <p className="font-semibold">⚠️ Gunakan hanya untuk membersihkan data uji atau atas permintaan pemilik.</p>
+        <p className="font-semibold"><ButtonIcon icon={AlertTriangle} />Gunakan hanya untuk membersihkan data uji atau atas permintaan pemilik.</p>
         <p className="text-xs mt-1 text-red-700">Penghapusan tidak mengembalikan stok, tidak mengubah riwayat shift atau poin loyalti, dan tidak membalik jurnal accounting yang sudah terkirim.</p>
       </div>
 
       {notice && (
         <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 text-sm text-emerald-800 flex justify-between gap-3">
           <span>{notice}</span>
-          <button onClick={() => setNotice('')} aria-label="Tutup pemberitahuan">×</button>
+          <button onClick={() => setNotice('')} aria-label="Tutup pemberitahuan"><X size={16} aria-hidden /></button>
         </div>
       )}
 
-      <form onSubmit={submitSearch} className="bg-white rounded-xl border border-slate-200 p-3 sm:p-4 flex gap-2">
+      <form onSubmit={submitSearch} className="card p-3 sm:p-4 flex gap-2">
         <input
           value={searchInput}
           onChange={(event) => setSearchInput(event.target.value)}
@@ -127,7 +129,7 @@ export default function ResetTransactionsPage() {
         <button className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm rounded-lg">Cari</button>
       </form>
 
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+      <div className="card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-slate-50 border-b border-slate-200">
