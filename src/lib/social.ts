@@ -1,8 +1,9 @@
-import type { SocialPost, SocialPostStatus, ThreadsStatus } from '../api/social.ts'
+import type { SocialMedia, SocialPost, SocialPostStatus, ThreadsStatus } from '../api/social.ts'
 
 // Batas sama dengan service (service/social_service.go). Panel memeriksa lebih
 // dulu agar admin tidak menunggu server untuk galat yang jelas.
 export const SOCIAL_LIMITS = {
+  /** Jumlah media (gambar + video) per posting. */
   images: 10,
   caption: 2200,
   hashtags: 5,
@@ -12,8 +13,36 @@ export const SOCIAL_LIMITS = {
   minWidth: 320,
   minAspect: 0.8,
   maxAspect: 1.91,
+  videoBytes: 100 * 1024 * 1024,
+  minVideoSeconds: 3,
+  maxVideoSeconds: 60,
+  maxVideoWidth: 1920,
+  /** Video tunggal (Reels) boleh sampai 9:16; di carousel tetap minAspect. */
+  minVideoAspect: 9 / 16,
   minLeadMinutes: 5,
 } as const
+
+const ASPECT_TOLERANCE = 0.005
+
+export const IMAGE_TYPES = ['image/jpeg', 'image/png']
+export const VIDEO_TYPES = ['video/mp4', 'video/quicktime']
+/** Nilai `accept` untuk input berkas. */
+export const SOCIAL_ACCEPT = [...IMAGE_TYPES, ...VIDEO_TYPES].join(',')
+
+export const isVideo = (m: Pick<SocialMedia, 'kind'>) => m.kind === 'video'
+
+/**
+ * URL gambar untuk thumbnail. Video Cloudinary diganti poster JPG dari detik
+ * pertama (`so_0`); URL lain dikembalikan apa adanya.
+ */
+export function mediaPoster(url: string): string {
+  const marker = '/video/upload/'
+  const i = url.indexOf(marker)
+  if (i < 0) return url
+  const head = url.slice(0, i + marker.length)
+  const rest = url.slice(i + marker.length).replace(/\.[a-z0-9]+$/i, '')
+  return `${head}so_0/${rest}.jpg`
+}
 
 const WIB_OFFSET_MS = 7 * 60 * 60 * 1000
 
@@ -52,6 +81,8 @@ export const charCount = (text: string) => Array.from(text).length
 export interface SocialDraft {
   caption: string
   mediaCount: number
+  /** Jenis dan ukuran media, untuk aturan video di carousel. */
+  media?: Pick<SocialMedia, 'kind' | 'width' | 'height'>[]
   schedule: boolean
   date: string
   time: string
@@ -63,7 +94,9 @@ export interface SocialDraft {
 export function validateSocialDraft(d: SocialDraft, now = new Date()): string | null {
   if (charCount(d.caption) > SOCIAL_LIMITS.caption) return `Caption maksimal ${SOCIAL_LIMITS.caption} karakter.`
   if (countHashtags(d.caption) > SOCIAL_LIMITS.hashtags) return `Instagram membatasi ${SOCIAL_LIMITS.hashtags} hashtag per posting.`
-  if (d.mediaCount > SOCIAL_LIMITS.images) return `Maksimal ${SOCIAL_LIMITS.images} gambar.`
+  if (d.mediaCount > SOCIAL_LIMITS.images) return `Maksimal ${SOCIAL_LIMITS.images} gambar/video.`
+  const carouselIssue = checkCarouselMedia(d.media ?? [])
+  if (carouselIssue) return carouselIssue
   if (d.threadsEnabled) {
     const own = d.threadsText.trim()
     const text = own || d.caption
@@ -73,7 +106,7 @@ export function validateSocialDraft(d: SocialDraft, now = new Date()): string | 
     if (countLinks(text) > SOCIAL_LIMITS.threadsLinks) return `Threads membatasi ${SOCIAL_LIMITS.threadsLinks} tautan.`
   }
   if (!d.schedule) return null
-  if (d.mediaCount === 0) return 'Tambahkan minimal 1 gambar sebelum menjadwalkan.'
+  if (d.mediaCount === 0) return 'Tambahkan minimal 1 gambar atau video sebelum menjadwalkan.'
   if (!d.caption.trim()) return 'Caption wajib diisi sebelum dijadwalkan.'
   if (!d.date || !d.time) return 'Pilih tanggal dan jam tayang.'
   if (new Date(wibToISO(d.date, d.time)).getTime() < now.getTime() + SOCIAL_LIMITS.minLeadMinutes * 60_000) {
@@ -82,11 +115,36 @@ export function validateSocialDraft(d: SocialDraft, now = new Date()): string | 
   return null
 }
 
+/** Cermin ValidateSocialMediaSet: video potret hanya boleh sendirian (Reels). */
+export function checkCarouselMedia(media: Pick<SocialMedia, 'kind' | 'width' | 'height'>[]): string | null {
+  if (media.length < 2) return null
+  for (const m of media) {
+    if (m.kind !== 'video' || !m.height) continue
+    const r = m.width / m.height
+    if (r < SOCIAL_LIMITS.minAspect - ASPECT_TOLERANCE || r > SOCIAL_LIMITS.maxAspect + ASPECT_TOLERANCE) {
+      return 'Video di carousel harus berasio 4:5 sampai 1.91:1. Video potret (mis. 9:16) hanya bisa diposting sendiri sebagai Reels.'
+    }
+  }
+  return null
+}
+
 /** Periksa berkas di browser sebelum diunggah (server memeriksa ulang). */
 export function checkImageDims(width: number, height: number): string | null {
   if (width < SOCIAL_LIMITS.minWidth) return `Lebar minimal ${SOCIAL_LIMITS.minWidth} px.`
   const r = width / height
-  if (r < SOCIAL_LIMITS.minAspect - 0.005 || r > SOCIAL_LIMITS.maxAspect + 0.005) return 'Rasio harus antara 4:5 dan 1.91:1.'
+  if (r < SOCIAL_LIMITS.minAspect - ASPECT_TOLERANCE || r > SOCIAL_LIMITS.maxAspect + ASPECT_TOLERANCE) return 'Rasio harus antara 4:5 dan 1.91:1.'
+  return null
+}
+
+/** Cermin ValidateSocialVideo: durasi, lebar, dan rasio dari metadata video. */
+export function checkVideoMeta(width: number, height: number, seconds: number): string | null {
+  if (!width || !height) return 'Video tidak terbaca.'
+  if (seconds < SOCIAL_LIMITS.minVideoSeconds || seconds > SOCIAL_LIMITS.maxVideoSeconds) {
+    return `Durasi video harus ${SOCIAL_LIMITS.minVideoSeconds}–${SOCIAL_LIMITS.maxVideoSeconds} detik (sekarang ${seconds.toFixed(1)} detik).`
+  }
+  if (width > SOCIAL_LIMITS.maxVideoWidth) return `Lebar video maksimal ${SOCIAL_LIMITS.maxVideoWidth} px. Ekspor ulang ke 1080p.`
+  const r = width / height
+  if (r < SOCIAL_LIMITS.minVideoAspect - ASPECT_TOLERANCE || r > SOCIAL_LIMITS.maxAspect + ASPECT_TOLERANCE) return 'Rasio video harus antara 9:16 dan 1.91:1.'
   return null
 }
 

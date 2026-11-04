@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type { SocialPost } from '../../api/social'
-import { POST_STATUS, monthGrid, wibDateKey, wibParts } from '../../lib/social'
+import { POST_STATUS, mediaPoster, monthGrid, wibDateKey, wibParts } from '../../lib/social'
 
 const DOT: Record<string, string> = {
   success: 'bg-emerald-500', danger: 'bg-red-500', warning: 'bg-amber-500', info: 'bg-indigo-500', neutral: 'bg-slate-400',
@@ -50,7 +50,7 @@ export default function SocialCalendar({ year, month, posts, onMonth, today }: {
                   const t = wibParts(p.scheduled_at!)
                   return (
                     <Link key={p.id} to={`/social/${p.id}`} title={`${POST_STATUS[p.status].label} · ${p.caption.slice(0, 80)}`} className="flex items-center gap-1.5 rounded-md px-1 py-0.5 hover:bg-slate-100">
-                      {p.media[0] ? <img src={p.media[0].url} alt="" className="h-5 w-5 shrink-0 rounded object-cover" /> : <span className="h-5 w-5 shrink-0 rounded bg-slate-200" />}
+                      {p.media[0] ? <img src={mediaPoster(p.media[0].url)} alt="" className="h-5 w-5 shrink-0 rounded object-cover" /> : <span className="h-5 w-5 shrink-0 rounded bg-slate-200" />}
                       <span className="tabular-nums text-slate-600">{String(t.hh).padStart(2, '0')}:{String(t.mm).padStart(2, '0')}</span>
                       <span className={`ml-auto h-1.5 w-1.5 shrink-0 rounded-full ${DOT[POST_STATUS[p.status].variant]}`} aria-label={POST_STATUS[p.status].label} />
                     </Link>

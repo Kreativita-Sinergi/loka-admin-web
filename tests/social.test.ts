@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import {
-  checkImageDims, countHashtags, monthGrid, monthRange, nextSlot, pollDelay, validateSocialDraft, wibDateKey, wibToISO,
+  checkImageDims, checkVideoMeta, countHashtags, mediaPoster, monthGrid, monthRange, nextSlot, pollDelay, validateSocialDraft, wibDateKey, wibToISO,
 } from '../src/lib/social.ts'
 
 const now = new Date('2026-11-04T03:02:00Z') // 10:02 WIB
@@ -51,4 +51,34 @@ test('month grid starts on Monday and covers six weeks', () => {
   const r = monthRange(2026, 11)
   assert.equal(r.from, '2026-10-25T17:00:00.000Z')
   assert.equal(r.to, '2026-12-06T17:00:00.000Z')
+})
+
+test('video metadata check mirrors the server', () => {
+  assert.equal(checkVideoMeta(1080, 1920, 15), null) // Reels 9:16
+  assert.equal(checkVideoMeta(1080, 1350, 3), null)
+  assert.match(checkVideoMeta(1080, 1080, 2.5) ?? '', /Durasi/)
+  assert.match(checkVideoMeta(1080, 1080, 61) ?? '', /Durasi/)
+  assert.match(checkVideoMeta(2160, 3840, 10) ?? '', /1920/)
+  assert.match(checkVideoMeta(1080, 2400, 10) ?? '', /Rasio/)
+  assert.match(checkVideoMeta(0, 0, 10) ?? '', /tidak terbaca/)
+})
+
+test('portrait video only allowed on its own', () => {
+  const img = { kind: 'image' as const, width: 1080, height: 1080 }
+  const tall = { kind: 'video' as const, width: 1080, height: 1920 }
+  const square = { kind: 'video' as const, width: 1080, height: 1080 }
+  assert.equal(validateSocialDraft({ ...base, media: [tall] }, now), null)
+  assert.equal(validateSocialDraft({ ...base, mediaCount: 3, media: [img, square, img] }, now), null)
+  assert.match(validateSocialDraft({ ...base, mediaCount: 2, media: [img, tall] }, now) ?? '', /carousel/)
+  assert.match(validateSocialDraft({ ...base, mediaCount: 11 }, now) ?? '', /gambar\/video/)
+})
+
+test('video thumbnails use the Cloudinary poster frame', () => {
+  assert.equal(
+    mediaPoster('https://res.cloudinary.com/demo/video/upload/v1730000000/loka-social/abc.mp4'),
+    'https://res.cloudinary.com/demo/video/upload/so_0/v1730000000/loka-social/abc.jpg',
+  )
+  assert.equal(mediaPoster('https://res.cloudinary.com/demo/video/upload/v1/loka-social/a.MOV'), 'https://res.cloudinary.com/demo/video/upload/so_0/v1/loka-social/a.jpg')
+  const img = 'https://res.cloudinary.com/demo/image/upload/v1/loka-social/a.jpg'
+  assert.equal(mediaPoster(img), img)
 })

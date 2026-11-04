@@ -7,14 +7,20 @@ export type SocialPostStatus = 'draft' | 'scheduled' | 'publishing' | 'published
 export type ThreadsStatus = 'none' | 'waiting' | 'publishing' | 'published' | 'failed'
 export type SocialAction = 'edit' | 'delete' | 'cancel' | 'retry' | 'retry_threads'
 
+export type SocialMediaKind = 'image' | 'video'
+
 export interface SocialMedia {
   id: string
   post_id: string | null
   position: number
+  kind: SocialMediaKind
   url: string
   width: number
   height: number
   size_bytes: number
+  /** Durasi video (detik); null untuk gambar. */
+  duration_seconds: number | null
+  /** Gambar sudah diganti salinan arsip. Video tidak diarsip (tetap null). */
   archived_at: string | null
 }
 
@@ -37,7 +43,7 @@ export interface SocialPost {
   created_by: string
   created_at: string
   updated_at: string
-  /** Gambar sudah diganti salinan arsip WebP < 100 KB. */
+  /** Gambar sudah diganti salinan arsip WebP < 100 KB (video dibiarkan). */
   archived_at: string | null
   media: SocialMedia[]
   allowed_actions: SocialAction[]

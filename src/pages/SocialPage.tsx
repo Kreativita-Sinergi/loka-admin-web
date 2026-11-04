@@ -7,7 +7,7 @@ import { Card } from '../components/ui/Card'
 import AccountsPanel from '../components/social/AccountsPanel'
 import SocialCalendar from '../components/social/SocialCalendar'
 import { getSocialPosts, getSocialStatus, type SocialPost, type SocialStatus } from '../api/social'
-import { POST_STATUS, THREADS_STATUS, monthRange, wibDateKey, wibParts } from '../lib/social'
+import { POST_STATUS, THREADS_STATUS, mediaPoster, monthRange, wibDateKey, wibParts } from '../lib/social'
 import { formatDate } from '../lib/analytics'
 
 function PostRow({ p }: { p: SocialPost }) {
@@ -15,7 +15,7 @@ function PostRow({ p }: { p: SocialPost }) {
   return (
     <li>
       <Link to={`/social/${p.id}`} className="flex items-center gap-3 rounded-lg px-2 py-2 hover:bg-slate-50">
-        {p.media[0] ? <img src={p.media[0].url} alt="" className="h-10 w-10 shrink-0 rounded-md object-cover" /> : <span className="h-10 w-10 shrink-0 rounded-md bg-slate-100" />}
+        {p.media[0] ? <img src={mediaPoster(p.media[0].url)} alt="" className="h-10 w-10 shrink-0 rounded-md object-cover" /> : <span className="h-10 w-10 shrink-0 rounded-md bg-slate-100" />}
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm text-slate-800">{p.caption || <span className="italic text-slate-400">Tanpa caption</span>}</p>
           <p className="text-xs text-slate-500">

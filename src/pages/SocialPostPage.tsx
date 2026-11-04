@@ -133,7 +133,7 @@ export default function SocialPostPage() {
   }, [post, load])
 
   const editable = isNew || !!post?.allowed_actions.includes('edit')
-  const draft = { caption, mediaCount: media.length, schedule, date, time, threadsEnabled, threadsText }
+  const draft = { caption, mediaCount: media.length, media, schedule, date, time, threadsEnabled, threadsText }
   const scheduledMs = date && time ? new Date(wibToISO(date, time)).getTime() : NaN
   const earliest = nextSlot(new Date(now))
   const tooSoon = Number.isFinite(scheduledMs) && scheduledMs < now + SOCIAL_LIMITS.minLeadMinutes * 60_000
@@ -219,11 +219,11 @@ export default function SocialPostPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_360px] gap-4 items-start">
         <div className="space-y-4 min-w-0">
-          <Card title="Gambar" description="Gambar pertama jadi sampul. 2–10 gambar menjadi carousel.">
+          <Card title="Gambar & video" description="Media pertama jadi sampul. 2–10 media (boleh campur) menjadi carousel; satu video tayang sebagai Reels.">
             <MediaPicker media={media} onChange={setMedia} disabled={!editable} />
             {post?.archived_at && (
               <p className="mt-2 text-xs text-slate-500">
-                Sudah terposting: gambar asli diganti salinan arsip WebP (≤ 100 KB) untuk menghemat penyimpanan.
+                Sudah terposting: gambar asli diganti salinan arsip WebP (≤ 100 KB) untuk menghemat penyimpanan. Video disimpan apa adanya.
               </p>
             )}
           </Card>
@@ -245,7 +245,7 @@ export default function SocialPostPage() {
 
           <Card
             title={<span className="inline-flex items-center gap-1.5"><ThreadsIcon size={16} aria-hidden="true" />Juga posting ke Threads</span>}
-            description="Gambar yang sama, terbit setelah Instagram berhasil. Bila Instagram gagal, Threads ikut ditahan."
+            description="Gambar/video yang sama, terbit setelah Instagram berhasil. Bila Instagram gagal, Threads ikut ditahan."
             action={<Switch checked={threadsEnabled} onChange={setThreadsEnabled} label="Posting ke Threads" disabled={!editable} />}
           >
             {threadsEnabled ? (
@@ -350,7 +350,7 @@ export default function SocialPostPage() {
       </div>
 
       <Modal title={confirm === 'delete' ? 'Hapus draf?' : 'Batalkan jadwal?'} open={confirm != null} onClose={() => !saving && setConfirm(null)}>
-        <p className="text-sm text-slate-600">{confirm === 'delete' ? 'Draf dan gambarnya dihapus dari panel.' : 'Posting tidak akan tayang. Status berubah jadi Dibatalkan dan tidak bisa dijadwalkan ulang.'}</p>
+        <p className="text-sm text-slate-600">{confirm === 'delete' ? 'Draf beserta gambar/videonya dihapus dari panel.' : 'Posting tidak akan tayang. Status berubah jadi Dibatalkan dan tidak bisa dijadwalkan ulang.'}</p>
         <div className="mt-6 flex justify-end gap-2">
           <button type="button" onClick={() => setConfirm(null)} className="h-9 px-4 rounded-lg border border-slate-200 text-sm font-medium text-slate-700 hover:bg-slate-50">Kembali</button>
           <button type="button" disabled={saving} onClick={() => (confirm === 'delete' ? void remove() : void act('cancel'))} className="h-9 px-4 rounded-lg bg-red-600 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50">
