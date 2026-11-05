@@ -82,3 +82,22 @@ export const getSales = (params: DataParams): Promise<SingleResponse<SalesData>>
   axios.get('/admin/transactions', { params }).then(r => r.data)
 export const getSaleDetail = (businessId: string, id: string): Promise<SingleResponse<TransactionDetail>> =>
   axios.get(`/admin/businesses/${businessId}/transactions/${id}`).then(r => r.data)
+export interface StoreProduct {
+  id: string
+  business_id: string
+  business_name: string
+  name: string
+  sku: string | null
+  image: string | null
+  category_name: string | null
+  sell_price: number | null
+  min_variant_price: number | null
+  max_variant_price: number | null
+  variant_count: number
+  is_active: boolean
+  track_stock: boolean
+  stock: number | null
+  created_at: string | null
+}
+export const getStoreProducts = (params: DataParams): Promise<PaginatedResponse<StoreProduct>> =>
+  axios.get('/admin/products', { params }).then(r => r.data)

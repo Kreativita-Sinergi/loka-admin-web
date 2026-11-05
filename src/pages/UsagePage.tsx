@@ -98,7 +98,7 @@ export default function UsagePage() {
               <td className="px-4 py-3 text-right tabular-nums"><span className={row[activeKey] > 0 ? 'font-semibold text-indigo-600' : 'text-slate-400'}>{formatNumber(row[activeKey])}</span><span className="text-slate-400"> / {formatNumber(row.total_users)}</span></td>
               <td className="px-4 py-3 text-right text-slate-600 tabular-nums">{formatHours(row[hoursKey])}</td>
               <td className="px-4 py-3 text-right text-slate-600 tabular-nums">{formatNumber(row[apiKey])}</td>
-              <td className="px-4 py-3 text-right text-slate-500 tabular-nums">{formatNumber(row.record_count)}</td>
+              <td className="px-4 py-3 text-right tabular-nums">{(row.record_count ?? 0) > 0 ? <Link to={`/products?business_id=${row.business_id}`} title="Lihat produk toko ini" className="text-indigo-600 hover:underline">{formatNumber(row.record_count)}</Link> : <span className="text-slate-400">0</span>}</td>
               <td className="px-4 py-3 text-xs text-slate-500">{row.last_seen_at ? formatDate(row.last_seen_at, true) : 'Belum tercatat'}</td>
             </tr>)}
             {!filtered.length && <tr><td colSpan={8} className="px-5 py-12 text-center text-slate-400">{rows.length ? 'Tidak ada bisnis yang cocok dengan filter.' : 'Belum ada bisnis tercatat.'}</td></tr>}

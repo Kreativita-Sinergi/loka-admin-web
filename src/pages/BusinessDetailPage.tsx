@@ -1,5 +1,5 @@
 import Select from '../components/ui/Select'
-import { ArrowLeft, Pencil, Trash2, TrendingUp, Users } from 'lucide-react'
+import { ArrowLeft, Boxes, Pencil, Trash2, TrendingUp, Users } from 'lucide-react'
 import ButtonIcon from '../components/ui/ButtonIcon'
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
@@ -269,6 +269,7 @@ export default function BusinessDetailPage() {
       <div className="flex flex-wrap gap-2">
         <button onClick={() => navigate(`/users?business_id=${business.id}`)} className="rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-700 hover:bg-indigo-100"><ButtonIcon icon={Users} />Lihat pengguna</button>
         <button onClick={() => navigate(`/sales?business_id=${business.id}`)} className="rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-700 hover:bg-indigo-100"><ButtonIcon icon={TrendingUp} />Lihat penjualan</button>
+        <button onClick={() => navigate(`/products?business_id=${business.id}`)} className="rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-700 hover:bg-indigo-100"><ButtonIcon icon={Boxes} />Lihat produk ({(usage?.record_count ?? 0).toLocaleString('id-ID')})</button>
       </div>
 
       {/* Snapshot operasional agar super admin bisa menilai kesehatan tenant
