@@ -23,6 +23,41 @@
 }
 
 /*
+ * Mode terang (redup)
+ * -------------------
+ * Putih murni di layar besar menyilaukan. Permukaan kartu (`white`) diganti abu
+ * sangat terang dan skala slate muda digeser sedikit lebih gelap, sehingga latar,
+ * hover, chip, dan garis tetap berjenjang tapi tidak ada bidang putih terang.
+ * Tint 50 warna aksen dicampur ke permukaan yang sama agar tidak "menyala".
+ */
+:root:not(.dark) {
+  --surface: #f1f4f8;
+
+  --color-white: var(--surface);
+  --color-slate-50: #e6eaf0;
+  --color-slate-100: #dce2ea;
+  --color-slate-200: #cfd7e1;
+  --color-slate-300: #b9c3d0;
+
+  --color-indigo-50: color-mix(in oklab, var(--color-indigo-500) 9%, var(--surface));
+  --color-red-50: color-mix(in oklab, var(--color-red-500) 8%, var(--surface));
+  --color-emerald-50: color-mix(in oklab, var(--color-emerald-500) 8%, var(--surface));
+  --color-amber-50: color-mix(in oklab, var(--color-amber-500) 9%, var(--surface));
+  --color-blue-50: color-mix(in oklab, var(--color-blue-500) 8%, var(--surface));
+  --color-orange-50: color-mix(in oklab, var(--color-orange-500) 8%, var(--surface));
+  --color-rose-50: color-mix(in oklab, var(--color-rose-500) 8%, var(--surface));
+  --color-purple-50: color-mix(in oklab, var(--color-purple-500) 8%, var(--surface));
+  --color-green-50: color-mix(in oklab, var(--color-green-500) 8%, var(--surface));
+}
+
+/* Teks/garis putih di atas tombol berwarna tetap putih asli. */
+:root:not(.dark) .text-white,
+:root:not(.dark) .hover\:text-white:hover,
+:root:not(.dark) .border-white {
+  --color-white: #fff;
+}
+
+/*
  * Mode gelap
  * ----------
  * Halaman-halaman memakai kelas warna Tailwind langsung (bg-white, text-slate-700,
