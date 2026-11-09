@@ -106,7 +106,7 @@ export default function DashboardPage() {
 
   const plans = (stats.membership_breakdown ?? []).map((m) => ({
     type: m.type,
-    name: planBucketLabel(m.type),
+    name: m.type === 'pro' ? 'Pro aktif' : m.type === 'trial' ? 'Trial aktif' : planBucketLabel(m.type),
     color: MEMBERSHIP_COLORS[m.type] || '#94a3b8',
     value: m.count,
   }))
@@ -252,7 +252,7 @@ export default function DashboardPage() {
           )}
         </Card>
 
-        <Card title="Paket bisnis" description={`${formatNumber(planTotal)} bisnis · satu paket per bisnis`}>
+        <Card title="Paket bisnis" description={`${formatNumber(planTotal)} bisnis · satu paket per bisnis · hanya langganan yang masih berlaku`}>
           {planTotal !== stats.total_businesses && <p className="mb-3 text-xs text-amber-700">Distribusi paket dari server belum mencakup seluruh bisnis.</p>}
           {planTotal > 0 ? (
             <>
