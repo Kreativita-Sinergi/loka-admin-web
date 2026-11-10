@@ -53,12 +53,13 @@ export function DeltaBadge({ value, goodWhenUp = true, suffix = 'vs 30 hari sebe
 }
 
 /** Kartu angka. Dengan `to`, seluruh kartu menjadi tautan ke halaman rinciannya. */
-export function StatCard({ label, value, detail, footer, to, tone = 'default' }: {
+export function StatCard({ label, value, detail, footer, to, onClick, tone = 'default' }: {
   label: string
   value: ReactNode
   detail?: ReactNode
   footer?: ReactNode
   to?: string
+  onClick?: () => void
   tone?: 'default' | 'danger' | 'warning' | 'success'
 }) {
   const valueTone = {
@@ -71,7 +72,7 @@ export function StatCard({ label, value, detail, footer, to, tone = 'default' }:
     <>
       <div className="flex items-start justify-between gap-2">
         <p className="text-xs font-medium text-slate-500">{label}</p>
-        {to && <ChevronRight size={16} className="shrink-0 text-slate-300 transition-colors group-hover:text-slate-500" aria-hidden />}
+        {(to || onClick) && <ChevronRight size={16} className="shrink-0 text-slate-300 transition-colors group-hover:text-slate-500" aria-hidden />}
       </div>
       <p className={`mt-1.5 text-2xl font-semibold tabular-nums tracking-tight break-words ${valueTone}`}>{value}</p>
       {detail && <p className="mt-1 text-xs leading-5 text-slate-500">{detail}</p>}
@@ -83,6 +84,10 @@ export function StatCard({ label, value, detail, footer, to, tone = 'default' }:
     <Link to={to} className={`${base} transition-colors hover:border-slate-300 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500`}>
       {body}
     </Link>
+  ) : onClick ? (
+    <button type="button" onClick={onClick} className={`${base} w-full text-left transition-colors hover:border-slate-300 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500`}>
+      {body}
+    </button>
   ) : (
     <div className={base}>{body}</div>
   )

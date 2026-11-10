@@ -13,6 +13,7 @@ import { dailySeries, formatHours, formatNumber, percentage } from '../lib/analy
 import { delta, formatMoneyShort, monthToDateRanges, monthlySeries, rate } from '../lib/dashboard'
 import { formatMoney } from '../lib/sales'
 import { planBucketLabel } from '../lib/membership'
+import Modal from '../components/ui/Modal'
 
 // `free` dari server = usaha tanpa langganan berlaku (trial/Pro berakhir).
 const MEMBERSHIP_COLORS: Record<string, string> = {
@@ -82,6 +83,7 @@ export default function DashboardPage() {
   const salesNow = useAnalytics(fetchSalesThisMonth)
   const salesPrev = useAnalytics(fetchSalesLastMonth)
   const [regionSource, setRegionSource] = useState<'ip' | 'profile'>('profile')
+  const [showNotRenewed, setShowNotRenewed] = useState(false)
 
   const stats = statsQuery.data
   const usage = usageQuery.data
@@ -219,9 +221,28 @@ export default function DashboardPage() {
             detail={growth
               ? `dari ${formatNumber(growth.pro_ended_30d)} paket Pro yang berakhir${growth.pro_ended_30d > 0 ? ` (${rate(growth.pro_not_renewed_30d, growth.pro_ended_30d)}%)` : ''}`
               : NEEDS_SERVICE}
+            onClick={growth ? () => setShowNotRenewed(true) : undefined}
           />
         </div>
       </div>
+
+      <Modal title="Pro tidak diperpanjang · 30 hari terakhir" open={showNotRenewed} onClose={() => setShowNotRenewed(false)}>
+        {growth?.pro_not_renewed_businesses?.length ? (
+          <ul className="divide-y divide-slate-100">
+            {growth.pro_not_renewed_businesses.map((business) => (
+              <li key={business.business_id} className="py-3 first:pt-0 last:pb-0">
+                <p className="font-medium text-sm text-slate-800">{business.business_name}</p>
+                <p className="mt-0.5 text-xs text-slate-500">Pemilik: {business.owner_name}</p>
+                {business.email && <p className="text-xs text-slate-500">{business.email}</p>}
+                {business.phone && <p className="text-xs text-slate-500">{business.phone}</p>}
+                <p className="mt-1 text-xs text-slate-400">Berakhir {new Date(business.ended_at).toLocaleDateString('id-ID')}</p>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-slate-500">Belum ada rincian bisnis untuk periode ini.</p>
+        )}
+      </Modal>
 
       {/* 4. Grafik */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

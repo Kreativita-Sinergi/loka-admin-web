@@ -134,6 +134,14 @@ export interface AdminGrowthStats {
   trials_converted_30d: number
   pro_ended_30d: number
   pro_not_renewed_30d: number
+  pro_not_renewed_businesses?: {
+    business_id: string
+    business_name: string
+    owner_name: string
+    email?: string
+    phone?: string
+    ended_at: string
+  }[]
   /** Opsional: ditambahkan setelah growth pertama. */
   mrr?: number
   active_pro?: number
