@@ -134,7 +134,10 @@ function BotConnection({ refreshKey }: { refreshKey: number }) {
       <p className="mt-1 text-xs">{status.connected ? 'Periksa izin threads_keyword_search dan Advanced Access aplikasi Meta, lalu hubungkan ulang akun jika izinnya berubah. Bot belum bisa menemukan postingan orang lain sampai pencarian berhasil.' : 'Gunakan akun Threads yang sudah dihubungkan melalui menu Posting Sosial.'}</p>
       {status.keyword_error && <details className="mt-2 text-xs"><summary className="cursor-pointer">Detail koneksi</summary><p className="mt-1 break-words">{status.keyword_error}</p></details>}
     </div>}
-    {status?.keyword_ready && <p className="text-xs text-emerald-700">Pencarian publik siap. Bot memeriksa postingan terbaru setiap 15 menit.</p>}
+    {status?.keyword_ready && <div className="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-800">
+      <p className="font-semibold">API pencarian kata kunci terhubung</p>
+      <p className="mt-1">Pencarian postingan akun lain memerlukan persetujuan Advanced Access untuk threads_keyword_search dari Meta. Tanpa persetujuan itu, hasil pencarian hanya mencakup postingan akun sendiri. Bot memeriksa postingan terbaru setiap 15 menit.</p>
+    </div>}
     {status && <p className="text-xs text-slate-500">{status.generator === 'ai' ? 'Balasan dibuat dengan AI sesuai konteks dan fakta produk.' : 'Mode balasan terarah: pertanyaan yang jelas dijawab dari fakta produk. Pertanyaan yang belum dikenali dilewati.'}</p>}
     {status?.last_poll_at && <p className="text-xs text-slate-500">Pemeriksaan terakhir {format(new Date(status.last_poll_at), 'dd MMM HH:mm', { locale: localeId })} · {status.last_drafts} draf baru · {status.last_sent} balasan otomatis</p>}
     {status?.last_poll_error && <p className="text-xs text-amber-700 break-words">Pemeriksaan terakhir: {status.last_poll_error}</p>}
@@ -155,7 +158,6 @@ function DraftList({ status, editable, historyView, onAction, refreshKey }: {
       .finally(() => setLoading(false))
   }, [status, historyView])
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { load(); const timer = setInterval(load, 15_000); return () => clearInterval(timer) }, [load, refreshKey])
 
   if (error) return <div role="alert" className="card p-4 text-sm text-red-600">{error}</div>
