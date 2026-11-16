@@ -1,7 +1,7 @@
 import axios from '../lib/axios'
 import type { PaginatedResponse, SingleResponse } from '../types'
 
-export type ThreadsDraftStatus = 'pending' | 'posted' | 'rejected' | 'failed'
+export type ThreadsDraftStatus = 'pending' | 'publishing' | 'posted' | 'rejected' | 'failed'
 export type ThreadsDraftKind = 'post' | 'reply'
 
 export interface ThreadsDraft {
@@ -35,8 +35,26 @@ export interface ThreadsSettings {
   posts_per_day: number
   /** Balasan pertanyaan seputar aplikasi kasir (komentar di postingan kita / mention) langsung tayang tanpa ACC. */
   auto_send_app_questions: boolean
+  auto_send_keyword_questions: boolean
+  max_auto_replies_per_day: number
   updated_at: string
 }
+
+export interface ThreadsBotStatus {
+  connected: boolean
+  username: string
+  account_source: string
+  generator: 'rules' | 'ai'
+  keyword_ready: boolean
+  keyword_error?: string
+  last_poll_at?: string
+  last_poll_error?: string
+  last_drafts: number
+  last_sent: number
+}
+
+export const getThreadsBotStatus = (): Promise<SingleResponse<ThreadsBotStatus>> =>
+  axios.get('/admin/threads/status').then((r) => r.data)
 
 export interface ThreadsDraftParams {
   page?: number
