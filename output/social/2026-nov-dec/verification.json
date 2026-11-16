@@ -1,0 +1,574 @@
+{
+  "added": 86,
+  "november_added": 24,
+  "december_added": 62,
+  "slides": 258,
+  "days_with_two_posts": 46,
+  "existing_future_posts_preserved": 6,
+  "days": {
+    "2026-11-16": 2,
+    "2026-11-17": 2,
+    "2026-11-18": 2,
+    "2026-11-19": 2,
+    "2026-11-20": 2,
+    "2026-11-21": 2,
+    "2026-11-22": 2,
+    "2026-11-23": 2,
+    "2026-11-24": 2,
+    "2026-11-25": 2,
+    "2026-11-26": 2,
+    "2026-11-27": 2,
+    "2026-11-28": 2,
+    "2026-11-29": 2,
+    "2026-11-30": 2,
+    "2026-12-01": 2,
+    "2026-12-02": 2,
+    "2026-12-03": 2,
+    "2026-12-04": 2,
+    "2026-12-05": 2,
+    "2026-12-06": 2,
+    "2026-12-07": 2,
+    "2026-12-08": 2,
+    "2026-12-09": 2,
+    "2026-12-10": 2,
+    "2026-12-11": 2,
+    "2026-12-12": 2,
+    "2026-12-13": 2,
+    "2026-12-14": 2,
+    "2026-12-15": 2,
+    "2026-12-16": 2,
+    "2026-12-17": 2,
+    "2026-12-18": 2,
+    "2026-12-19": 2,
+    "2026-12-20": 2,
+    "2026-12-21": 2,
+    "2026-12-22": 2,
+    "2026-12-23": 2,
+    "2026-12-24": 2,
+    "2026-12-25": 2,
+    "2026-12-26": 2,
+    "2026-12-27": 2,
+    "2026-12-28": 2,
+    "2026-12-29": 2,
+    "2026-12-30": 2,
+    "2026-12-31": 2
+  },
+  "posts": [
+    {
+      "id": "5f70fea6-1773-489e-9355-301752ac2f99",
+      "scheduled_at": "2026-11-16T14:00:00+07:00",
+      "title": "Cabainya naik. Untungnya ikut turun?",
+      "media": 3
+    },
+    {
+      "id": "9baa0d6f-2ab4-4f79-ba78-d7bdeb31eb28",
+      "scheduled_at": "2026-11-18T20:00:00+07:00",
+      "title": "Promo selesai. Sisanya apa?",
+      "media": 3
+    },
+    {
+      "id": "c21889c7-9575-4eba-a090-4b50eae0603c",
+      "scheduled_at": "2026-11-19T14:00:00+07:00",
+      "title": "Cuaca berubah. Belanja ikut mikir.",
+      "media": 3
+    },
+    {
+      "id": "2b527c96-3765-4f60-850e-6e8748f46d47",
+      "scheduled_at": "2026-11-19T20:00:00+07:00",
+      "title": "Pesanan sama. Totalnya beda?",
+      "media": 3
+    },
+    {
+      "id": "1de3b232-b85f-491a-b33e-97f431b688f2",
+      "scheduled_at": "2026-11-20T14:00:00+07:00",
+      "title": "Toko kecil. Catatannya serius.",
+      "media": 3
+    },
+    {
+      "id": "14e0f559-f8fb-445b-bd45-9dd3c1add59c",
+      "scheduled_at": "2026-11-20T20:00:00+07:00",
+      "title": "Diskon tetangga. Kamu ikut juga?",
+      "media": 3
+    },
+    {
+      "id": "e6f73785-463a-4965-ac7c-59abe99cea7c",
+      "scheduled_at": "2026-11-21T14:00:00+07:00",
+      "title": "Hampers banyak. Modalnya cukup?",
+      "media": 3
+    },
+    {
+      "id": "10708706-05ca-417a-89f2-c62e8a9ac495",
+      "scheduled_at": "2026-11-21T20:00:00+07:00",
+      "title": "Antre panjang. Jangan tambah bingung.",
+      "media": 3
+    },
+    {
+      "id": "c740ab9a-67de-4800-b771-2fea27cdad89",
+      "scheduled_at": "2026-11-22T14:00:00+07:00",
+      "title": "Murah per dus. Mahal kalau diam.",
+      "media": 3
+    },
+    {
+      "id": "757ecb15-0b95-45d3-aa1f-223085436d24",
+      "scheduled_at": "2026-11-22T20:00:00+07:00",
+      "title": "Hari ini sepi. Tetap ada petunjuk.",
+      "media": 3
+    },
+    {
+      "id": "5e1e3c9a-4576-4d4a-8061-2a5ca255cc75",
+      "scheduled_at": "2026-11-23T14:00:00+07:00",
+      "title": "Bukti dikirim. Dana sudah masuk?",
+      "media": 3
+    },
+    {
+      "id": "b267b6e3-89f6-442c-8621-63f1ef85b04c",
+      "scheduled_at": "2026-11-23T20:00:00+07:00",
+      "title": "Ganti shift. Jangan ganti ingatan.",
+      "media": 3
+    },
+    {
+      "id": "d513324d-9bbc-4612-a2b1-4dd0b7037229",
+      "scheduled_at": "2026-11-24T14:00:00+07:00",
+      "title": "Paket hemat. Bukan asal murah.",
+      "media": 3
+    },
+    {
+      "id": "5c580bd3-5551-4032-b851-00b63552c19f",
+      "scheduled_at": "2026-11-25T20:00:00+07:00",
+      "title": "Guru usaha? Catatan kemarin.",
+      "media": 3
+    },
+    {
+      "id": "97dbc398-7490-4080-8f5f-8a093a7f66b5",
+      "scheduled_at": "2026-11-26T14:00:00+07:00",
+      "title": "Tamu beda negara. Kasir tetap siap.",
+      "media": 3
+    },
+    {
+      "id": "e51c7391-42f8-4942-bb57-d63c23b89781",
+      "scheduled_at": "2026-11-26T20:00:00+07:00",
+      "title": "Laku di aplikasi. Margin di mana?",
+      "media": 3
+    },
+    {
+      "id": "b404bdb0-0d0e-4cf1-8cec-dd86c2b1b5d3",
+      "scheduled_at": "2026-11-27T14:00:00+07:00",
+      "title": "Promo besar. Batasnya harus jelas.",
+      "media": 3
+    },
+    {
+      "id": "e18f945f-849e-4c13-893e-dc94057a1663",
+      "scheduled_at": "2026-11-27T20:00:00+07:00",
+      "title": "Capek itu nyata. Semua jangan diingat.",
+      "media": 3
+    },
+    {
+      "id": "4685a145-e629-433a-85ef-f940eeaada93",
+      "scheduled_at": "2026-11-28T14:00:00+07:00",
+      "title": "Pemasok libur. Toko tetap buka?",
+      "media": 3
+    },
+    {
+      "id": "4250e5a1-8063-469d-8437-c011cd8a7d2c",
+      "scheduled_at": "2026-11-28T20:00:00+07:00",
+      "title": "Pembeli pertama. Jangan jadi terakhir.",
+      "media": 3
+    },
+    {
+      "id": "92dc4a68-f40b-4f79-abef-3fa2d5fc5ece",
+      "scheduled_at": "2026-11-29T14:00:00+07:00",
+      "title": "Menu banyak. Yang laku siapa?",
+      "media": 3
+    },
+    {
+      "id": "6571422d-b8ef-4f6e-a290-1960a8ae820d",
+      "scheduled_at": "2026-11-29T20:00:00+07:00",
+      "title": "Stok di layar. Sama dengan rak?",
+      "media": 3
+    },
+    {
+      "id": "2f34220c-bc60-4916-932d-1cd33dbcd87d",
+      "scheduled_at": "2026-11-30T14:00:00+07:00",
+      "title": "November lewat. Pelajarannya simpan.",
+      "media": 3
+    },
+    {
+      "id": "45feae9d-1a39-486c-b151-dea6f5070953",
+      "scheduled_at": "2026-11-30T20:00:00+07:00",
+      "title": "Besok Desember. Siapnya dari malam ini.",
+      "media": 3
+    },
+    {
+      "id": "6c343fea-0eda-48eb-addc-6812ae67707e",
+      "scheduled_at": "2026-12-01T14:00:00+07:00",
+      "title": "Target besar. Langkahnya harian.",
+      "media": 3
+    },
+    {
+      "id": "902d574e-409b-4d33-b0d0-7f19f601fb47",
+      "scheduled_at": "2026-12-01T20:00:00+07:00",
+      "title": "Buka laporan. Jangan cuma omzet.",
+      "media": 3
+    },
+    {
+      "id": "0b2c46a6-6e22-408a-ad70-c9de7bbb99a4",
+      "scheduled_at": "2026-12-02T14:00:00+07:00",
+      "title": "12.12 dekat. Stok jangan nekat.",
+      "media": 3
+    },
+    {
+      "id": "efc15727-cdfc-474a-8f4f-e65f3a4079b0",
+      "scheduled_at": "2026-12-02T20:00:00+07:00",
+      "title": "Titip 30 kotak. Catatnya di mana?",
+      "media": 3
+    },
+    {
+      "id": "3ed4e4df-44ff-487d-b031-bb619221c499",
+      "scheduled_at": "2026-12-03T14:00:00+07:00",
+      "title": "Diskon 12%. Hitung pakai rupiah.",
+      "media": 3
+    },
+    {
+      "id": "298e43dc-eecf-43fc-9344-62c8612d3193",
+      "scheduled_at": "2026-12-03T20:00:00+07:00",
+      "title": "Beli es Rp8.000. Dicatat juga?",
+      "media": 3
+    },
+    {
+      "id": "39cade5d-3256-4271-a001-a28e89390c20",
+      "scheduled_at": "2026-12-04T14:00:00+07:00",
+      "title": "Akhir pekan. Tugas sudah jelas?",
+      "media": 3
+    },
+    {
+      "id": "a1e58882-855e-4a03-a172-0241b505b467",
+      "scheduled_at": "2026-12-04T20:00:00+07:00",
+      "title": "Kado mendadak. Janjinya jangan asal.",
+      "media": 3
+    },
+    {
+      "id": "89d63894-a348-436d-bf59-2bf558c93dd3",
+      "scheduled_at": "2026-12-05T14:00:00+07:00",
+      "title": "Sisa 6 botol. Besok cukup?",
+      "media": 3
+    },
+    {
+      "id": "3cdfc2a8-db02-4c4e-b5bf-7b70588ba4f2",
+      "scheduled_at": "2026-12-05T20:00:00+07:00",
+      "title": "Di menu beda. Di kasir beda?",
+      "media": 3
+    },
+    {
+      "id": "ee6118d2-befb-4a60-a101-b6dc1e0fa5d1",
+      "scheduled_at": "2026-12-06T14:00:00+07:00",
+      "title": "Kotaknya cantik. Biayanya ikut masuk?",
+      "media": 3
+    },
+    {
+      "id": "97df5ce5-e0bd-479e-a4fb-9678df0fe83d",
+      "scheduled_at": "2026-12-06T20:00:00+07:00",
+      "title": "Minggu pertama. Sudah belajar apa?",
+      "media": 3
+    },
+    {
+      "id": "fa082ac3-b48c-43a9-bade-c89258dfe977",
+      "scheduled_at": "2026-12-07T14:00:00+07:00",
+      "title": "Foto sudah cakep. Pilihan sudah jelas?",
+      "media": 3
+    },
+    {
+      "id": "60ac4805-c63b-4f6c-baed-baa56fef18fd",
+      "scheduled_at": "2026-12-07T20:00:00+07:00",
+      "title": "Meja penuh. Pesanan jangan nyasar.",
+      "media": 3
+    },
+    {
+      "id": "c4211bdd-4d1f-4a47-9c04-10ca49f954b5",
+      "scheduled_at": "2026-12-08T14:00:00+07:00",
+      "title": "Belanja banyak. Habisnya belum tentu.",
+      "media": 3
+    },
+    {
+      "id": "7ad08f48-0f85-4164-951e-74f2f5743088",
+      "scheduled_at": "2026-12-08T20:00:00+07:00",
+      "title": "Kasir baru. Jangan cuma disuruh bisa.",
+      "media": 3
+    },
+    {
+      "id": "e748e2d9-c36c-42f9-ae1c-fb169f585873",
+      "scheduled_at": "2026-12-09T14:00:00+07:00",
+      "title": "Harbolnas dekat. Janji promo jelas?",
+      "media": 3
+    },
+    {
+      "id": "2f57a006-151e-43a4-a1ef-e3fe65cbde7c",
+      "scheduled_at": "2026-12-09T20:00:00+07:00",
+      "title": "Pelanggan buru-buru. Cek tetap perlu.",
+      "media": 3
+    },
+    {
+      "id": "fe0a0b12-7d59-4179-acce-1035520570af",
+      "scheduled_at": "2026-12-10T14:00:00+07:00",
+      "title": "Promo mulai. Jangan jual stok kosong.",
+      "media": 3
+    },
+    {
+      "id": "b00c7d93-2eb8-45ce-ae39-b6171ea481bc",
+      "scheduled_at": "2026-12-10T20:00:00+07:00",
+      "title": "Order naik. Uang jangan campur.",
+      "media": 3
+    },
+    {
+      "id": "1ba88aee-c43f-4047-bd91-d26cf107a96e",
+      "scheduled_at": "2026-12-11T14:00:00+07:00",
+      "title": "Besok ramai? Coba alurnya dulu.",
+      "media": 3
+    },
+    {
+      "id": "06792af5-45ea-407b-b495-0595a5c603ba",
+      "scheduled_at": "2026-12-11T20:00:00+07:00",
+      "title": "Slot penuh. Jangan dobel janji.",
+      "media": 3
+    },
+    {
+      "id": "9f0189d8-1cce-4875-b041-ec9449a5dc4c",
+      "scheduled_at": "2026-12-12T14:00:00+07:00",
+      "title": "12.12 hari ini. Margin ikut dijaga.",
+      "media": 3
+    },
+    {
+      "id": "db98ef0b-9589-43c5-bdb5-9c0ab286596b",
+      "scheduled_at": "2026-12-12T20:00:00+07:00",
+      "title": "Capek seharian. Tutupnya tetap rapi.",
+      "media": 3
+    },
+    {
+      "id": "edc4cc81-30f5-42c6-a127-a75c9a142b44",
+      "scheduled_at": "2026-12-13T14:00:00+07:00",
+      "title": "Laris kemarin. Harus restok semua?",
+      "media": 3
+    },
+    {
+      "id": "dfc75641-dac7-45e4-b79c-c696a061732c",
+      "scheduled_at": "2026-12-13T20:00:00+07:00",
+      "title": "Owner rehat. Toko punya pegangan.",
+      "media": 3
+    },
+    {
+      "id": "20f72a65-00fa-469e-8abb-b1587b389d80",
+      "scheduled_at": "2026-12-14T14:00:00+07:00",
+      "title": "Tanggal ambil dekat. Detailnya cocok?",
+      "media": 3
+    },
+    {
+      "id": "fed7fccf-cb30-4f57-988a-c995da000676",
+      "scheduled_at": "2026-12-14T20:00:00+07:00",
+      "title": "Nota baru datang. Hitungan ikut baru?",
+      "media": 3
+    },
+    {
+      "id": "164de743-f2ee-4b74-a2e8-9faacc9b0775",
+      "scheduled_at": "2026-12-15T14:00:00+07:00",
+      "title": "Rak padat. Hitung bertahap.",
+      "media": 3
+    },
+    {
+      "id": "ba9dc31b-78e4-4159-9907-c24e6b9da035",
+      "scheduled_at": "2026-12-15T20:00:00+07:00",
+      "title": "Ada saldo member. Bukan uang bebas.",
+      "media": 3
+    },
+    {
+      "id": "af3aa3b0-2900-4850-a410-0f0490d34e8f",
+      "scheduled_at": "2026-12-16T14:00:00+07:00",
+      "title": "Hari terakhir promo. Pelajarannya apa?",
+      "media": 3
+    },
+    {
+      "id": "03a18818-7881-4b20-8968-f74bf30b8f84",
+      "scheduled_at": "2026-12-16T20:00:00+07:00",
+      "title": "Omzet naik. Kok belanja makin berat?",
+      "media": 3
+    },
+    {
+      "id": "dbb5d1b7-5e61-4618-bfb7-bbc697f5286b",
+      "scheduled_at": "2026-12-17T14:00:00+07:00",
+      "title": "Pemasok punya libur. Kamu sudah tahu?",
+      "media": 3
+    },
+    {
+      "id": "53535a5a-624d-45da-818e-6dba3033721d",
+      "scheduled_at": "2026-12-17T20:00:00+07:00",
+      "title": "Beli per dus. Jual per botol.",
+      "media": 3
+    },
+    {
+      "id": "832536dd-ccec-4f27-83d6-ac95be79b653",
+      "scheduled_at": "2026-12-18T14:00:00+07:00",
+      "title": "Pesan banyak. Bukan berarti diskon asal.",
+      "media": 3
+    },
+    {
+      "id": "156d2c70-9856-437b-8b32-1f2669997631",
+      "scheduled_at": "2026-12-18T20:00:00+07:00",
+      "title": "Mau cepat? Menu perlu terbaca.",
+      "media": 3
+    },
+    {
+      "id": "86ce7104-96f0-40b0-a7a1-d3fc196d66c4",
+      "scheduled_at": "2026-12-19T14:00:00+07:00",
+      "title": "Sewa jalan. Waktunya tercatat?",
+      "media": 3
+    },
+    {
+      "id": "e05a6beb-9d97-42ab-8988-5cd8bc0e139f",
+      "scheduled_at": "2026-12-19T20:00:00+07:00",
+      "title": "Diskon pemasok. Jangan lupa ruang.",
+      "media": 3
+    },
+    {
+      "id": "a0f9ac46-9830-4ad0-b10e-ce6487d468db",
+      "scheduled_at": "2026-12-20T14:00:00+07:00",
+      "title": "Jam buka berubah? Kasih tahu dulu.",
+      "media": 3
+    },
+    {
+      "id": "a6d8b1aa-6bf4-4c64-a5a5-058fe80dd775",
+      "scheduled_at": "2026-12-20T20:00:00+07:00",
+      "title": "Rak milikmu. Barang titipan siapa?",
+      "media": 3
+    },
+    {
+      "id": "b0fbad0f-5a70-49a6-b973-fdc993a416f3",
+      "scheduled_at": "2026-12-21T14:00:00+07:00",
+      "title": "Produknya siap. Kemasan cukup?",
+      "media": 3
+    },
+    {
+      "id": "0cbeb356-6550-4bd8-95e8-2140d148c269",
+      "scheduled_at": "2026-12-21T20:00:00+07:00",
+      "title": "Mau pesan lagi. Kasir sedang sibuk?",
+      "media": 3
+    },
+    {
+      "id": "563640ec-1d8e-4a8a-ae30-307a4b0f33b6",
+      "scheduled_at": "2026-12-22T14:00:00+07:00",
+      "title": "Ibu juga owner. Kerjanya banyak.",
+      "media": 3
+    },
+    {
+      "id": "3e5521db-02d0-48e0-b3e4-4e05dedc6fca",
+      "scheduled_at": "2026-12-22T20:00:00+07:00",
+      "title": "Usaha keluarga. Catatan tetap jelas.",
+      "media": 3
+    },
+    {
+      "id": "29685963-affe-4312-9020-cd7a4ffa10e2",
+      "scheduled_at": "2026-12-23T14:00:00+07:00",
+      "title": "Ambil hampers. Jangan sampai tertukar.",
+      "media": 3
+    },
+    {
+      "id": "9b3d41e2-d997-4e9b-96d2-04fa74da4079",
+      "scheduled_at": "2026-12-23T20:00:00+07:00",
+      "title": "Sudah dibayar. Belum tentu cair.",
+      "media": 3
+    },
+    {
+      "id": "6f2768c0-3477-41f1-9344-3ed2288565ac",
+      "scheduled_at": "2026-12-24T14:00:00+07:00",
+      "title": "Pesanan terakhir. Tetap diperiksa.",
+      "media": 3
+    },
+    {
+      "id": "3e79e5e4-0062-4770-bf8e-974ce33c6eac",
+      "scheduled_at": "2026-12-24T20:00:00+07:00",
+      "title": "Besok libur? Tutupnya dipikirkan.",
+      "media": 3
+    },
+    {
+      "id": "dac490f7-ad91-4c16-befc-b0eb5bc79d7e",
+      "scheduled_at": "2026-12-25T14:00:00+07:00",
+      "title": "Selamat Natal. Hangat untuk semua.",
+      "media": 3
+    },
+    {
+      "id": "629c3b00-9774-482f-8947-dc951dac1c89",
+      "scheduled_at": "2026-12-25T20:00:00+07:00",
+      "title": "Hari ramai. Nada bicara dijaga.",
+      "media": 3
+    },
+    {
+      "id": "ccd1c722-e237-416c-bfa4-0e89095f7237",
+      "scheduled_at": "2026-12-26T14:00:00+07:00",
+      "title": "Buka lagi. Cek dulu barangnya.",
+      "media": 3
+    },
+    {
+      "id": "5a8ee9ea-16ac-401f-9769-ca2dfbf7bdcf",
+      "scheduled_at": "2026-12-26T20:00:00+07:00",
+      "title": "Satu transaksi. Bisa tambah manfaat.",
+      "media": 3
+    },
+    {
+      "id": "067ed91e-eeec-4c54-85b7-703e025ddbab",
+      "scheduled_at": "2026-12-27T14:00:00+07:00",
+      "title": "Pesanan 31 Des. Kapasitasmu berapa?",
+      "media": 3
+    },
+    {
+      "id": "6100b2b3-23bc-4ed7-933d-d1777d8ed98e",
+      "scheduled_at": "2026-12-27T20:00:00+07:00",
+      "title": "Kas selisih. Cari jejaknya dulu.",
+      "media": 3
+    },
+    {
+      "id": "458fb4de-ed1d-447d-878c-e3f407b7df4b",
+      "scheduled_at": "2026-12-28T14:00:00+07:00",
+      "title": "Setahun jualan. Produk juaranya siapa?",
+      "media": 3
+    },
+    {
+      "id": "cfed12d2-2af1-45fd-9225-a80c4b09d3ab",
+      "scheduled_at": "2026-12-28T20:00:00+07:00",
+      "title": "Yang balik lagi. Jangan dilupakan.",
+      "media": 3
+    },
+    {
+      "id": "e3ac4a51-3bbb-43e2-babc-4f847a384a1a",
+      "scheduled_at": "2026-12-29T14:00:00+07:00",
+      "title": "Stok tersisa. Bukan otomatis rugi.",
+      "media": 3
+    },
+    {
+      "id": "5baa10c6-f321-4698-a6ca-6e0192613879",
+      "scheduled_at": "2026-12-29T20:00:00+07:00",
+      "title": "Tahun berganti. Catatan jangan hilang.",
+      "media": 3
+    },
+    {
+      "id": "1ea8e7b9-fc46-4212-a1f3-1bd19a84adf2",
+      "scheduled_at": "2026-12-30T14:00:00+07:00",
+      "title": "Besok padat. Malam ini rapikan.",
+      "media": 3
+    },
+    {
+      "id": "d4e2b204-b86f-4ee1-9187-1f79b0574837",
+      "scheduled_at": "2026-12-30T20:00:00+07:00",
+      "title": "Resolusi usaha. Mulai satu dulu.",
+      "media": 3
+    },
+    {
+      "id": "999a259e-eb41-4f11-8be1-781e34b8ca95",
+      "scheduled_at": "2026-12-31T14:00:00+07:00",
+      "title": "31 Desember. Ramai tetap tertib.",
+      "media": 3
+    },
+    {
+      "id": "2ec825f3-70e7-458f-a8d8-ddcb9943c9aa",
+      "scheduled_at": "2026-12-31T20:00:00+07:00",
+      "title": "Usahanya jalan. Kamu sudah berjuang.",
+      "media": 3
+    }
+  ]
+}

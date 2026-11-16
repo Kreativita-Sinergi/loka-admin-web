@@ -1,0 +1,19 @@
+{
+  "status": "passed",
+  "posts": 86,
+  "slides": 413,
+  "dimensions": "1080x1350",
+  "unique_final_jpegs": 413,
+  "formats": 8,
+  "text_overflow": 0,
+  "block_collisions": 0,
+  "original_date_and_id_mapping": "passed",
+  "caption_and_threads_limits": "passed",
+  "simulation_arithmetic": "passed",
+  "gallery_references": "passed",
+  "total_media_bytes": 51207317,
+  "external_uploads_or_schedule_changes": true,
+  "live_posts": 85,
+  "live_slides": 408,
+  "release_receipt": "release-verification.json"
+}

@@ -1,0 +1,38 @@
+{
+  "pangan": {
+    "title": "BI, 2 November 2026 — Inflasi IHK Oktober 2026 Tetap Terjaga",
+    "url": "https://www.bi.go.id/id/publikasi/ruang-media/news-release/Pages/sp_2823826.aspx",
+    "fact": "Cabai merah dan cabai rawit termasuk penyumbang inflasi pangan Oktober.",
+    "angle": "Harga bahan bisa mengubah margin meski harga jual tetap."
+  },
+  "hujan": {
+    "title": "BMKG, 14 November 2026 — Analisis Dinamika Atmosfer Dasarian I November",
+    "url": "https://www.bmkg.go.id/iklim/analisis-dinamika-atmosfer-dasarian-i-november-2026",
+    "fact": "Perkembangan musim hujan berbeda antarwilayah; pantau prakiraan setempat.",
+    "angle": "Sesuaikan belanja bahan dengan penjualan, jangan menebak cuaca nasional."
+  },
+  "ritel": {
+    "title": "Kemenko Perekonomian, 11 November 2026 — Daya Saing Ritel dan Produk Lokal",
+    "url": "https://ekon.go.id/publikasi/detail/7211/pemerintah-perkuat-daya-saing-ritel-dan-produk-lokal-untuk-dorong-pertumbuhan-ekonomi",
+    "fact": "Penguatan ritel mencakup adaptasi digital, rantai pasok, dan kemitraan UMKM.",
+    "angle": "Pencatatan operasional adalah langkah kecil yang bisa dilakukan toko."
+  },
+  "qris": {
+    "title": "Bank Indonesia — QRIS Antarnegara Raih Pengakuan Dunia pada 50-in-5 Awards",
+    "url": "https://www.bi.go.id/id/publikasi/ruang-media/news-release/Pages/sp_2819126.aspx",
+    "fact": "QRIS antarnegara mendukung pembayaran wisatawan dari negara mitra.",
+    "angle": "Kesiapan pembayaran dan pengecekan dana masuk di toko wisata."
+  },
+  "harbolnas": {
+    "title": "Kemendag, 27 Agustus 2026 — Kick-off Road to Harbolnas 2026",
+    "url": "https://www.kemendag.go.id/index.php/berita/siaran-pers/kick-off-road-to-harbolnas-2026-mendag-busan-optimistis-nilai-transaksi-meningkat-5-10-persen",
+    "fact": "Harbolnas 2026 diumumkan berlangsung 10–16 Desember.",
+    "angle": "Persiapan promosi, stok, dan evaluasi margin; tidak menjanjikan kenaikan omzet."
+  },
+  "libur": {
+    "title": "Kemnaker — Hari Libur Nasional dan Cuti Bersama Tahun 2026",
+    "url": "https://jdih.kemnaker.go.id/asset/data_puu/2025senakeran008.pdf",
+    "fact": "Natal jatuh pada 25 Desember 2026.",
+    "angle": "Persiapan layanan dan stok; jadwal libur sekolah tidak diasumsikan seragam."
+  }
+}

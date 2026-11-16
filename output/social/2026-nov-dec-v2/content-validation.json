@@ -1,0 +1,28 @@
+{
+  "status": "live_schedule_verified",
+  "posts": 86,
+  "slides": 413,
+  "formats": {
+    "Cek anggapan": 7,
+    "Bedah angka": 7,
+    "Checklist toko": 18,
+    "Obrolan kasir": 14,
+    "Dua sudut": 15,
+    "Coba pilih": 11,
+    "Cerita toko": 8,
+    "Di balik usaha": 6
+  },
+  "slide_counts": {
+    "5": 55,
+    "6": 7,
+    "4": 24
+  },
+  "new_generated_photos": 4,
+  "retained_illustrations": 6,
+  "original_dates_and_ids_preserved_as_references": true,
+  "max_caption_chars": 641,
+  "max_threads_chars": 234,
+  "live_posts": 85,
+  "live_slides": 408,
+  "release_receipt": "release-verification.json"
+}

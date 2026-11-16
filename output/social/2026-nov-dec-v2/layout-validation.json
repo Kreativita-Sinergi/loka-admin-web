@@ -1,0 +1,74 @@
+{
+  "adjustments": [
+    {
+      "slide": "p2-1",
+      "text": "50%",
+      "from": 184,
+      "to": 178
+    },
+    {
+      "slide": "p13-1",
+      "text": "Rp2rb",
+      "from": 184,
+      "to": 178
+    },
+    {
+      "slide": "p25-1",
+      "text": "20",
+      "from": 184,
+      "to": 178
+    },
+    {
+      "slide": "p29-1",
+      "text": "Rp4rb",
+      "from": 184,
+      "to": 178
+    },
+    {
+      "slide": "p30-1",
+      "text": "Rp240rb",
+      "from": 184,
+      "to": 178
+    },
+    {
+      "slide": "p35-1",
+      "text": "Rp10rb",
+      "from": 184,
+      "to": 178
+    },
+    {
+      "slide": "p42-1",
+      "text": "“Sebentar ya, Kak. Saya cocokkan nominal dan statusnya supaya tagihannya selesai dengan benar.”",
+      "from": 43,
+      "to": 40
+    },
+    {
+      "slide": "p59-5",
+      "text": "Pertanyaan apa yang selalu kamu ajukan sebelum menerima order besar?",
+      "from": 76,
+      "to": 75
+    },
+    {
+      "slide": "p74-1",
+      "text": "“Maaf, menu itu sudah habis. Yang masih tersedia ini, harganya sekian. Mau kami bantu pilih?”",
+      "from": 43,
+      "to": 40
+    },
+    {
+      "slide": "p77-1",
+      "text": "30 mnt",
+      "from": 184,
+      "to": 178
+    },
+    {
+      "slide": "p82-1",
+      "text": "“Kami cocokkan sisa tagihannya, ya. Ini transaksi dan pembayaran yang tercatat.”",
+      "from": 43,
+      "to": 40
+    }
+  ],
+  "overflow": [],
+  "collisions": [],
+  "images": true,
+  "slides": 413
+}

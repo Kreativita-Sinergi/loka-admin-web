@@ -1,0 +1,9 @@
+{
+  "posts": 86,
+  "format_filter": "passed",
+  "search": "passed",
+  "empty_state": "passed",
+  "caption_disclosure": "passed",
+  "mobile_horizontal_overflow": false,
+  "page_errors": []
+}

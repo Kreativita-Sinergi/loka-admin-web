@@ -1,0 +1,21 @@
+{
+  "mode": "built-in image_gen",
+  "assets": [
+    {
+      "file": "owner-photo.png",
+      "prompt": "Use case: photorealistic-natural. Asset type: supporting photography for Indonesian small-business Instagram carousel, portrait 4:5. Primary request: candid editorial photograph of an Indonesian woman in her thirties running a modest neighborhood coffee and food stall, checking paper receipts after closing, natural tired but calm expression, brown apron, warm practical tungsten lights and cool blue twilight outside, tactile real materials, lived-in wooden counter, kettle and cup, intimate medium shot with subject in lower two thirds. Premium documentary photography, realistic hands and face, natural skin texture, gentle film grain. Upper quarter dark quiet negative space for separately typeset headline. Brand context Loka Kasir, blue can appear subtly in wall or clothing. No logo, no typography, no readable text, no illustration, no glossy 3D cartoon, no stock-photo handshake, no watermark. This is illustrative fictional business photography, not a real customer testimonial."
+    },
+    {
+      "file": "hampers-photo.png",
+      "prompt": "Use case: photorealistic-natural. Asset type: editorial flat-lay image for Indonesian small-business Instagram carousel, portrait 4:5. Primary request: overhead tactile photographic still life of a small home bakery packing a festive gift box: kraft paper box, neatly wrapped cookies, spool of ribbon, blank gift card, hands tying a simple bow, a few spare packaging pieces at the edges. Warm cream paper surface, cobalt blue ribbon accents, soft afternoon window light, natural shadows, refined restrained art direction, believable small business preparation. Composition puts main gift box in lower two-thirds, upper quarter is uncluttered cream negative space for typeset copy added later. No printed words, no logo, no watermark, no cartoon or 3D render. Fictional editorial illustration, not documentary proof of a customer."
+    },
+    {
+      "file": "retail-photo.png",
+      "prompt": "Use case: photorealistic-natural. Asset type: human editorial photography supporting an Indonesian POS brand carousel, portrait 4:5. Primary request: eye-level candid photo at a modest Indonesian neighborhood grocery store counter, Indonesian male shopkeeper in a navy blue work shirt handing a paper shopping bag to an Indonesian woman customer, real lived-in shelves with unbranded groceries softly out of focus, small receipt printer on counter, genuine calm warm interaction. Natural daylight, rich cobalt blue accents, warm skin tones, premium editorial photography with realistic anatomy and slight film grain. Focus on hands and interaction in lower two thirds, upper quarter darker and quiet for headline overlay. No readable signage or words, no real brands, no logos, no floating UI, no watermark, no cartoon illustration. Fictional illustrative scene, no testimonial implication."
+    },
+    {
+      "file": "cash-photo.png",
+      "prompt": "Use case: photorealistic-natural. Asset type: supporting macro editorial photograph for an Indonesian small-business Instagram carousel, portrait 4:5. Primary request: close-up still life of a small shop's end-of-day counter: ordinary calculator, blank-facing folded receipts, a few Indonesian rupiah notes partly under a notebook, blue ballpoint pen, ceramic coffee cup, worn wooden table. Focus on honest daily bookkeeping, not wealth. Evening sidelight, moody deep navy shadows, subtle cobalt accent, realistic tactile photography. Objects clustered in lower half, generous dark navy quiet upper half for separately typeset copy. Do not make any visible readable text or precise financial values. No logo, no charts, no watermark, no 3D cartoon. Fictional editorial image."
+    }
+  ]
+}

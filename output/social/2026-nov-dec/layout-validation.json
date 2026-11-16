@@ -1,0 +1,37 @@
+{
+  "adjustments": [
+    {
+      "slide": "s7-1",
+      "from": 88,
+      "to": 84
+    },
+    {
+      "slide": "s39-1",
+      "from": 88,
+      "to": 80
+    },
+    {
+      "slide": "s42-1",
+      "from": 88,
+      "to": 86
+    },
+    {
+      "slide": "s55-1",
+      "from": 88,
+      "to": 83
+    },
+    {
+      "slide": "s58-1",
+      "from": 88,
+      "to": 81
+    },
+    {
+      "slide": "s68-1",
+      "from": 88,
+      "to": 86
+    }
+  ],
+  "overflow": [],
+  "collisions": [],
+  "images": true
+}
