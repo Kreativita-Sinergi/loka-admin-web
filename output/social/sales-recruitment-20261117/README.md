@@ -2,6 +2,8 @@
 
 Empat slide Instagram 1080×1350, caption Instagram dan Threads, serta dua ilustrasi asli dibuat dengan built-in image_gen. Preview: `preview.jpg`; urutan unggah: `post.json` → `files`. File ilustrasi: `assets/recruitment-hero.png` dan `assets/sales-content-kit.png`. Prompt final: `image-prompts.json`.
 
+Arahan pengguna untuk postingan mitra berikutnya: **utamakan komisi sebagai pesan sampul dan pembuka caption**. Rincian tarif, usulan hook, dan alur carousel: [next-post-brief.md](next-post-brief.md).
+
 ## Status
 
 Terjadwal pada **17 November 2026 pukul 19.00 WIB** untuk Instagram dan Threads, ID `a23dde25-c9a5-40b8-abe2-b4637cb2a8da`. Empat slide dipertahankan. Jadwal 92 posting lainnya tidak berubah. Bukti jadwal: `schedule-verification.json`; bukti pembuatan draft awal: `draft-verification.json`.
