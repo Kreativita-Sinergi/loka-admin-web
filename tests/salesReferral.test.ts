@@ -6,6 +6,7 @@ import {
   formatBp,
   gatewayFee,
   groupFeeRates,
+  kycComplete,
   parsePercentToBp,
   safeUrl,
   validateSalesInput,
@@ -24,6 +25,14 @@ test('sales code follows the server rule', () => {
   assert.match(validateSalesInput({ ...ok, code: 'LK1234' }) ?? '', /LK/)
   assert.match(validateSalesInput({ ...ok, code: 'ABC' }) ?? '', /4–12/)
   assert.match(validateSalesInput(ok, 'pendek') ?? '', /8 karakter/)
+})
+
+test('activation identity needs a full NIK and matching account owner', () => {
+  const identity = { name: 'Budi Santoso', nik: '3201010101010001', bank_name: 'BCA', bank_account_no: '1234567890', bank_account_name: ' BUDI   SANTOSO ' }
+  assert.equal(kycComplete(identity), true)
+  assert.equal(kycComplete({ ...identity, nik: '3201' }), false)
+  assert.equal(kycComplete({ ...identity, bank_account_name: 'Nama Orang Lain' }), false)
+  assert.equal(kycComplete({ ...identity, bank_account_no: '' }), false)
 })
 
 test('percent ↔ basis points', () => {

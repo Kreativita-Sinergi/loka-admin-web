@@ -44,12 +44,14 @@ export default function SalesAgentForm({ agent, onSaved, onCancel }: {
   const [password, setPassword] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [identityReviewed, setIdentityReviewed] = useState(false)
 
   const set = <K extends keyof SalesAgentInput>(key: K, value: SalesAgentInput[K]) => {
     setForm((f) => ({ ...f, [key]: value }))
     setError('')
+    setIdentityReviewed(false)
   }
-  const text = (key: keyof SalesAgentInput) => ({
+  const text = (key: Exclude<keyof SalesAgentInput, 'identity_verified'>) => ({
     value: form[key],
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => set(key, e.target.value as never),
     disabled: saving,
@@ -57,15 +59,18 @@ export default function SalesAgentForm({ agent, onSaved, onCancel }: {
   })
 
   const willActivate = form.status === 'active' && !kycComplete(form)
+  const needsReview = form.status === 'active' && agent?.status !== 'active'
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (saving) return
     const invalid = validateSalesInput(form, agent ? undefined : password)
     if (invalid) { setError(invalid); return }
+    if (willActivate) { setError('Lengkapi NIK 16 digit, bank, nomor rekening, dan nama rekening yang sama dengan nama lengkap pada KTP.'); return }
+    if (needsReview && !identityReviewed) { setError('Konfirmasi pemeriksaan identitas dan kepemilikan rekening sebelum aktivasi.'); return }
     setSaving(true)
     setError('')
-    const payload = { ...form, code: form.code.trim().toUpperCase() }
+    const payload = { ...form, code: form.code.trim().toUpperCase(), identity_verified: identityReviewed }
     try {
       const res = agent ? await updateSalesAgent(agent.id, payload) : await createSalesAgent({ ...payload, password })
       onSaved(res.data)
@@ -118,7 +123,7 @@ export default function SalesAgentForm({ agent, onSaved, onCancel }: {
       <div className="space-y-3 pt-4 border-t border-slate-100">
         <div>
           <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">KYC & rekening pencairan</p>
-          <p className="text-xs text-slate-500 mt-1">Rekening harus atas nama yang sama dengan KTP. Sales tanpa rekening lengkap dilewati saat draf pencairan dibuat.</p>
+          <p className="text-xs text-slate-500 mt-1">Periksa KTP dan bukti kepemilikan rekening sebelum mengaktifkan sales. Nama lengkap harus mengikuti KTP dan sama dengan nama rekening. Referral ke toko sendiri atau milik identitas pinjaman dilarang.</p>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
           <Field label="NIK (KTP)"><input inputMode="numeric" {...text('nik')} /></Field>
@@ -138,9 +143,10 @@ export default function SalesAgentForm({ agent, onSaved, onCancel }: {
       )}
       {willActivate && (
         <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-          KYC belum lengkap. Sales tetap bisa diaktifkan, tetapi pencairannya dilewati sampai NIK dan rekening lengkap.
+          Aktivasi diblokir sampai NIK 16 digit dan rekening lengkap dengan nama yang sama. Data identitas ini tetap perlu diperiksa admin.
         </p>
       )}
+      {needsReview && <label className="flex items-start gap-2 rounded-lg border border-indigo-200 bg-indigo-50 p-3 text-sm text-indigo-900"><input type="checkbox" checked={identityReviewed} onChange={(e) => setIdentityReviewed(e.target.checked)} className="mt-1" /><span>Saya sudah memeriksa KTP dan kepemilikan rekening, serta mengonfirmasi mitra tidak memakai kode untuk toko sendiri atau identitas pinjaman.</span></label>}
       {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
 
       <div className="flex gap-3">

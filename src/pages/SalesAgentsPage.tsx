@@ -14,6 +14,8 @@ const STATUS_FILTERS: { value: '' | SalesAgentStatus; label: string }[] = [
   { value: '', label: 'Semua' },
   ...(Object.keys(SALES_STATUS) as SalesAgentStatus[]).map((s) => ({ value: s, label: SALES_STATUS[s].label })),
 ]
+const SALES_LIMIT = 100
+const SALES_SIGNUP_URL = 'https://app.lokakasir.id/mitra/daftar'
 
 /**
  * Program referral sales — daftar sales lapangan, kodenya, dan saldo
@@ -27,6 +29,8 @@ export default function SalesAgentsPage() {
   const [status, setStatus] = useState<'' | SalesAgentStatus>('')
   const [search, setSearch] = useState('')
   const [createOpen, setCreateOpen] = useState(false)
+  const [copied, setCopied] = useState(false)
+  const reserved = agents?.filter((a) => a.status !== 'terminated').length
 
   useEffect(() => {
     let active = true
@@ -67,10 +71,20 @@ export default function SalesAgentsPage() {
             Pelanggan baru dengan kode sales dapat diskon 20% tagihan pertama. Sales mendapat 50% nilai bersih selama 12 bulan, lalu 20%.
           </p>
         </div>
-        <button onClick={() => setCreateOpen(true)}
-          className="shrink-0 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg">
+        <button onClick={() => setCreateOpen(true)} disabled={reserved === undefined || reserved >= SALES_LIMIT || !!error}
+          className="shrink-0 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-lg">
           + Tambah sales
         </button>
+      </div>
+
+      <div className="card flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-sm font-semibold text-slate-800">Kuota mitra: {reserved === undefined ? 'Memuat…' : `${reserved}/${SALES_LIMIT} terisi · ${Math.max(0, SALES_LIMIT - reserved)} tempat tersedia`}</p>
+          <p className="mt-1 text-xs text-slate-500">Menunggu verifikasi, aktif, dan ditangguhkan memakai kuota. Buka pengajuan berstatus menunggu, periksa datanya, lalu ubah ke aktif untuk mengaktifkan kode referral.</p>
+          <a href={SALES_SIGNUP_URL} target="_blank" rel="noopener noreferrer" className="mt-2 inline-block break-all text-sm text-indigo-600 hover:underline">{SALES_SIGNUP_URL}</a>
+        </div>
+        <button type="button" onClick={async () => { try { await navigator.clipboard.writeText(SALES_SIGNUP_URL); setCopied(true) } catch { setError('Tautan belum dapat disalin. Salin alamat pendaftaran yang ditampilkan.') } }}
+          className="shrink-0 rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">{copied ? 'Tautan disalin' : 'Salin tautan pendaftaran'}</button>
       </div>
 
       {error && (

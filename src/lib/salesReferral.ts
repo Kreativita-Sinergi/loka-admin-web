@@ -70,8 +70,9 @@ export function validateSalesInput(
   return null
 }
 
-export const kycComplete = (a: Pick<SalesAgent, 'nik' | 'bank_name' | 'bank_account_no' | 'bank_account_name'>) =>
-  !!(a.nik && a.bank_name && a.bank_account_no && a.bank_account_name)
+export const kycComplete = (a: Pick<SalesAgent, 'name' | 'nik' | 'bank_name' | 'bank_account_no' | 'bank_account_name'>) =>
+  /^[1-9][0-9]{15}$/.test(a.nik.trim()) && !!a.bank_name.trim() && /^[0-9]{5,30}$/.test(a.bank_account_no.trim()) &&
+  !!a.name.trim() && a.name.trim().replace(/\s+/g, ' ').toUpperCase() === a.bank_account_name.trim().replace(/\s+/g, ' ').toUpperCase()
 
 /** Kata sandi awal yang mudah didikte: tanpa huruf/angka yang mirip (0/O, 1/l). */
 export function generatePassword(length = 10): string {

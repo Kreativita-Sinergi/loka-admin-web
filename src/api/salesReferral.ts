@@ -21,6 +21,8 @@ export interface SalesAgentInput {
   bank_name: string
   bank_account_no: string
   bank_account_name: string
+  /** Admin attestation, required when moving a partner into active status. */
+  identity_verified?: boolean
 }
 
 /** Tampilan admin: NIK dan nomor rekening sudah didekripsi server. */
