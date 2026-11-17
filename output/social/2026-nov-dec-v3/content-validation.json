@@ -1,0 +1,25 @@
+{
+  "posts_in_gallery": 86,
+  "future_posts_with_distinct_new_art": 85,
+  "new_generated_art_required": 85,
+  "styles": {
+    "still-life": 11,
+    "photo": 23,
+    "comic": 9,
+    "isometric": 9,
+    "paper-collage": 9,
+    "3d": 10,
+    "clay": 6,
+    "watercolor": 8
+  },
+  "layouts": {
+    "bottom-caption": 15,
+    "immersive": 13,
+    "paper": 23,
+    "offset": 15,
+    "poster": 19
+  },
+  "copy_and_schedule_changed": false,
+  "slides": 413,
+  "status": "live_schedule_verified"
+}

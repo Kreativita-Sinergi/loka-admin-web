@@ -1,6 +1,8 @@
 # Revisi materi Instagram Loka Kasir
 
-**Status: aktif di antrean Instagram/Threads. Sebanyak 85 posting dengan 408 slide diperbarui dan diverifikasi melalui API Loka pada 17 November 2026, pukul 06.14 WIB.** Caption, gambar, dan teks Threads sudah memakai revisi. ID serta jam tayang tetap. Total antrean tetap 92 posting, dua kali sehari pukul 14.00 dan 20.00 WIB, tanpa membuat duplikat. Bukti lengkap ada di [release-verification.json](release-verification.json).
+**Status: arsip visual versi 2. Antrean sudah memakai [versi 3](../2026-nov-dec-v3/README.md), dengan 85 gambar baru khusus tiap posting, sejak 17 November 2026 pukul 07.10 WIB.**
+
+Riwayat penerapan versi 2: 85 posting dengan 408 slide diperbarui dan diverifikasi melalui API Loka pada 17 November 2026 pukul 06.14 WIB. Caption dan teks Threads dari versi ini dipertahankan di versi 3; gambarnya diganti. ID serta jam tayang tetap. Bukti historis versi 2 ada di [release-verification.json](release-verification.json).
 
 Satu dari 86 materi sudah terbit pada 16 November sehingga versi tayangnya dipertahankan. Enam posting lain di luar revisi juga tetap. Versi asli tersimpan di `../2026-nov-dec/` sebagai arsip. Revisi lokal materi yang sudah terbit tersedia untuk perbandingan dan tidak dipasang atau diterbitkan ulang.
 

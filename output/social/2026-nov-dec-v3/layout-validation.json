@@ -1,0 +1,44 @@
+{
+  "adjustments": [
+    {
+      "slide": "p42-5",
+      "text": "Tim kasirmu punya kalimat andalan saat mengecek pembayaran?",
+      "from": 69,
+      "to": 60
+    },
+    {
+      "slide": "p52-5",
+      "text": "Barang apa yang harga belinya paling sering berubah?",
+      "from": 69,
+      "to": 68
+    },
+    {
+      "slide": "p59-5",
+      "text": "Pertanyaan apa yang selalu kamu ajukan sebelum menerima order besar?",
+      "from": 76,
+      "to": 75
+    },
+    {
+      "slide": "p71-5",
+      "text": "Tag rekan yang menjaga ketelitian sampai order terakhir.",
+      "from": 69,
+      "to": 65
+    },
+    {
+      "slide": "p76-5",
+      "text": "Pelengkap apa yang paling cocok dengan produk andalanmu?",
+      "from": 69,
+      "to": 62
+    },
+    {
+      "slide": "p78-5",
+      "text": "Kirim ke tim sebagai pengingat untuk memeriksa bersama.",
+      "from": 69,
+      "to": 67
+    }
+  ],
+  "overflow": [],
+  "collisions": [],
+  "images": true,
+  "slides": 413
+}

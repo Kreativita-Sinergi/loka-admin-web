@@ -1,0 +1,767 @@
+[
+  {
+    "number": 2,
+    "file": "assets/art/002.png",
+    "sha256": "6e51213387257976322c1927b4da9d0a85fdbe4097721c49528fbb3777ab6588",
+    "width": 1122,
+    "height": 1402,
+    "style": "still-life",
+    "scene": "Studio still life: a takeaway coffee cup and a sandwich on a small counter, a blank coral sale tag visibly cut in half by scissors, a short stack of coins beside the cut tag. Camera close at table height, long crisp afternoon shadows. The sale eats into what remains from each product. Objects dominate; no people."
+  },
+  {
+    "number": 3,
+    "file": "assets/art/003.png",
+    "sha256": "a8b87ff00f68c68cbf43b5f9a177a12f32283a7f7931fb1c47bb7c9b99720d77",
+    "width": 1122,
+    "height": 1402,
+    "style": "photo",
+    "scene": "View from just inside a small Indonesian vegetable stall during rain. A woman's hand checks a shallow basket with just enough fresh greens; beyond the counter, rain falls on a quiet street and one umbrella passes. Condensation, wet tiles, warm lamp, natural documentary mood. Landscape of weather and careful shopping, not a posed portrait."
+  },
+  {
+    "number": 4,
+    "file": "assets/art/004.png",
+    "sha256": "7b49c82233eb33b9be4c3415bb555c904852d2319d07babb1857ae539ba5a47e",
+    "width": 1122,
+    "height": 1402,
+    "style": "comic",
+    "scene": "One large expressive hand-drawn comic scene inside a sandwich stall. A cook has placed an egg and cheese on a sandwich while a cashier looking at a blank receipt has only one topping token beside the till. Customer at the edge points gently to the sandwich. Bold ink outlines, detailed food, humorous observational scene; no speech bubbles or lettering."
+  },
+  {
+    "number": 5,
+    "file": "assets/art/005.png",
+    "sha256": "9d415d40f7dfa3c462cfb16b8f10a8aad5af3d516f1d554c712b780299297bef",
+    "width": 1122,
+    "height": 1402,
+    "style": "isometric",
+    "scene": "Isometric miniature Indonesian corner kiosk, viewed from high above. The entire tiny shop sits on a neat square platform, with an orderly counter, organized stock cubbies, a notebook and pen at the till, shopkeeper opening the shutters. Human-scale careful routines inside a tiny business. Architectural detail and warm blue shopfront, no signage."
+  },
+  {
+    "number": 6,
+    "file": "assets/art/006.png",
+    "sha256": "ef389dca058e58629efd959558d4e5360858ddfeca9412eb1c8772bf2773c881",
+    "width": 1122,
+    "height": 1402,
+    "style": "paper-collage",
+    "scene": "Editorial cut-paper collage of two neighboring food stalls with different-sized bowls and different ingredient baskets. In the center a thoughtful Indonesian stall owner holds a blank price tag while looking back at their own ingredients, rather than copying the adjacent stall. Asymmetric torn-paper architecture, tactile food photo cutouts, no text or comparison boxes."
+  },
+  {
+    "number": 7,
+    "file": "assets/art/007.png",
+    "sha256": "f536b6f826f9592b44ef04b00086e410cd29a155a3b977c94e45e31e8977fe51",
+    "width": 1122,
+    "height": 1402,
+    "style": "photo",
+    "scene": "Small home bakery at early morning, side-on documentary photograph. A baker's hands pack a long line of cookie gift boxes; a nearly empty change tray and a newly delivered bundle of wrapping supplies sit in the foreground. Window light, flour on the work surface, half-finished ribbons, real home-business textures. Focus on production stretching working cash."
+  },
+  {
+    "number": 8,
+    "file": "assets/art/008.png",
+    "sha256": "73ffd673d4102de02270e8a03fbf60c6c17200871e87c12036e40f942b336ec2",
+    "width": 1122,
+    "height": 1402,
+    "style": "3d",
+    "scene": "Charming detailed 3D food-stall diorama seen from customer eye level. A cashier turns a prepared order tray toward a waiting customer for confirmation; behind, a short orderly queue curves between a counter and a potted plant. Different cup lids and one paper bag distinguish the actual order. Friendly expressions, calm energy, soft tactile materials."
+  },
+  {
+    "number": 9,
+    "file": "assets/art/009.png",
+    "sha256": "41a35df645894ef6cd6fbba971fee47ac87adc16cbf481b2df09307c36be148b",
+    "width": 1122,
+    "height": 1402,
+    "style": "3d",
+    "scene": "Priority artwork from initial-prompts.json: three wholesale cartons crowd a tiny grocery counter, unsold stock, nearly empty coin jar, small shopkeeper looking at storage space. Keep the approved priority image."
+  },
+  {
+    "number": 10,
+    "file": "assets/art/010.png",
+    "sha256": "939f9395b8394b6ac5e4840cc97f6696a01e779bec89c45cf3248e26bce1f2d5",
+    "width": 1122,
+    "height": 1402,
+    "style": "photo",
+    "scene": "Wide low-angle photograph of an almost empty small noodle cafe after lunch. One couple sits near the window, chairs in the foreground are empty, a shopkeeper at the distant counter studies a small open notebook. Afternoon sun crosses the floor. The subject is the rhythm of a quiet day and the space itself; no anxious stock portrait."
+  },
+  {
+    "number": 11,
+    "file": "assets/art/011.png",
+    "sha256": "0e5bfcefdc3cb6b12ea540cc6376be0d0b1c56ed1c94e806237c330cc931a9da",
+    "width": 1122,
+    "height": 1402,
+    "style": "clay",
+    "scene": "Tactile clay-style close-up of a shop counter: customer hand presents a smartphone with an entirely blank blue screen; opposite, cashier checks a separate small merchant device with a blank pale screen. A wrapped order waits between the two hands. Emphasize checking from the shop's side, with friendly rounded forms and handcrafted clay imperfections."
+  },
+  {
+    "number": 12,
+    "file": "assets/art/012.png",
+    "sha256": "3c5e45a590b1b598c0255ed0d733e96d14bbce64c3e78338577b629ff19fe04b",
+    "width": 1122,
+    "height": 1402,
+    "style": "comic",
+    "scene": "Hand-inked editorial scene at a bakery shift change. An outgoing cashier hands a small open notebook to the arriving coworker; a half-packed customer order waits on the counter, a delivery crate is beside it. Two clearly different workers, deliberate handover gesture, shelves of bread, warm late-afternoon atmosphere. No comic panels or speech bubbles."
+  },
+  {
+    "number": 13,
+    "file": "assets/art/013.png",
+    "sha256": "60bf7fed0a7d178d344b6720235ee265d08b1393bd06ed0cc382a380b84ea2ea",
+    "width": 1122,
+    "height": 1402,
+    "style": "still-life",
+    "scene": "Overhead food still life: a complete Indonesian rice-and-chicken lunch package in a paper tray, a separately placed iced drink and straw, scattered simple ingredient portions on small dishes around them. The drink is visibly an additional real component. Bold directional studio light, appetizing textures, clean blue tabletop, blank packaging."
+  },
+  {
+    "number": 14,
+    "file": "assets/art/014.png",
+    "sha256": "408d369110518a3d384ee45eb9a3fce85745717b1cc883dd46b689e4e03f63c4",
+    "width": 1122,
+    "height": 1402,
+    "style": "watercolor",
+    "scene": "Rich gouache illustration of a little fruit-drink stand across a single scene: one side of the counter has an empty fruit basket, the other an oversized mound of ripe fruit waiting untouched. A young Indonesian seller thoughtfully examines the imbalance with an open blank notebook nearby. Expressive painterly texture, lively still-life composition, no split comparison cards."
+  },
+  {
+    "number": 15,
+    "file": "assets/art/015.png",
+    "sha256": "0a07c67f5b4fc954ce6e42a158cabcc1817b3357c1dd47fd931a932a03686034",
+    "width": 1122,
+    "height": 1402,
+    "style": "photo",
+    "scene": "Candid street-level photo at a modest Indonesian souvenir shop. A traveler with a backpack asks a question at checkout while the local shopkeeper gestures to the available payment terminal; device screens are blank and unbranded. Woven souvenirs and a sunlit doorway provide a travel setting. Respectful natural interaction, no tourist stereotypes."
+  },
+  {
+    "number": 16,
+    "file": "assets/art/016.png",
+    "sha256": "325184052744cf07b54e1368572a8b4689fa0be52c7c0560ee04e7cefc82b4df",
+    "width": 1122,
+    "height": 1402,
+    "style": "paper-collage",
+    "scene": "Graphic photographic collage of the same bowl of noodles traveling through two tangible routes on a blue work surface: one ceramic bowl on a cafe table, another meal packed in a plain delivery bag with cutlery and a small motorbike helmet nearby. Strong diagonal composition, real packaging details, torn-paper borders, no arrows or UI panels."
+  },
+  {
+    "number": 17,
+    "file": "assets/art/017.png",
+    "sha256": "3b21a57ce71ba08b84a4b66dd6b6516c6e9e2703577c23893714a4c7e16af6b3",
+    "width": 1122,
+    "height": 1402,
+    "style": "3d",
+    "scene": "3D miniature neighborhood clothing shop preparing a sale. A staff member carefully pins several blank price tags to a small clothing rack while a coworker compares the rack with a blank paper checklist. Only one selected rail is decorated, the rest remains normal. Close three-quarter view, tactile fabric and acrylic, controlled retail preparation."
+  },
+  {
+    "number": 18,
+    "file": "assets/art/018.png",
+    "sha256": "daeb2cc613b640823a240b2e2fd81a33159c0b87e98c437da8646f78fc1ce25c",
+    "width": 1122,
+    "height": 1402,
+    "style": "clay",
+    "scene": "Expressive clay illustration of a tired but composed cafe owner at a little desk. Several distinct tiny objects orbit just above the desktop—coffee cup, paper bag, delivery crate, coins—while the owner moves one real object onto an open notebook. Visual metaphor of taking tasks out of memory. Cozy night lamp, no floating words or UI."
+  },
+  {
+    "number": 19,
+    "file": "assets/art/019.png",
+    "sha256": "264629e066e505422ee85a7b79b38e08ecd465a69db1f36c7586cd61341ad21d",
+    "width": 1122,
+    "height": 1402,
+    "style": "isometric",
+    "scene": "Isometric diorama of a small restaurant's back door: an empty ingredient shelf inside and a delivery loading dock outside with a parked shuttered supplier van. Owner stands in the doorway holding a blank order sheet, considering the gap. Strong physical separation between shop operation and unavailable delivery, cold morning light."
+  },
+  {
+    "number": 20,
+    "file": "assets/art/020.png",
+    "sha256": "7846cc7561c3433955a094326eb653e0b9b066cb4445cdf6f47a559e5751e7f9",
+    "width": 1122,
+    "height": 1402,
+    "style": "photo",
+    "scene": "Intimate photo from behind a bakery counter: a returning customer receives a small neatly packed pastry bag from the same attentive baker, who recognizes them with a relaxed smile. In focus are the exchange and careful wrapping; fresh rolls sit at the edge. Late-afternoon light, realistic unposed human warmth, no sale signs."
+  },
+  {
+    "number": 21,
+    "file": "assets/art/021.png",
+    "sha256": "d123ef90c09179db441db6fec539401c5a23ec28ba62bc723996451ee7c81d5c",
+    "width": 1122,
+    "height": 1402,
+    "style": "paper-collage",
+    "scene": "Priority artwork from initial-prompts.json: untouched elaborate pistachio cake contrasts with an outgoing tray of iced coffees and simple sandwiches, photographed paper collage from overhead. Keep the approved priority image."
+  },
+  {
+    "number": 22,
+    "file": "assets/art/022.png",
+    "sha256": "143683da77f3da46425094787799b2d33c1c38ed69588594e95c4cabe868935b",
+    "width": 1122,
+    "height": 1402,
+    "style": "still-life",
+    "scene": "Conceptual studio photograph of a grocery shelf with a row of glass bottles and three conspicuous bottle-shaped empty spaces. At the counter a small plain tablet has an entirely blank screen and a physical stock-count tally made only of unmarked wooden tokens. Low close camera angle, exact physical gaps tell the missing-stock story without numerals."
+  },
+  {
+    "number": 23,
+    "file": "assets/art/023.png",
+    "sha256": "22c7fa233c02f4ab2572f6d076fe3741032692ccc1f9c53bd57e000e35ee8ffb",
+    "width": 1122,
+    "height": 1402,
+    "style": "photo",
+    "scene": "Documentary photo of a small shop owner closing the month at a dining table: several different blank-facing purchase receipts arranged into three tidy groups, a cup of tea, a nearly finished notebook, warm desk lamp. Hands do the sorting, owner's face only partly visible at the frame edge. Quiet concentrated late-night atmosphere."
+  },
+  {
+    "number": 24,
+    "file": "assets/art/024.png",
+    "sha256": "3aa75cc2fcd2cc70453aaa664699620f370fb0ca5637b661b59196798eeea066",
+    "width": 1122,
+    "height": 1402,
+    "style": "isometric",
+    "scene": "A detailed miniature kiosk readying for a new month, like a cutaway stage set: organized bestselling products at the front, packing bench at one side, small staff noticeboard with blank sheets, sensible stack of supply boxes behind. One owner sets a cup by the till before opening. High-angle morning scene with a visible coherent workflow, not a UI diagram."
+  },
+  {
+    "number": 25,
+    "file": "assets/art/025.png",
+    "sha256": "80f3fd576a2be1390bfbd1375a88459940f947306ee487f82d37f0fb82944373",
+    "width": 1122,
+    "height": 1402,
+    "style": "3d",
+    "scene": "Playful but refined 3D coffee stand in a compact city square. A trail of individual takeaway coffee cups stretches from the till to several actual customers waiting nearby, each cup representing one transaction. Owner stands at the counter checking the day's prepared capacity. Wide elevated camera, miniature scale, simple sunlit forms, no numbers or target arrows."
+  },
+  {
+    "number": 26,
+    "file": "assets/art/026.png",
+    "sha256": "342c46a42df084a50d5b8f6dafe35d16830dc40826fce660b237b8063ff2ac08",
+    "width": 1122,
+    "height": 1402,
+    "style": "paper-collage",
+    "scene": "Editorial collage of a bulging shopping bag surrounded by the costs that come with sales: ingredient basket, packaging roll, ribbon of blank receipts, a small coin purse with only a few coins left. A hand holds the purse open at the foreground while the big bag fills the background. Dramatic scale contrast, tactile cut paper and real object photography."
+  },
+  {
+    "number": 27,
+    "file": "assets/art/027.png",
+    "sha256": "0108aeb5c7dbc04ac719f568ee20743228072b2bca76b1342f09854a681380cb",
+    "width": 1122,
+    "height": 1402,
+    "style": "photo",
+    "scene": "Realistic overhead photo of a small online shop planning limited stock. Owner's hands set aside three chosen products on a clean packing table; several other products remain in their storage bins beyond the table. A small stack of plain cardboard mailers and a blank notebook show preparation. Window daylight and practical modest workspace."
+  },
+  {
+    "number": 28,
+    "file": "assets/art/028.png",
+    "sha256": "524ad86f95ad898cdfa435a383dc68593af956a54d7cff1bcd75784b88b60ba7",
+    "width": 1122,
+    "height": 1402,
+    "style": "comic",
+    "scene": "Single hand-drawn comic illustration of a home food business overwhelmed by a large boxed-lunch order. Thirty-like many identical lunch boxes stack across a table while two staff members search through a long unlettered paper scroll curling from a phone. The visual joke is important order details getting buried. Ink and gouache, expressive but believable, no text anywhere."
+  },
+  {
+    "number": 29,
+    "file": "assets/art/029.png",
+    "sha256": "1bc3f0c763b1baeb74a788fb75fce06a8811a0d9c0155663f60854c9b184d9f5",
+    "width": 1122,
+    "height": 1402,
+    "style": "still-life",
+    "scene": "Precise studio still life of one beautifully boxed bakery slice, a blank pink discount tag, a small brass balance scale with a few coins on one side and tiny ingredient portions on the other. Focus on the tangible trade-off when price is cut. Three-quarter close view, hard clean shadows, premium product photography, no quantities or numerals."
+  },
+  {
+    "number": 30,
+    "file": "assets/art/030.png",
+    "sha256": "87f0ba73e86f59007b54562d1b756099f3723ff60da9a47ead781712c553a803",
+    "width": 1122,
+    "height": 1402,
+    "style": "photo",
+    "scene": "Macro documentary photograph of a food-stall purchase: a hand places a small bag of ice next to a little stack of daily paper receipts and a pen at the open cash drawer. Cool condensation on the bag, warm evening counter light, realistic rupiah notes partially covered and out of focus. Tiny recurring expense is the hero, no readable currency values."
+  },
+  {
+    "number": 31,
+    "file": "assets/art/031.png",
+    "sha256": "90c0a4efd728c6d2043d19a2628cd2edeae2c8dbd7dcec0fcc698e4bc63fa221",
+    "width": 1122,
+    "height": 1402,
+    "style": "isometric",
+    "scene": "Cutaway isometric model of a tiny takeaway kitchen with three distinct workers: one at the stove, one packing a paper bag, one receiving payment at the front counter. Their positions form a clear physical sequence without arrows. Bright appetizing food props, compact real business layout, balanced clean daylight, no duplicated limbs or interface labels."
+  },
+  {
+    "number": 32,
+    "file": "assets/art/032.png",
+    "sha256": "bb51ec21148285ae53ac83a87d0140b02d42f2ffd662b6d1b843ad81324f9fa2",
+    "width": 1122,
+    "height": 1402,
+    "style": "photo",
+    "scene": "Candid close photo in a flower-and-gift stall. A customer asks for an urgent wrapped gift while the florist checks a line of half-finished bouquets already waiting on the workbench before answering. Focus on the florist's checking gesture, distinct colored bouquets, ribbon spools and scissors. Human natural mood, no clock numerals or readable tags."
+  },
+  {
+    "number": 33,
+    "file": "assets/art/033.png",
+    "sha256": "b40d85c06a7031e4ae225242fe8569fad2a6c1015c60946a199d1ed6fb1e60ed",
+    "width": 1122,
+    "height": 1402,
+    "style": "clay",
+    "scene": "Tactile stop-motion-style miniature grocery scene: a short row of six plain milk bottles on a low shelf, several customers' shopping baskets in the foreground, and a tiny delivery truck far outside the window. Shelf emptiness and demand tell the restocking story. Low shelf-level perspective, handmade ceramic bottles, friendly warm lighting, no labels."
+  },
+  {
+    "number": 34,
+    "file": "assets/art/034.png",
+    "sha256": "3cc006a9840878afd32bbc65abf5e4dc393d219184d60cc9a2f15cdef5f15d4e",
+    "width": 1122,
+    "height": 1402,
+    "style": "paper-collage",
+    "scene": "Photographic paper collage of a takeaway menu board with blank price-tag shapes on a shop wall and a different stack of blank till tags below, with a shop worker peeling an old tag off the board. Clear tactile act of updating mismatched information, rich blue shop wall, realistic hands, poster-paper layers, no writing or numerals."
+  },
+  {
+    "number": 35,
+    "file": "assets/art/035.png",
+    "sha256": "dab64b321120dc76b5514be50ec945084145d37f9a10a79d647d6ecab570a939",
+    "width": 1122,
+    "height": 1402,
+    "style": "still-life",
+    "scene": "Exploded photographic arrangement of a gift hamper above a warm ivory tabletop: cookies in a kraft box, ribbon, card, tissue, protective filling, all separate and equally visible around the open box. Overhead flat lay, museum-like attention to material textures, deliberate blue ribbon curves, subtle shadows. Show packaging as real components, no labels or pricing."
+  },
+  {
+    "number": 36,
+    "file": "assets/art/036.png",
+    "sha256": "831cf74bc5b4ed14695d5e5ecad0accf5d77fb745b74b1e180b0c7e37b6764f4",
+    "width": 1122,
+    "height": 1402,
+    "style": "watercolor",
+    "scene": "Painterly gouache vignette of a small cafe owner changing just one shelf display while the rest of the shop stays orderly. Owner has moved one pastry stand nearer the counter and pauses to observe the doorway. Cozy shop plants, restrained brush texture, side-on medium-wide composition, calm thoughtful atmosphere, no charts or diagram boxes."
+  },
+  {
+    "number": 37,
+    "file": "assets/art/037.png",
+    "sha256": "8b44b97d663d2cfde1296d5616f13b307c5fef4b3c7afceeb2ef01cf1a7d99df",
+    "width": 1122,
+    "height": 1402,
+    "style": "photo",
+    "scene": "Editorial food photography on a cafe counter: two visibly different drink sizes, one with extra topping, a plain small takeaway menu stand turned away so no writing shows, barista hand arranging the products clearly for a menu photo. Soft directional window light, beautiful drinks, exact size and topping details, camera close enough to make choices tangible."
+  },
+  {
+    "number": 38,
+    "file": "assets/art/038.png",
+    "sha256": "256fc7d93d455b7407a046d815ee045b326e8d71440c6d78d501a0a6f377c49f",
+    "width": 1122,
+    "height": 1402,
+    "style": "comic",
+    "scene": "One large comic scene in a cozy Indonesian cafe: a waiter holds two almost identical iced teas, one unsweetened, while checking which of two occupied tables should receive them. Table positions and customers' polite pointing gestures tell the mix-up. Bold expressive linework, cozy seating details, no table numbers, no speech bubbles or lettering."
+  },
+  {
+    "number": 39,
+    "file": "assets/art/039.png",
+    "sha256": "c1f2a8035d10b4146f78c14fe6fb4e981dd2b8cc732018ebcdd318e43fe55d7b",
+    "width": 1122,
+    "height": 1402,
+    "style": "still-life",
+    "scene": "Moody editorial still life of fresh produce in a small food business: one shallow crate of crisp green vegetables, a second large overflowing crate with a few visibly wilted leaves, a chilled milk bottle with condensation nearby. Side lighting reveals freshness and physical limits of storage, dark wood surface, no warning icons or labels."
+  },
+  {
+    "number": 40,
+    "file": "assets/art/040.png",
+    "sha256": "fd903871a4077914a90d31542da81d7795f83932e3424c443044805456ee8dea",
+    "width": 1122,
+    "height": 1402,
+    "style": "photo",
+    "scene": "Candid training photo from slightly above a small retail counter. Experienced cashier demonstrates a practice sale to a new coworker using a plain tablet with blank screen, actual product, cash tray and receipt printer. The learner's hand tries the next step while the trainer watches. Natural patient interaction, small real shop, no branded interface or readable text."
+  },
+  {
+    "number": 41,
+    "file": "assets/art/041.png",
+    "sha256": "5d630ae7dfffb57dab431b9ebd19fcbf1468b600786557418ed7f1ad254729b8",
+    "width": 1122,
+    "height": 1402,
+    "style": "3d",
+    "scene": "Detailed miniature sale-preparation scene inside a shoe shop. Two coworkers discuss one selected shoe at the till; a small blank promotional placard sits beside it and a limited stock shelf is visible behind. One coworker gestures to the selected item while the other confirms with a blank note. Friendly art-directed 3D, tactile shoeboxes and laces, no sale typography."
+  },
+  {
+    "number": 42,
+    "file": "assets/art/042.png",
+    "sha256": "fc8ad2670d042ac7b37796bab44ee6ba71fcaba154b89672b6524db0d6ed5ae7",
+    "width": 1122,
+    "height": 1402,
+    "style": "clay",
+    "scene": "Close handmade clay scene at a cafe payment counter. A customer in a hurry holds a takeaway cup and looks toward the exit while the cashier calmly checks a small unbranded merchant device; a paper bag is waiting between them. Dynamic diagonal body language versus a steady checking gesture, rounded clay shapes and intentional fingerprints, no text or screens with symbols."
+  },
+  {
+    "number": 43,
+    "file": "assets/art/043.png",
+    "sha256": "f395935a872cf23c2bc4ce364533b5413bd3e40abf75ec5f8ebd35eeb07a46e0",
+    "width": 1122,
+    "height": 1402,
+    "style": "photo",
+    "scene": "Photograph of a bakery display with one visibly empty pastry tray among stocked trays. A worker's hand turns a small blank tabletop product card face down while a waiting customer looks toward the alternatives. Glass reflections and crumb details, bright honest midday light. Show updating availability, no written sold-out sign or digital UI."
+  },
+  {
+    "number": 44,
+    "file": "assets/art/044.png",
+    "sha256": "c1e3663bb0ca5ddc447e0a9071e7da02b38d5c2d381077c451d12c548fa8d03d",
+    "width": 1122,
+    "height": 1402,
+    "style": "paper-collage",
+    "scene": "Editorial cut-paper still life of an open cash drawer, grocery supply boxes, a utility-envelope shape with no writing, and a hand about to take a small personal wallet from beside the drawer. Funds have multiple real destinations. Strong layered perspective and actual photographed textures, cobalt highlights, restrained composition, no money values or pie charts."
+  },
+  {
+    "number": 45,
+    "file": "assets/art/045.png",
+    "sha256": "09991b420ab6ba7d5e38d055496d343377bb1afc12e3b2cb1ddcae411a7c8209",
+    "width": 1122,
+    "height": 1402,
+    "style": "comic",
+    "scene": "A warm comic illustration of two small-shop coworkers rehearsing a pretend complicated order after closing: one plays the customer with a little basket, the other practices at the till with drink extras and a wrapped snack. Chairs already stacked in the background show rehearsal time. Expressive confident gestures, ink and colored pencil, no lettering or speech balloons."
+  },
+  {
+    "number": 46,
+    "file": "assets/art/046.png",
+    "sha256": "1574d3e998fa8557bf07a55d86c4705165080197f41648d00ca7b90230c00bb4",
+    "width": 1122,
+    "height": 1402,
+    "style": "isometric",
+    "scene": "Isometric miniature game-console rental lounge with two separate staff members approaching the same single empty gaming station from opposite sides, one holding a phone and one greeting a walk-in customer. Other stations are occupied. The physical collision over one available seat makes double booking obvious. Playful 3D architecture, no game trademarks or screen content."
+  },
+  {
+    "number": 47,
+    "file": "assets/art/047.png",
+    "sha256": "f1a6d4bf6b6ada46f496e5c1ac93a748a58553893caa0e6a8b8ded7f6e723497",
+    "width": 1122,
+    "height": 1402,
+    "style": "photo",
+    "scene": "Close editorial photograph during a busy small online-shop sale: neat parcels move along a packing bench while a supervisor's hands pause to inspect a single completed receipt beside the matching product and blank sale tag. Active coworkers softly blurred behind, practical tungsten lights, real material detail, no numbers or written campaign dates."
+  },
+  {
+    "number": 48,
+    "file": "assets/art/048.png",
+    "sha256": "99b2e2588e4bc273f0825d666634acf315c0c27242845376edb2e512c87bb126",
+    "width": 1122,
+    "height": 1402,
+    "style": "photo",
+    "scene": "Intimate night photograph of a small noodle-stall worker at the very end of the day, counting the cash drawer beside an open notebook while chairs are stacked and the front shutter is halfway lowered. Counter light illuminates hands, coins and blank-facing receipts; outside is dark. Human tired-but-methodical focus, no visible banknote values."
+  },
+  {
+    "number": 49,
+    "file": "assets/art/049.png",
+    "sha256": "1b127330e1924f56b16b56a9670a497cf04a5b0fba9efd7421c775c4a68bc26c",
+    "width": 1122,
+    "height": 1402,
+    "style": "3d",
+    "scene": "A 3D diorama of a clothing boutique the morning after a sale: a few leftover garments remain on a rail, folded unsold pieces sit on a table, and a worker compares them with an empty restocking crate before ordering more. Bright quiet morning, fabric textures, careful small-business scale, side-on view, no printed signs or numerals."
+  },
+  {
+    "number": 50,
+    "file": "assets/art/050.png",
+    "sha256": "a8b47e683826f6dfd77d585cd8a736ca282fbfd76e7b072c8c5a4c1de1f38b46",
+    "width": 1122,
+    "height": 1402,
+    "style": "watercolor",
+    "scene": "Gouache illustration of a cafe owner peacefully sitting with tea just outside the shop while a capable coworker inside follows a blank paper note at the counter. Open doorway connects the two; sunlight and a leafy plant frame the owner's short break. The person rests while the business has a clear handover. Warm unhurried humane scene, no labels."
+  },
+  {
+    "number": 51,
+    "file": "assets/art/051.png",
+    "sha256": "79281e4cb4e90f944b57963fe9d454e88fc07b08f6515c169316e9a53e046d6a",
+    "width": 1122,
+    "height": 1402,
+    "style": "still-life",
+    "scene": "Overhead photo of two nearly finished festive cookie hampers with visibly different contents, a pair of blank name tags and a hand checking each box before tying the final ribbon. Sharp tactile ribbon, tissue and biscuit details; one box intentionally open. Warm ivory table with cobalt and burgundy accents, no writing on cards."
+  },
+  {
+    "number": 52,
+    "file": "assets/art/052.png",
+    "sha256": "3faf08f598e377b981f307f44d7d8dddb1fb8f45c4ee7a433b6c889659489545",
+    "width": 1122,
+    "height": 1402,
+    "style": "photo",
+    "scene": "Close candid photo of a cafe owner's hands comparing two blank-facing supplier invoices beside a newly opened ingredient sack, measuring scoop and a bowl of the actual ingredient. One old receipt is creased; the fresh invoice is crisp. Side-on desk perspective, practical daylight, small-business material realism, no readable prices or text."
+  },
+  {
+    "number": 53,
+    "file": "assets/art/053.png",
+    "sha256": "393cfea574e8d8ae8e30a3dab55217ff234d83d1319e623a9ade483085af8596",
+    "width": 1122,
+    "height": 1402,
+    "style": "isometric",
+    "scene": "Architectural cutaway of a small convenience store doing a partial stock count: one worker counts a single shelf section using a blank clipboard while another serves a customer at the front. Most shelves remain open for business, one counting area is clearly active. Neat miniature real-world detail, elevated diagonal camera, no numbers or icons."
+  },
+  {
+    "number": 54,
+    "file": "assets/art/054.png",
+    "sha256": "df59727cb17a1dc119de58f96efd2e48290b41f9c4d6a415193d48303d18014c",
+    "width": 1122,
+    "height": 1402,
+    "style": "clay",
+    "scene": "Conceptual handcrafted clay still life: a small member wallet with several plain blue round tokens, some tokens exchanged for a real cup of coffee, remaining tokens still clearly in the wallet. Human hands only, friendly shop counter, three-quarter close view, tactile wallet and ceramic cup. Show unused prepaid rights without charts, numbers or writing."
+  },
+  {
+    "number": 55,
+    "file": "assets/art/055.png",
+    "sha256": "a29b2c52023c36f9158f08a60344eb16ca5abf3ddc00a9ccd219ddae696b2277",
+    "width": 1122,
+    "height": 1402,
+    "style": "paper-collage",
+    "scene": "Editorial scrapbook collage of the aftermath of a shop promotion: one actual sold product wrapper, one leftover product, a blank cut sale tag, a packaging receipt and a handwritten-looking notebook page with no marks. A hand pins these tangible pieces onto a cream paper surface, analyzing what happened. Strong diagonal shadows, no charts or text."
+  },
+  {
+    "number": 56,
+    "file": "assets/art/056.png",
+    "sha256": "a620c44a7680087ec2b37a063a3a3515f790faec60af3313d99122084d7c0ff3",
+    "width": 1122,
+    "height": 1402,
+    "style": "3d",
+    "scene": "Slightly surreal but polished 3D shop diorama: a long flowing ribbon made of plain blank receipt paper leads from a busy counter into oversized storage boxes that fill the back room, while a very small cash tray remains at the front. Owner looks at the stockroom rather than at the till. Clear spatial story of cash tied in inventory, no written symbols."
+  },
+  {
+    "number": 57,
+    "file": "assets/art/057.png",
+    "sha256": "bef5f9862cc18d5290c6f5c125c2c99567537b33c69d75772493308630a6a026",
+    "width": 1122,
+    "height": 1402,
+    "style": "photo",
+    "scene": "Early morning photo behind a neighborhood food shop: owner stands near a small stack of ingredient crates, speaking on the phone while checking an entirely blank calendar sheet at the loading door. A supplier motorcycle is parked in soft focus outside. Natural local delivery setting, cool dawn light and warm interior, no visible dates or screens."
+  },
+  {
+    "number": 58,
+    "file": "assets/art/058.png",
+    "sha256": "e1b74a27925bafba1ec5e8f14c0c4e18f1de91e7777956de957c86580d04bb43",
+    "width": 1122,
+    "height": 1402,
+    "style": "still-life",
+    "scene": "Precise overhead product photograph: three open plain cardboard cartons, each filled with neat rows of unbranded amber drink bottles, one carton partly opened to reveal consistent pack structure. A hand lifts one individual bottle beside the cartons, showing the relationship between package and unit. Bold clean blue tabletop, crisp studio shadow, no numerical labels."
+  },
+  {
+    "number": 59,
+    "file": "assets/art/059.png",
+    "sha256": "7404c12e2bff7ad726081c573140b5630e740150bff81233bc81a5eb702cfd4e",
+    "width": 1122,
+    "height": 1402,
+    "style": "photo",
+    "scene": "Wide food-production photograph of a modest catering kitchen preparing a large group order: many lunch portions on a clean bench, a worker sealing special containers, a second worker arranging an insulated delivery bag. Real labor, packaging and transport are visible alongside the meals. Bright working light, appetizing details, no printed labels or numbers."
+  },
+  {
+    "number": 60,
+    "file": "assets/art/060.png",
+    "sha256": "970eb226c2f213468b22f28724dde3f5832534a2ca326e092f96873de149de85",
+    "width": 1122,
+    "height": 1402,
+    "style": "watercolor",
+    "scene": "Gouache-and-pencil illustration from a customer's eye level in a little juice stall. The vendor arranges actual different fruit drinks and cup sizes on the counter so a first-time customer can easily point to a choice. A menu board is present only as an abstract blank surface. Delightful food color and clear physical selection, no lettering."
+  },
+  {
+    "number": 61,
+    "file": "assets/art/061.png",
+    "sha256": "82a695f6f040e3aeceaed4ea04bd5238a66b89921826bc141a830dd9bb6657c1",
+    "width": 1122,
+    "height": 1402,
+    "style": "comic",
+    "scene": "Hand-inked comic scene at a small bicycle-rental stand: a customer returns a bike while the attendant checks a plain analog clock with no numerals and a blank booking slip. Another parked bicycle and helmets establish the rental business. Both people politely clarify the timing, rich bike details, energetic but calm expressions, no speech bubbles or written rates."
+  },
+  {
+    "number": 62,
+    "file": "assets/art/062.png",
+    "sha256": "ea9b75fa714f2d28cb716cc0eee50935c5768ef13733fe82ba7cd2f846ca22f0",
+    "width": 1122,
+    "height": 1402,
+    "style": "isometric",
+    "scene": "High-angle 3D miniature of a tiny storeroom visibly filled almost to its practical limit. A worker at the doorway holds one additional delivery box and pauses because the shelf space and walking aisle are tight. A few grocery products peek from cartons, realistic storage arrangement, warm natural light, no comedic crushing or dangerous stacking."
+  },
+  {
+    "number": 63,
+    "file": "assets/art/063.png",
+    "sha256": "e87df8947526c94eaaff1530796328440394001eac34ce5c756f2d9386e88dc7",
+    "width": 1122,
+    "height": 1402,
+    "style": "photo",
+    "scene": "Street-level documentary photo of a small neighborhood shop preparing for changed opening hours. Shopkeeper lifts a plain unlettered hanging placard on the glass door while a coworker inside points to a blank paper schedule. Doorway, keys and rising shutter tell the operational story. Morning light, inviting modest storefront, no readable signage."
+  },
+  {
+    "number": 64,
+    "file": "assets/art/064.png",
+    "sha256": "a435f1b903e7ad58297c01f923bd6fc9d197bac35900c205647d78ac0ba57c60",
+    "width": 1122,
+    "height": 1402,
+    "style": "paper-collage",
+    "scene": "Photographic paper collage of a small grocery shelf carrying homemade snack jars from two different suppliers, distinguished by simple unlettered colored lids and wrapping. Owner sorts a small stack of blank delivery slips beside returned empty baskets. Rich snack textures, layered shelf perspective, physical ownership and settlement clues, no labels or split comparison cards."
+  },
+  {
+    "number": 65,
+    "file": "assets/art/065.png",
+    "sha256": "469dceb8114ffb7c064c0f2e285c415ff25f4f28f6935964a0865cc7fa108a66",
+    "width": 1122,
+    "height": 1402,
+    "style": "3d",
+    "scene": "Detailed 3D cafe-counter close-up: several freshly made takeaway iced coffees are ready, but the dispenser for cup lids is empty; a barista searches an almost empty plain supply box beside the drinks. Emphasize small missing packaging component halting a prepared order. Soft realistic materials, tactile condensation, friendly observational humor, no warning symbols."
+  },
+  {
+    "number": 66,
+    "file": "assets/art/066.png",
+    "sha256": "dd55482c57ccca8e7e6dbdbfc4bc623bcb22926070e78b58f0ed7d1cf7f54966",
+    "width": 1122,
+    "height": 1402,
+    "style": "photo",
+    "scene": "Candid cafe scene from table height: a seated customer uses a phone to scan a small table ordering placard while a staff member nearby offers help; the busy front counter is visible deep in the background. Placard has a simple abstract unscannable black geometric pattern, no real QR code or words. Natural inclusive service interaction and clear table context."
+  },
+  {
+    "number": 67,
+    "file": "assets/art/067.png",
+    "sha256": "32c0eada161b7a926aab6bcd9174ebd8f26b41fd0dc75d64a195e82035b070f3",
+    "width": 1122,
+    "height": 1402,
+    "style": "watercolor",
+    "scene": "Tender detailed watercolor-and-gouache illustration of an Indonesian mother who owns a small bakery, finally sitting with tea while her adult daughter takes over tying boxes at the nearby counter. They share a relaxed glance. Morning pastries, soft window light, aprons and lived-in business details, respectful capable women, no flowers-as-default or holiday lettering."
+  },
+  {
+    "number": 68,
+    "file": "assets/art/068.png",
+    "sha256": "cf5bab7392072717d5ab5e77dc6b4337c7b5a0f03049c2fba91c2913461e6ebd",
+    "width": 1122,
+    "height": 1402,
+    "style": "comic",
+    "scene": "Single expressive comic scene at a family-run small shop: one relative carefully explains the open cash drawer and a blank note to another relative before handing over the keys. A child's drawing without letters is pinned far behind, adding family context without distracting. Genuine helpful body language, warm ink-and-gouache textures, no speech bubbles or text."
+  },
+  {
+    "number": 69,
+    "file": "assets/art/069.png",
+    "sha256": "06061bb011bfcb0c5837123b0da8973cf42889fb904ccb19afdcf7c9e9aad3e6",
+    "width": 1122,
+    "height": 1402,
+    "style": "still-life",
+    "scene": "High-end overhead still life of two similarly shaped gift hampers being checked before pickup. One open box contains cookies, the other tea and snacks; both have different blank color-coded tags, and a hand aligns each tag with its own box. Large clear contrasting contents, tactile paper ribbons, warm natural shadows, no written names."
+  },
+  {
+    "number": 70,
+    "file": "assets/art/070.png",
+    "sha256": "1b99454538c36aef8cc9b7fca88cb658c22b948262bc89007f1098a29e231e91",
+    "width": 1122,
+    "height": 1402,
+    "style": "clay",
+    "scene": "Handcrafted clay conceptual scene on a merchant counter: a completed card-terminal transaction with an entirely blank screen sits beside a small closed transparent coin capsule still moving along a short physical conveyor toward an open wallet. Tangible delayed availability metaphor, simple tasteful forms, three-quarter view, no checkmarks, currency signs or numerical timelines."
+  },
+  {
+    "number": 71,
+    "file": "assets/art/071.png",
+    "sha256": "3d221b3820151736a63c7c272c0bd5aed1691749196abca5518e0a006cc3842e",
+    "width": 1122,
+    "height": 1402,
+    "style": "photo",
+    "scene": "Evening photograph at a small celebration-cake shop close to closing. A customer asks at the front while the baker looks back at several half-finished cakes and a small amount of remaining packaging before responding. Face partly in profile, actual work capacity visible on the bench, warm window light, calm sincere service mood, no text or clocks."
+  },
+  {
+    "number": 72,
+    "file": "assets/art/072.png",
+    "sha256": "a0665ac7341285a6194fc805279bd85954933173de0d05ab29d2857dd40bb945",
+    "width": 1122,
+    "height": 1402,
+    "style": "isometric",
+    "scene": "Miniature cutaway of a small shop being carefully closed for a holiday: one worker checks the chilled cabinet, another finishes a wrapped pending order, owner places a blank opening note beside the till. Outside shutter halfway down, warm interior against cool night street. Three distinct practical closing tasks, physically coherent shop floor, no labels."
+  },
+  {
+    "number": 73,
+    "file": "assets/art/073.png",
+    "sha256": "8ebd5460780d7037aad61d92cdc514939c350c405a94aebeb0aa4975cb15412d",
+    "width": 1122,
+    "height": 1402,
+    "style": "watercolor",
+    "scene": "Beautiful restrained watercolor illustration of a small cafe at Christmas evening: a modest evergreen branch and warm string lights at a window, two coworkers sharing a quiet tea break after serving customers, a softly lit home visible across the street. Inclusive and intimate, focus on rest and gathering, no religious text, no sales products, no lettering."
+  },
+  {
+    "number": 74,
+    "file": "assets/art/074.png",
+    "sha256": "2f87a0b4e59570fb498ca820171261970ba4c46c95b4d7cf9e592ab63ebe71b9",
+    "width": 1122,
+    "height": 1402,
+    "style": "comic",
+    "scene": "Observational comic scene at a food counter where one serving tray is empty. A calm staff member gently gestures toward two actually available dishes while a customer considers them. Expressions are patient rather than exaggerated anger, visible food choice and reassuring body language tell the service story. Brushy ink, tactile gouache, no speech bubbles or signs."
+  },
+  {
+    "number": 75,
+    "file": "assets/art/075.png",
+    "sha256": "552181cc467c513cd4f82853a651fe0a89ca3d82f82eb12e73e85f683cd422ff",
+    "width": 1122,
+    "height": 1402,
+    "style": "photo",
+    "scene": "Early morning documentary close-up inside a small shop reopening after a break. Worker checks the condition of fresh produce and a chilled ingredient container before putting items back on sale, with one small damaged item set aside in a separate plain tray. Clean practical workspace, soft first light, inspection gesture, no health claims or readable text."
+  },
+  {
+    "number": 76,
+    "file": "assets/art/076.png",
+    "sha256": "d5204cfa7b0691a6fff308f483f0a014d197b29c341b08316c2236e1ee577deb",
+    "width": 1122,
+    "height": 1402,
+    "style": "still-life",
+    "scene": "Appetizing editorial still life at hand level: one takeaway coffee and a small complementary pastry offered on a separate little plate by a cashier's hand, while the customer's hand lightly indicates their choice. Price tag is blank, no forced bundle. Blue counter tile, crispy pastry detail and real coffee texture, simple respectful sales moment."
+  },
+  {
+    "number": 77,
+    "file": "assets/art/077.png",
+    "sha256": "7014dd318d34e363a78639215236334ede9203553fc8580cc667a4eb5ed109f0",
+    "width": 1122,
+    "height": 1402,
+    "style": "3d",
+    "scene": "Elevated 3D diorama of a pickup counter with several prepared customer bags clustered at once. One staff member is carefully handing over a single bag while multiple customers wait at spaced spots along the small storefront. The bottleneck is one physical handover point. Warm miniature architectural detail, distinct packages, no clocks, numbers or queue labels."
+  },
+  {
+    "number": 78,
+    "file": "assets/art/078.png",
+    "sha256": "c845d48ea22f222dde73a7fb46a3c93d8f69a99fb82bae4a4f23d7fde6c65369",
+    "width": 1122,
+    "height": 1402,
+    "style": "photo",
+    "scene": "Calm documentary photo from directly above a small cash drawer during reconciliation. Two coworkers' hands count coins and compare blank-facing receipts together; one points to a small cash-out slip rather than at a person. Careful collaborative examination, warm lamp and slightly worn counter, no accusing gestures, readable denominations or written numbers."
+  },
+  {
+    "number": 79,
+    "file": "assets/art/079.png",
+    "sha256": "e970b42e4f64b80c96c276c66f0df7aa895263c77d265a062b86bb72bc967e2b",
+    "width": 1122,
+    "height": 1402,
+    "style": "paper-collage",
+    "scene": "Premium photographic food collage showing three actual potential hero products on one workbench: popular coffee, a carefully made sandwich, and an elaborate dessert. Ingredient bowls, a preparation tool, and a plain order slip surround each product differently, suggesting demand and effort together. Overhead asymmetric editorial composition, no scorecards, badges or numerical charts."
+  },
+  {
+    "number": 80,
+    "file": "assets/art/080.png",
+    "sha256": "8c8389caab34fdfa4413999525e2bc2faffc3edb570d3ba9ab67508cdbd20851",
+    "width": 1122,
+    "height": 1402,
+    "style": "photo",
+    "scene": "Intimate natural photo at a neighborhood snack shop: owner listens attentively to a returning customer's feedback across a small counter, both seated or leaning comfortably, a familiar wrapped purchase in front. Focus on eye contact and listening posture, not handshake. Warm afternoon window, lived-in store details, no testimonial quote or text."
+  },
+  {
+    "number": 81,
+    "file": "assets/art/081.png",
+    "sha256": "48a63518084ed2f01fecafdcd3d10e2fc2c88377851c31eeb3ba2f2445036f51",
+    "width": 1122,
+    "height": 1402,
+    "style": "still-life",
+    "scene": "Overhead editorial photograph of end-of-year grocery stock grouped physically on a long table by actual condition: sealed pristine snack packs, a few slow-moving jars, and one damaged plain box set separately for inspection. Owner's hand moves one item to the appropriate group. Natural object textures, careful thoughtful sorting, no labels, colored checklist cards or diagrams."
+  },
+  {
+    "number": 82,
+    "file": "assets/art/082.png",
+    "sha256": "be809bda443359b07549348bf2733a30e8c9370f689242e3ba4e2da5ef370267",
+    "width": 1122,
+    "height": 1402,
+    "style": "comic",
+    "scene": "Friendly hand-inked illustration of a small shop owner and a customer jointly checking a long blank account slip and a few blank-facing payment receipts at the counter. Both point to documents with calm cooperative expressions. An old wall calendar is visible only as blank paper squares, warm human setting, no numerals, speech bubbles or writing."
+  },
+  {
+    "number": 83,
+    "file": "assets/art/083.png",
+    "sha256": "3b6e60ec56bab8469aea1fea8f3148eb8b29fae2a93ec0c8b91bcf7d8e7e8fd5",
+    "width": 1122,
+    "height": 1402,
+    "style": "3d",
+    "scene": "Close tactile 3D still life at a busy shop till on the eve of a big day: an almost empty receipt-paper roll beside fresh spare rolls, a stack of takeaway containers, cup lids, and one packed customer order. A worker's hand replaces the depleted roll before service begins. Detailed paper texture and small practical objects, no text or dates."
+  },
+  {
+    "number": 84,
+    "file": "assets/art/084.png",
+    "sha256": "7bb3d4c680c34e0362030211c5714859002b3b6ea27a1500d06b14d56b6d5ac9",
+    "width": 1122,
+    "height": 1402,
+    "style": "watercolor",
+    "scene": "Quiet gouache illustration of a small-business owner beginning one manageable new habit: at morning opening they write in one small blank notebook beside a single checked physical inventory shelf, with an unused oversized tangled pile of blank task slips pushed aside. Clear focus on one concrete routine, sunlight and plants, thoughtful encouraging tone, no lettering or checkmark graphics."
+  },
+  {
+    "number": 85,
+    "file": "assets/art/085.png",
+    "sha256": "a72132b9389fbbd5c4347189d25e363396a4b8c84d9c459786d2dae317289004",
+    "width": 1122,
+    "height": 1402,
+    "style": "isometric",
+    "scene": "Detailed miniature street-food shop at the start of a busy year-end evening. A small team gathers around a physical packing bench with orderly prepared orders while outside the storefront an arriving customer waits. One coworker indicates the pickup area, another checks ingredient baskets. Festive but restrained street lights in background, coherent teamwork, no dates or campaign text."
+  },
+  {
+    "number": 86,
+    "file": "assets/art/086.png",
+    "sha256": "291eb02920b278d856d2de28637b0315878340db6378de6b4d35ce5b24f5baf9",
+    "width": 1122,
+    "height": 1402,
+    "style": "watercolor",
+    "scene": "Emotional watercolor-and-gouache view from outside a modest Indonesian shop just after the last closing of the year. A tired owner lowers the shutter while a coworker gently waits with two cups of tea, warm light still glowing inside, quiet ordinary street. Dignified human effort and rest, subtle hopeful dawn-like color at horizon, no fireworks, dates, slogans or lettering."
+  }
+]

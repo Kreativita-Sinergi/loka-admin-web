@@ -1,0 +1,14 @@
+{
+  "review": "manual contact-sheet review",
+  "source_images_reviewed": 85,
+  "final_covers_reviewed": 85,
+  "cover_sheets_reviewed": ["cover-contact-01.jpg", "cover-contact-02.jpg", "cover-contact-03.jpg", "cover-contact-04.jpg", "cover-contact-05.jpg", "cover-contact-06.jpg"],
+  "source_sheets_reviewed": ["art-contact-01.jpg", "art-contact-02.jpg", "art-contact-03.jpg", "art-contact-04.jpg", "art-contact-05.jpg", "art-contact-06.jpg"],
+  "specific_user_examples_replaced": {
+    "9": "New 3D grocery scene with overstocked cartons, bottles, worried shopkeeper and nearly empty coin jar; old two-card green cover removed.",
+    "21": "New photographic food collage showing untouched cake and outgoing coffee/sandwich orders; old A/B/C cover removed."
+  },
+  "findings": "All 85 future posts have individually generated topic-specific source art. Subjects, products, settings, viewpoints and media vary. Artwork is reused only within its own carousel. No prior v2 source image is assigned to a future v3 post.",
+  "copy_preserved": true,
+  "published_post_excluded_from_release": true
+}

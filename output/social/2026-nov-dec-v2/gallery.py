@@ -8,9 +8,14 @@ posts = json.loads((ROOT/'campaign.json').read_text())
 receipt_path = ROOT/'release-verification.json'
 receipt = json.loads(receipt_path.read_text()) if receipt_path.exists() else {}
 live = receipt.get('status') == 'verified'
+superseded = (ROOT/'superseded-by.json').exists()
 released_ids = {p['id'] for p in receipt.get('posts', [])} if live else set()
 status_text = f'{receipt["updated_posts"]} materi revisi aktif di antrean IG/Threads · jadwal tetap' if live else 'Draf revisi · belum mengganti jadwal IG'
 footer_text = f'{receipt["updated_posts"]} posting dengan {receipt["updated_slides"]} slide sudah diperbarui dan diverifikasi melalui API Loka. ID posting dan jam tayang tetap; posting yang sudah terbit dipertahankan.' if live else 'Versi ini tersimpan lokal sebagai materi tinjauan. Tidak ada unggahan atau perubahan jadwal Instagram/Threads.'
+if superseded:
+    released_ids = set()
+    status_text = 'Arsip visual versi 2 · gambar terbaru berada di versi 3'
+    footer_text = 'Arsip untuk perbandingan. Antrean IG/Threads memakai visual versi 3; lihat ../2026-nov-dec-v3/index.html.'
 esc = html.escape
 options = ''.join(f'<option value="{esc(label)}">{esc(label)}</option>' for label in dict.fromkeys(p['format_label'] for p in posts))
 cards = []
@@ -36,6 +41,6 @@ for(const button of document.querySelectorAll('.copy'))button.addEventListener('
 page = f'''<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Revisi materi IG · Loka Kasir</title><style>{style}</style></head><body>
 <header><img src="assets/loka-white.svg" alt="Loka"><div class="status">{esc(status_text)}</div><h1>Lebih banyak sudut cerita.<br>Lebih kuat tiap geseran.</h1><p>Revisi 86 materi November–Desember: delapan format, cerita singkat, hitungan visual, percakapan, kuis, dan checklist. Foto ilustratif, ilustrasi 3D, serta grafis memakai warna dan font Loka.</p><div class="stats"><span>86 materi</span><span>413 slide</span><span>8 format</span><span>4–6 slide per carousel</span></div><p><a href="preview.jpg">Lihat variasi cover</a> · <a href="../2026-nov-dec/index.html">Bandingkan versi lama</a> · <a href="calendar.md">Kalender materi</a></p></header>
 <div class="toolbar"><input id="search" type="search" placeholder="Cari topik, hook, atau tanggal…" aria-label="Cari materi"><select id="format" aria-label="Filter format"><option value="">Semua format</option>{options}</select><span id="count" class="count">86 materi</span></div>
-<main><p class="note">Geser deretan gambar untuk melihat seluruh carousel. Klik gambar untuk membuka JPG 1080 × 1350. {'Materi bertanda aktif sudah dipasang ke antrean. ' if live else 'Jadwal di sini hanya referensi. '}Materi yang sudah terbit tidak untuk diterbitkan ulang. Foto AI adalah ilustrasi, bukan testimoni pelanggan.</p>{''.join(cards)}<div class="empty">Materi tidak ditemukan.</div><p class="bottom">{esc(footer_text)}</p></main><script>{script}</script></body></html>'''
+<main><p class="note">Geser deretan gambar untuk melihat seluruh carousel. Klik gambar untuk membuka JPG 1080 × 1350. {'Visual versi 2 ini sudah diarsipkan; antrean menggunakan versi 3. ' if superseded else 'Materi bertanda aktif sudah dipasang ke antrean. ' if live else 'Jadwal di sini hanya referensi. '}Materi yang sudah terbit tidak untuk diterbitkan ulang. Foto AI adalah ilustrasi, bukan testimoni pelanggan.</p>{''.join(cards)}<div class="empty">Materi tidak ditemukan.</div><p class="bottom">{esc(footer_text)}</p></main><script>{script}</script></body></html>'''
 (ROOT/'index.html').write_text(page)
 print(json.dumps({'gallery_posts':len(posts),'images':sum(len(p['files']) for p in posts)}))
