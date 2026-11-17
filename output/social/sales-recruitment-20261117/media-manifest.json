@@ -1,0 +1,30 @@
+[
+  {
+    "file": "media/recruitment-1.jpg",
+    "width": 1080,
+    "height": 1350,
+    "bytes": 322901,
+    "sha256": "2f7d0015e10b8eba1dd279ab24c9b1dc5f2fc0b096bc13c3bff88bbc883a34fa"
+  },
+  {
+    "file": "media/recruitment-2.jpg",
+    "width": 1080,
+    "height": 1350,
+    "bytes": 235638,
+    "sha256": "f36af3d4c14b5cfadcf81431128862bdea3ef175428cfe5e9b784db4b54da8ea"
+  },
+  {
+    "file": "media/recruitment-3.jpg",
+    "width": 1080,
+    "height": 1350,
+    "bytes": 314365,
+    "sha256": "7dfbc43ba52edaa52eaa4da7626a526d4d4d40b42e9dcbebbea476f02b0ccb89"
+  },
+  {
+    "file": "media/recruitment-4.jpg",
+    "width": 1080,
+    "height": 1350,
+    "bytes": 185314,
+    "sha256": "dbb3a953a8eaa8c96e901e39e647c57e0158ce73d7b61c86f759dbb8bfee8695"
+  }
+]

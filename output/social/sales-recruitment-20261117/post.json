@@ -1,0 +1,98 @@
+{
+  "key": "sales-recruitment-20261117",
+  "title": "Jadi Mitra Sales Loka Kasir — maksimal 100 mitra",
+  "signup_url": "https://app.lokakasir.id/mitra/daftar",
+  "portal_url": "https://app.lokakasir.id/mitra",
+  "maximum_sales_partners": 100,
+  "quota_wording": "Kuota maksimal 100 mitra; bukan klaim 100 slot tersisa.",
+  "caption": "Jadi Mitra Sales Loka Kasir.\n\nKuota maksimal 100 mitra. Bantu pemilik usaha mengenal Loka Kasir lewat program berbasis komisi.\n\nDi portal sales: kode/link referral pribadi, pantauan pelanggan & komisi, gambar promosi, caption siap salin, dan video tutorial.\n\nDaftar: https://app.lokakasir.id/mitra/daftar\nPendaftaran melalui verifikasi tim Loka Kasir.\n\n#LokaKasir #MitraSales #PeluangUsaha",
+  "threads_enabled": true,
+  "threads_text": "Loka Kasir membuka pendaftaran Mitra Sales, maksimal 100 mitra.\n\nBantu usaha lokal mengenal Loka Kasir. Tersedia kode/link referral pribadi, pantauan pelanggan & komisi, serta materi promosi di portal sales.\n\nProgram berbasis komisi. Pendaftaran melalui verifikasi tim Loka Kasir.\n\nDaftar: https://app.lokakasir.id/mitra/daftar",
+  "slides": [
+    {
+      "kind": "cover",
+      "eyebrow": "PROGRAM MITRA SALES",
+      "title": [
+        "Jadi Mitra Sales",
+        "Loka Kasir."
+      ],
+      "body": "Kenalkan Loka Kasir kepada pemilik usaha di sekitarmu.",
+      "quota_label": "KUOTA MAKSIMAL",
+      "quota": 100,
+      "quota_unit": "MITRA SALES",
+      "art": "assets/recruitment-hero.png"
+    },
+    {
+      "kind": "role",
+      "eyebrow": "KENALKAN. AJAK. DAMPINGI.",
+      "title": [
+        "Bantu usaha lokal",
+        "kenal Loka Kasir."
+      ],
+      "body": "Mulai dari kebutuhan usaha, lalu bantu mereka mengenal cara kerja Loka Kasir.",
+      "steps": [
+        {
+          "title": "Kenali usaha lokal.",
+          "body": "Cari tahu kebutuhan kasir calon pelanggan."
+        },
+        {
+          "title": "Ajak pakai Loka Kasir.",
+          "body": "Bagikan kode atau link referral pribadimu."
+        },
+        {
+          "title": "Pantau di portal.",
+          "body": "Lihat pelanggan dan komisi dari akun salesmu."
+        }
+      ],
+      "art": "assets/recruitment-hero.png"
+    },
+    {
+      "kind": "kit",
+      "eyebrow": "BAHAN JUALAN DI PORTAL SALES",
+      "title": [
+        "Materi promosi.",
+        "Tinggal pilih & bagikan."
+      ],
+      "body": "Gambar promosi resmi, caption siap salin, dan video tutorial tersedia di halaman sales.",
+      "features": [
+        "Gambar promosi",
+        "Caption siap salin",
+        "Video tutorial"
+      ],
+      "art": "assets/sales-content-kit.png"
+    },
+    {
+      "kind": "cta",
+      "eyebrow": "TERBATAS MAKSIMAL 100 MITRA",
+      "title": [
+        "Siap jadi mitra?",
+        "Mulai dari daftar."
+      ],
+      "body": "Isi pendaftaran. Tim Loka Kasir akan meninjau pengajuanmu.",
+      "verification_lines": [
+        "Pendaftaran melalui",
+        "verifikasi tim Loka Kasir."
+      ],
+      "url": "https://app.lokakasir.id/mitra/daftar",
+      "display_domain": "app.lokakasir.id",
+      "display_path": "/mitra/daftar",
+      "footer": "Program mitra berbasis komisi.",
+      "art": "assets/sales-content-kit.png"
+    }
+  ],
+  "files": [
+    "media/recruitment-1.jpg",
+    "media/recruitment-2.jpg",
+    "media/recruitment-3.jpg",
+    "media/recruitment-4.jpg"
+  ],
+  "status": "draft",
+  "publication_prerequisites": [
+    "Signup URL works publicly",
+    "Maximum-100 quota enforced by server",
+    "Sales content available in portal"
+  ],
+  "published_or_scheduled": false,
+  "admin_draft_id": "a23dde25-c9a5-40b8-abe2-b4637cb2a8da",
+  "publication_prerequisites_verified": true
+}

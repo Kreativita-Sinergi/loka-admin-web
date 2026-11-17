@@ -1,0 +1,16 @@
+[
+  {
+    "file": "assets/recruitment-hero.png",
+    "width": 1122,
+    "height": 1402,
+    "sha256": "7ba513bf7c163eb8884430f2f65391069f54011b0afff3d79e39dc6f72a8058b",
+    "mode": "built-in image_gen"
+  },
+  {
+    "file": "assets/sales-content-kit.png",
+    "width": 1122,
+    "height": 1402,
+    "sha256": "8689d43068d32aaee946f234287dbab410f47f1a4035434b07ab6e9681284301",
+    "mode": "built-in image_gen"
+  }
+]

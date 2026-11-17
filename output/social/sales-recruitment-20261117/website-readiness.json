@@ -1,0 +1,30 @@
+{
+  "live_signup_verified": true,
+  "signup_url": "https://app.lokakasir.id/mitra/daftar",
+  "quota": {
+    "limit": 100,
+    "reserved": 1,
+    "remaining": 99,
+    "registration_open": true,
+    "terms_version": "2026-10-26",
+    "first_year_rate_percent": 50,
+    "later_rate_percent": 20,
+    "discount_percent": 20,
+    "payout_minimum": 100000,
+    "hold_days": 30
+  },
+  "hd_jpeg_cdn_verified": true,
+  "unauthenticated_portal_redirect_verified": true,
+  "javascript_errors": [],
+  "content_api_verified": true,
+  "backend_commit": "67c700e9f73a9f18f0e1bf20b235f3c993688169",
+  "web_commit": "c4fc279175ac1672ff6cc9ab8a85317967c8a8b0",
+  "admin_commit": "71e5b49f59933f80c07b4ef518dd36adfe7d4c1f",
+  "approved_content_posts": 100,
+  "approved_slides": 457,
+  "hd_assets": 408,
+  "public_registration_requires_captcha": true,
+  "identity_encryption_configured": true,
+  "no_production_test_partner_created": true,
+  "checked_at_utc": "2026-11-17T06:42:35.561041+00:00"
+}

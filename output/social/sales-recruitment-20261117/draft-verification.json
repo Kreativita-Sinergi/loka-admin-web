@@ -1,0 +1,36 @@
+{
+  "id": "a23dde25-c9a5-40b8-abe2-b4637cb2a8da",
+  "status": "draft",
+  "scheduled_at": null,
+  "signup_url": "https://app.lokakasir.id/mitra/daftar",
+  "slides": 4,
+  "width": 1080,
+  "height": 1350,
+  "instagram_caption_characters": 389,
+  "threads_characters": 327,
+  "existing_calendar_preserved": true,
+  "existing_posts_in_range": 92,
+  "live_site_verified_before_creation": true,
+  "media": [
+    {
+      "id": "c2ef3b20-b260-4b48-81f0-dfd5d48fba59",
+      "position": 0,
+      "url": "https://res.cloudinary.com/deydnvhbc/image/upload/v1794898067/loka-social/vvlm78wd2hugxfhmcfei.jpg"
+    },
+    {
+      "id": "6801929e-a763-4b29-b8b4-6ea5d3dc902f",
+      "position": 1,
+      "url": "https://res.cloudinary.com/deydnvhbc/image/upload/v1794898068/loka-social/ib103t3zwpkws5xxw8yk.jpg"
+    },
+    {
+      "id": "e0215848-3f39-4c89-b201-08241203e73e",
+      "position": 2,
+      "url": "https://res.cloudinary.com/deydnvhbc/image/upload/v1794898069/loka-social/itkdd0odiriavhamahnr.jpg"
+    },
+    {
+      "id": "f96d8dd5-4bd5-41ef-aecd-75402ab2b8b4",
+      "position": 3,
+      "url": "https://res.cloudinary.com/deydnvhbc/image/upload/v1794898071/loka-social/rdhchgw6c0rxowabkc7e.jpg"
+    }
+  ]
+}

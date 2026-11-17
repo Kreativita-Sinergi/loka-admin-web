@@ -1,0 +1,17 @@
+{
+  "status": "passed",
+  "slides": 4,
+  "dimensions": "1080x1350",
+  "new_original_images": 2,
+  "image_mode": "built-in image_gen",
+  "reused_previous_campaign_raster_assets": 0,
+  "instagram_chars": 389,
+  "threads_chars": 327,
+  "quota": 100,
+  "quota_remaining_claims": false,
+  "income_or_percentage_claims": false,
+  "text_overflow": 0,
+  "text_collisions": 0,
+  "publication_actions_performed": false,
+  "live_signup_verification": "application owner prerequisite; not asserted by asset audit"
+}
