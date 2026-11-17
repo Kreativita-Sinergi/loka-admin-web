@@ -1,0 +1,32 @@
+{
+  "key": "sales-commission-20261118-1000",
+  "title": "Komisi Mitra Loka Kasir 50% lalu 20%",
+  "scheduled_at": "2026-11-18T10:00:00+07:00",
+  "signup_url": "https://app.lokakasir.id/mitra/daftar",
+  "caption": "Jual Loka Kasir. Dapat komisi dari langganan pelangganmu.\n\n50% dari nilai bersih setiap pembayaran Pro bulanan/tahunan selama 12 bulan pertama pelanggan, lalu 20% sesuai ketentuan program. Periode dihitung sejak pembayaran langganan pertama pelanggan.\n\nKomisi berasal dari pembayaran pertama dan perpanjangan yang memenuhi syarat. Nilai bersih = pembayaran pelanggan setelah biaya pembayaran dan pajak yang berlaku.\n\nContoh dasar hitung: nilai bersih Rp100.000 × 50% = komisi Rp50.000. Angka ilustrasi untuk memahami rumus.\n\nBagikan link pribadimu, bantu pelanggan mulai memakai Loka Kasir, lalu pantau pelanggan dan komisi di portal mitra. Gambar promosi, caption, dan tutorial sudah tersedia.\n\nPencairan setelah masa tahan 30 hari, minimal Rp100.000, melalui pemeriksaan tim dan transfer bulanan sekitar tanggal 10. Refund atau penyalahgunaan dapat membatalkan komisi. Paket tiga tahun dan tambahan outlet tidak menghasilkan komisi.\n\nKuota maksimal 100 mitra total, melalui verifikasi KTP dan rekening. Kode untuk pelanggan lain; referral toko sendiri dilarang.\n\nDaftar: https://app.lokakasir.id/mitra/daftar\n\n#LokaKasir #MitraSales #KomisiSales #PeluangUsaha",
+  "threads_enabled": true,
+  "threads_text": "Jadi mitra Loka Kasir: komisi 50% dari nilai bersih pembayaran Pro bulanan/tahunan selama 12 bulan pertama pelanggan, lalu 20% sesuai ketentuan.\n\nPembayaran pertama dan perpanjangan yang memenuhi syarat menghasilkan komisi. Nilai bersih setelah biaya pembayaran dan pajak yang berlaku.\n\nMasa tahan 30 hari, minimum pencairan Rp100.000. Maksimal 100 mitra total, melalui verifikasi tim.\n\nDaftar: https://app.lokakasir.id/mitra/daftar",
+  "files": [
+    "media/commission-1.jpg",
+    "media/commission-2.jpg",
+    "media/commission-3.jpg",
+    "media/commission-4.jpg",
+    "media/commission-5.jpg"
+  ],
+  "status": "scheduled",
+  "commission": {
+    "first_12_months_percent": 50,
+    "later_percent": 20,
+    "basis": "nilai bersih pembayaran Pro bulanan/tahunan yang memenuhi syarat",
+    "period_starts": "pembayaran langganan pertama per pelanggan",
+    "net_basis": "setelah biaya pembayaran dan pajak yang berlaku",
+    "hold_days": 30,
+    "payout_minimum": 100000,
+    "illustrative_net": 100000,
+    "illustrative_commission": 50000
+  },
+  "maximum_total_partners": 100,
+  "publication_scope": "new commission-focused post; preserve other posts and schedules",
+  "admin_post_id": "585b598a-2371-4801-9ae4-7c43e3831442",
+  "published_or_scheduled": true
+}

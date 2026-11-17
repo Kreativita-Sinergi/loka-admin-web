@@ -1,0 +1,49 @@
+{
+  "id": "585b598a-2371-4801-9ae4-7c43e3831442",
+  "status": "scheduled",
+  "scheduled_at": "2026-11-18T10:00:00+07:00",
+  "timezone": "Asia/Jakarta",
+  "slides": 5,
+  "image_dimensions": [
+    1080,
+    1350
+  ],
+  "threads_enabled": true,
+  "caption_characters": 1161,
+  "threads_characters": 432,
+  "other_posts_preserved": true,
+  "existing_other_posts": 93,
+  "verified_commission_percent": [
+    50,
+    20
+  ],
+  "signup_url": "https://app.lokakasir.id/mitra/daftar",
+  "verified_at_utc": "2026-11-17T13:37:27.947879+00:00",
+  "media": [
+    {
+      "id": "c12b376f-e7ad-40f2-af78-9be02e73c8b0",
+      "position": 0,
+      "url": "https://res.cloudinary.com/deydnvhbc/image/upload/v1794922641/loka-social/dv6heh7oc6t1stvwh97m.jpg"
+    },
+    {
+      "id": "a905b202-107d-44c5-b672-67c411900246",
+      "position": 1,
+      "url": "https://res.cloudinary.com/deydnvhbc/image/upload/v1794922642/loka-social/fbmmmweefrw2ntdhhiat.jpg"
+    },
+    {
+      "id": "5666c956-88ef-42b0-909c-3394d134bb78",
+      "position": 2,
+      "url": "https://res.cloudinary.com/deydnvhbc/image/upload/v1794922643/loka-social/ukqmv7arh1makjic8cfp.jpg"
+    },
+    {
+      "id": "bc4fc4ea-bfa4-4920-9693-eb6f0a584df9",
+      "position": 3,
+      "url": "https://res.cloudinary.com/deydnvhbc/image/upload/v1794922644/loka-social/dufsncnfvfaketq8lwvk.jpg"
+    },
+    {
+      "id": "21a1e78c-7468-4e03-afb8-afc693ca3f72",
+      "position": 4,
+      "url": "https://res.cloudinary.com/deydnvhbc/image/upload/v1794922646/loka-social/iicvradbwoprvvksfabs.jpg"
+    }
+  ]
+}

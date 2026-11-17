@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "slides": 5,
+  "caption_characters": 1161,
+  "threads_characters": 432,
+  "schedule": "2026-11-18T10:00:00+07:00",
+  "unique_slides": true,
+  "new_artwork_vs_first_recruitment": true,
+  "illustrative_math_verified": true,
+  "layout_no_overflow_or_collision": true,
+  "files": {
+    "media/commission-1.jpg": {
+      "width": 1080,
+      "height": 1350,
+      "format": "JPEG",
+      "bytes": 235596,
+      "sha256": "5decef4286096cc110394ba74a87aff5552963081d1928aa10a3931c0e4ef5fa"
+    },
+    "media/commission-2.jpg": {
+      "width": 1080,
+      "height": 1350,
+      "format": "JPEG",
+      "bytes": 189655,
+      "sha256": "253e33e60c6114c0c62989ab944c3e6153e2f9a756da6b9b2989fa7e4b8ce154"
+    },
+    "media/commission-3.jpg": {
+      "width": 1080,
+      "height": 1350,
+      "format": "JPEG",
+      "bytes": 190066,
+      "sha256": "ec528709fee1af70f2f823d00a82a74d977eac841f0b089aff3daa7d199f5e01"
+    },
+    "media/commission-4.jpg": {
+      "width": 1080,
+      "height": 1350,
+      "format": "JPEG",
+      "bytes": 222510,
+      "sha256": "0b402d0ef81b52eb36b3b86f6fe389e5865db341c35073bb664409cc2291b016"
+    },
+    "media/commission-5.jpg": {
+      "width": 1080,
+      "height": 1350,
+      "format": "JPEG",
+      "bytes": 178758,
+      "sha256": "183bbff47d3834b3c5f95b6c823f8d1c8de7f1bb3205b0d464f16e2d4b49803c"
+    }
+  }
+}

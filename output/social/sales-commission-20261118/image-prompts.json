@@ -1,0 +1,15 @@
+{
+  "mode": "built-in image_gen",
+  "assets": [
+    {
+      "file": "assets/bakery-partner.png",
+      "prompt": "Use case: ads-marketing. Asset type: original portrait 4:5 photographic artwork for an Indonesian Loka Kasir sales-partner commission campaign. Primary request: a photorealistic, warm candid editorial scene of a young Indonesian male independent software sales partner in an ordinary navy overshirt meeting an Indonesian woman bakery owner wearing a warm taupe hijab at her modest neighborhood bakery counter. They review a simple blank unbranded tablet together, with naturally posed hands, fresh bread trays, a small receipt printer and genuine worn wood textures. Fictional models and fictional business, not a testimonial. Camera at counter height, intimate three-quarter medium shot, modern documentary advertising craft, soft morning window light. Composition concentrates people and bakery scene in the bottom two thirds, with a quiet warm cream wall in the upper third reserved for separately typeset copy. Navy, cobalt accents, ivory and warm natural bakery colors. Distinct from a cartoon coffee-stall meeting; real photographic textures, no 3D/cartoon style. No visible words, letters, digits, signs, logos, charts, banknotes, earnings claims, floating currency, watermark or software UI. The tablet screen must be blank. No A/B/C cards or generic infographic comparison panels.",
+      "transparent_background": false
+    },
+    {
+      "file": "assets/commission-desk.png",
+      "prompt": "Use case: ads-marketing. Asset type: original portrait 4:5 editorial still-life photograph for explaining software sales commission and recurring subscription payments. Primary request: premium close-up side-angle studio photograph of a practical independent sales partner's navy zip document pouch on an ivory worktable, a real small unbranded desktop paper calendar with blank paper pages and a cobalt bookmark tab, several blank cream receipt strips neatly arranged across the table, a capped cobalt pen, and the corner of a simple blank notebook. One person's natural hand turns the blank calendar page. Physical tactile everyday objects, cream paper fibers, soft daylight and deep navy shadows; calm capable work, not luxurious wealth. A subtle out-of-focus neighborhood bakery window in the far background connects it to Indonesian small businesses. Keep all meaningful objects in the lower two thirds and leave upper third quiet off-white for separately typeset text. Photorealistic, not illustration; no laptop, no marketing photo sheets, no phone mockup toolkit. No writing, logos, numerals, monetary amounts, banknotes, fake payment screenshots, checkmarks, digital UI, floating coins, giant A/B/C, or watermark. Conceptual scene, not evidence of an actual payout.",
+      "transparent_background": false
+    }
+  ]
+}

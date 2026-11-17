@@ -1,0 +1,14 @@
+[
+  {
+    "file": "assets/bakery-partner.png",
+    "source": "/Users/odhiahmad/.codex/generated_images/01a1e68a-3cd2-7892-a1e8-c8495cedd09b/exec-0934d0fe-856d-4d0c-b413-91d708d62ff0.png",
+    "sha256": "70db128fe58d56bad112f04f93e6afc53ae5165444428ac852304fb657f6dde0",
+    "mode": "built-in image_gen"
+  },
+  {
+    "file": "assets/commission-desk.png",
+    "source": "/Users/odhiahmad/.codex/generated_images/01a1e68a-3cd2-7892-a1e8-c8495cedd09b/exec-54bc5a88-7a1b-4f8d-98df-98c934fcf0c7.png",
+    "sha256": "02d0ad9ba3dbbbe8b1bdf4b1d64c2be140226cf1911d3304468a66efe8e70e3d",
+    "mode": "built-in image_gen"
+  }
+]
