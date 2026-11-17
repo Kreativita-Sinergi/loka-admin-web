@@ -4,7 +4,7 @@ Empat slide Instagram 1080×1350, caption Instagram dan Threads, serta dua ilust
 
 ## Status
 
-Sudah tersimpan sebagai draft panel admin, ID `a23dde25-c9a5-40b8-abe2-b4637cb2a8da`. Belum diterbitkan atau dijadwalkan. Seluruh 92 posting pada kalender November–Desember dipertahankan. Bukti: `draft-verification.json`.
+Terjadwal pada **17 November 2026 pukul 19.00 WIB** untuk Instagram dan Threads, ID `a23dde25-c9a5-40b8-abe2-b4637cb2a8da`. Empat slide dipertahankan. Jadwal 92 posting lainnya tidak berubah. Bukti jadwal: `schedule-verification.json`; bukti pembuatan draft awal: `draft-verification.json`.
 
 Pendaftaran live: https://app.lokakasir.id/mitra/daftar
 Portal: https://app.lokakasir.id/mitra

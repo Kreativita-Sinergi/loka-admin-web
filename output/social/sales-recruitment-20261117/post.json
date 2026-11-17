@@ -86,13 +86,14 @@
     "media/recruitment-3.jpg",
     "media/recruitment-4.jpg"
   ],
-  "status": "draft",
+  "status": "scheduled",
   "publication_prerequisites": [
     "Signup URL works publicly",
     "Maximum-100 quota enforced by server",
     "Sales content available in portal"
   ],
-  "published_or_scheduled": false,
+  "published_or_scheduled": true,
   "admin_draft_id": "a23dde25-c9a5-40b8-abe2-b4637cb2a8da",
-  "publication_prerequisites_verified": true
+  "publication_prerequisites_verified": true,
+  "scheduled_at": "2026-11-17T19:00:00+07:00"
 }
