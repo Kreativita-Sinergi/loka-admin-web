@@ -4,6 +4,7 @@ import AppLayout from './components/layout/AppLayout'
 import LoginPage from './pages/LoginPage'
 
 // Lazy-loaded pages — split into separate chunks for a smaller initial bundle.
+const GrowthPage = lazy(() => import('./pages/GrowthPage'))
 const DashboardPage = lazy(() => import('./pages/DashboardPage'))
 const UsersPage = lazy(() => import('./pages/UsersPage'))
 const SalesPage = lazy(() => import('./pages/SalesPage'))
@@ -50,6 +51,7 @@ export default function App() {
             <Route path="/users" element={<UsersPage />} />
             <Route path="/sales" element={<SalesPage />} />
             <Route path="/products" element={<StoreProductsPage />} />
+            <Route path="/growth" element={<GrowthPage />} />
             <Route path="/usage" element={<UsagePage />} />
             <Route path="/merchant-health" element={<MerchantHealthPage />} />
             <Route path="/businesses" element={<BusinessesPage />} />
