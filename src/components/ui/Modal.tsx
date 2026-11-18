@@ -1,5 +1,6 @@
 import { X } from 'lucide-react'
-import { useEffect } from 'react'
+import { useEffect, useId } from 'react'
+import { createPortal } from 'react-dom'
 
 interface ModalProps {
   title: string
@@ -9,24 +10,27 @@ interface ModalProps {
 }
 
 export default function Modal({ title, open, onClose, children }: ModalProps) {
+  const titleId = useId()
   useEffect(() => {
+    if (!open) return
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
     document.addEventListener('keydown', handler)
     return () => document.removeEventListener('keydown', handler)
-  }, [onClose])
+  }, [open, onClose])
 
   if (!open) return null
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+  return createPortal(
+    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative bg-white rounded-t-2xl sm:rounded-xl shadow-xl w-full max-w-lg sm:mx-4 p-4 sm:p-6 max-h-[90dvh] overflow-y-auto">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-semibold text-slate-800">{title}</h2>
-          <button onClick={onClose} aria-label="Tutup" className="-m-1.5 p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600"><X size={18} aria-hidden /></button>
+      <div role="dialog" aria-modal="true" aria-labelledby={titleId} className="admin-modal relative max-h-[90dvh] w-full max-w-lg overflow-y-auto overscroll-contain rounded-t-2xl bg-white p-4 shadow-xl sm:mx-4 sm:rounded-xl sm:p-6">
+        <div className="mb-4 flex items-center justify-between gap-2">
+          <h2 id={titleId} className="text-base font-semibold text-slate-800">{title}</h2>
+          <button type="button" onClick={onClose} aria-label="Tutup" className="-m-1.5 grid size-11 shrink-0 place-items-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800"><X size={18} aria-hidden /></button>
         </div>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

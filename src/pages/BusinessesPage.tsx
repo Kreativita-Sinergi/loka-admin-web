@@ -1,7 +1,7 @@
 import Select from '../components/ui/Select'
 import { FilterBar, SearchField, filterControl } from '../components/ui/FilterBar'
 import { useEffect, useState, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { getBusinesses, toggleBusinessActive, deleteBusiness } from '../api/admin'
 import type { AdminBusiness } from '../types'
 import Badge from '../components/ui/Badge'
@@ -52,7 +52,6 @@ export default function BusinessesPage() {
   const [loading, setLoading] = useState(true)
   const [toggling, setToggling] = useState<string | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<AdminBusiness | null>(null)
-  const navigate = useNavigate()
 
   const limit = 15
 
@@ -119,6 +118,25 @@ export default function BusinessesPage() {
     load()
   }
 
+  const actions = (b: AdminBusiness, className = '') => (
+    <div className={`flex flex-wrap gap-2 ${className}`}>
+      <Link to={`/businesses/${b.id}`} className="inline-flex min-h-11 items-center rounded-lg bg-indigo-50 px-3 text-sm font-semibold text-indigo-700 hover:bg-indigo-100 md:min-h-8 md:text-xs">
+        Detail
+      </Link>
+      <button
+        type="button"
+        onClick={() => handleToggle(b)}
+        disabled={toggling === b.id}
+        className={`min-h-11 rounded-lg px-3 text-sm font-medium transition-colors disabled:opacity-50 md:min-h-8 md:text-xs ${b.is_active ? 'bg-slate-100 text-slate-700 hover:bg-slate-200' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'}`}
+      >
+        {toggling === b.id ? 'Memproses…' : b.is_active ? 'Nonaktifkan' : 'Aktifkan'}
+      </button>
+      <button type="button" onClick={() => setDeleteTarget(b)} className="min-h-11 rounded-lg border border-red-200 bg-red-50 px-3 text-sm font-medium text-red-700 transition-colors hover:bg-red-100 md:min-h-8 md:text-xs">
+        Hapus
+      </button>
+    </div>
+  )
+
   return (
     <div className="space-y-4">
       <DeleteConfirmModal
@@ -172,9 +190,42 @@ export default function BusinessesPage() {
         }
       />
 
-      {/* Table */}
-      <div className="card overflow-hidden">
-        <div className="overflow-x-auto">
+      <div className="space-y-3 md:hidden">
+        {loading || error || businesses.length === 0 ? (
+          <p className="card p-6 text-center text-sm text-slate-500">
+            {loading ? 'Memuat data…' : error ? 'Daftar bisnis belum berhasil dimuat.' : 'Tidak ada bisnis sesuai filter.'}
+          </p>
+        ) : businesses.map((b) => (
+          <article key={b.id} className="card space-y-3 p-4">
+            <div className="flex items-start gap-3">
+              {b.image ? (
+                <img src={b.image} alt="" className="size-10 shrink-0 rounded-xl object-cover" />
+              ) : (
+                <div aria-hidden className="grid size-10 shrink-0 place-items-center rounded-xl bg-indigo-100 text-sm font-bold text-indigo-700">
+                  {b.business_name.charAt(0).toUpperCase()}
+                </div>
+              )}
+              <div className="min-w-0">
+                <h3 className="font-semibold wrap-anywhere text-slate-900">{b.business_name}</h3>
+                <p className="mt-0.5 text-xs wrap-anywhere text-slate-500">{b.business_type?.name ?? 'Tipe tidak diketahui'} · {formatDate(b.created_at)}</p>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {membershipBadge(b.membership)}
+              <Badge variant={b.is_active ? 'success' : 'danger'}>{b.is_active ? 'Diaktifkan' : 'Dinonaktifkan'}</Badge>
+            </div>
+            <div className="text-sm wrap-anywhere text-slate-600">
+              <p>{b.owner_name}</p>
+              {b.owner?.email && <p className="text-xs text-slate-500">{b.owner.email}</p>}
+              {b.owner?.phone_number && <p className="text-xs text-slate-500">{b.owner.phone_number}</p>}
+            </div>
+            <div className="border-t border-slate-200 pt-3">{actions(b)}</div>
+          </article>
+        ))}
+      </div>
+
+      <div className="md:card md:overflow-hidden">
+        <div className="hidden overflow-x-auto md:block">
           <table className="w-full text-sm">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
@@ -249,31 +300,7 @@ export default function BusinessesPage() {
                       {formatDate(b.created_at)}
                     </td>
                     <td className="px-4 py-3">
-                      <div className="flex justify-end gap-2">
-                        <button
-                          onClick={() => navigate(`/businesses/${b.id}`)}
-                          className="px-3 py-1 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors"
-                        >
-                          Detail
-                        </button>
-                        <button
-                          onClick={() => handleToggle(b)}
-                          disabled={toggling === b.id}
-                          className={`px-3 py-1 text-xs rounded-lg transition-colors ${
-                            b.is_active
-                              ? 'bg-red-100 hover:bg-red-200 text-red-700'
-                              : 'bg-emerald-100 hover:bg-emerald-200 text-emerald-700'
-                          } disabled:opacity-50`}
-                        >
-                          {toggling === b.id ? '...' : b.is_active ? 'Nonaktifkan' : 'Aktifkan'}
-                        </button>
-                        <button
-                          onClick={() => setDeleteTarget(b)}
-                          className="px-3 py-1 text-xs bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors border border-red-200"
-                        >
-                          Hapus
-                        </button>
-                      </div>
+                      {actions(b, "md:justify-end")}
                     </td>
                   </tr>
                 ))
@@ -283,7 +310,7 @@ export default function BusinessesPage() {
         </div>
 
         {!loading && !error && (
-          <div className="px-4 py-3 border-t border-slate-100">
+          <div className="md:border-t md:border-slate-100 md:px-4 md:py-3">
             <Pagination page={page} total={total} limit={limit} onChange={(next) => { if (next !== page) { setLoading(true); setPage(next) } }} />
           </div>
         )}

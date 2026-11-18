@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { CircleAlert, Eye, EyeOff, Loader2, LockKeyhole, ShieldCheck, User } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
 import { loginAdmin } from '../api/admin'
+import InstallAppButton from '../components/layout/InstallAppButton'
 import { ThemeIconButton } from '../components/layout/ThemeToggle'
 import LokaLogo from '../components/ui/LokaLogo'
 
@@ -28,7 +29,7 @@ export default function LoginPage() {
       login(token, expiresAt ?? null)
       navigate('/')
     } catch {
-      setError('Username atau password salah.')
+      setError(navigator.onLine ? 'Username atau password salah.' : 'Koneksi terputus. Sambungkan internet untuk masuk.')
     } finally {
       setLoading(false)
     }
@@ -38,20 +39,21 @@ export default function LoginPage() {
     'w-full h-11 pl-10 pr-3 border border-slate-200 rounded-lg text-sm text-slate-900 transition-colors hover:border-slate-300 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/15'
 
   return (
-    <div className="relative min-h-screen bg-slate-50 flex items-center justify-center p-4 overflow-hidden">
+    <div className="admin-login relative flex min-h-dvh items-center justify-center overflow-hidden bg-slate-50 px-4">
       {/* Pola titik halus, memudar ke tepi agar tidak ramai. */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 [background-image:radial-gradient(var(--color-slate-300)_1px,transparent_1px)] [background-size:22px_22px] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_45%,#000_30%,transparent_100%)]"
       />
 
-      <div className="absolute top-4 right-4">
+      <div className="login-actions absolute flex items-center gap-1">
+        <InstallAppButton />
         <ThemeIconButton />
       </div>
 
       <div className="relative w-full max-w-[400px]">
         <div className="bg-white border border-slate-200 rounded-2xl shadow-[0_1px_2px_rgb(15_23_42/0.04),0_12px_32px_-12px_rgb(15_23_42/0.12)] dark:shadow-none p-6 sm:p-8">
-          <div className="flex items-center gap-2.5 mb-8">
+          <div className="mb-6 flex items-center gap-2.5 sm:mb-8">
             <LokaLogo className="h-8 w-auto text-slate-900" />
             <span className="px-1.5 py-0.5 rounded-md bg-slate-100 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
               Admin
@@ -76,7 +78,8 @@ export default function LoginPage() {
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Masukkan username"
                   className={fieldClass}
-                  autoFocus
+                  autoCapitalize="none"
+                  spellCheck={false}
                   autoComplete="username"
                 />
               </div>
@@ -102,7 +105,7 @@ export default function LoginPage() {
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
                   aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
-                  className="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-md flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+                  className="absolute right-0 top-1/2 size-11 -translate-y-1/2 rounded-md flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100"
                 >
                   {showPassword ? <EyeOff size={17} aria-hidden /> : <Eye size={17} aria-hidden />}
                 </button>

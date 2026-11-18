@@ -1,6 +1,6 @@
 import Select from '../components/ui/Select'
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { format } from 'date-fns'
 import { id as localeId } from 'date-fns/locale'
 import Badge from '../components/ui/Badge'
@@ -9,6 +9,7 @@ import SalesAgentForm from '../components/sales/SalesAgentForm'
 import { getSalesAgents, type SalesAgent, type SalesAgentStatus } from '../api/salesReferral'
 import { SALES_STATUS, apiErrorText, kycComplete } from '../lib/salesReferral'
 import { formatMoney } from '../lib/sales'
+import { ChevronRight } from 'lucide-react'
 
 const STATUS_FILTERS: { value: '' | SalesAgentStatus; label: string }[] = [
   { value: '', label: 'Semua' },
@@ -57,7 +58,7 @@ export default function SalesAgentsPage() {
   const card = (label: string, value: string, hint?: string) => (
     <div className="card p-4">
       <p className="text-xs font-medium text-slate-500">{label}</p>
-      <p className="mt-1 text-2xl font-bold tabular-nums text-slate-800">{value}</p>
+      <p className="mt-1 text-lg font-bold wrap-anywhere tabular-nums text-slate-800 sm:text-2xl">{value}</p>
       {hint && <p className="text-xs text-slate-400 mt-0.5">{hint}</p>}
     </div>
   )
@@ -102,15 +103,45 @@ export default function SalesAgentsPage() {
       </div>
 
       <div className="card p-3 sm:p-4 flex flex-col sm:flex-row sm:flex-wrap gap-3">
-        <input type="search" placeholder="Cari nama, kode, email, HP…" value={search} onChange={(e) => setSearch(e.target.value)}
+        <input type="search" aria-label="Cari sales" placeholder="Cari nama, kode, email, HP…" value={search} onChange={(e) => setSearch(e.target.value)}
           className="flex-1 min-w-0 sm:min-w-60 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-        <Select value={status} onChange={(e) => setStatus(e.target.value as '' | SalesAgentStatus)}
+        <Select aria-label="Status sales" value={status} onChange={(e) => setStatus(e.target.value as '' | SalesAgentStatus)}
           className="w-full sm:w-auto px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
           {STATUS_FILTERS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
         </Select>
       </div>
 
-      <div className="card overflow-hidden">
+      <div className="space-y-3 md:hidden">
+        {!agents || rows.length === 0 ? (
+          <p className="card p-6 text-center text-sm text-slate-500">
+            {!agents && !error ? 'Memuat…' : error ? 'Daftar sales gagal dimuat.' : agents?.length ? 'Tidak ada sales sesuai filter.' : 'Belum ada sales. Tambahkan sales pertama.'}
+          </p>
+        ) : rows.map((a) => {
+          const status = SALES_STATUS[a.status] ?? { label: a.status, variant: 'neutral' as const }
+          return (
+            <Link key={a.id} to={`/sales-agents/${a.id}`} className="card block space-y-3 p-4 hover:border-indigo-300 focus-visible:outline-2 focus-visible:outline-indigo-600">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <h3 className="font-semibold wrap-anywhere text-slate-900">{a.name}</h3>
+                  <p className="mt-1 text-xs wrap-anywhere text-slate-500">{[a.email, a.phone].filter(Boolean).join(' · ')}</p>
+                </div>
+                <ChevronRight size={18} className="mt-0.5 shrink-0 text-slate-500" aria-hidden />
+              </div>
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className="rounded-md bg-slate-100 px-2 py-1 font-mono text-xs text-slate-700">{a.code}</span>
+                <Badge variant={status.variant}>{status.label}</Badge>
+                {!kycComplete(a) && <Badge variant="neutral">KYC belum lengkap</Badge>}
+              </div>
+              <dl className="grid grid-cols-2 gap-3 border-t border-slate-200 pt-3 text-xs">
+                <div><dt className="text-slate-500">Pelanggan aktif</dt><dd className="mt-1 font-semibold tabular-nums">{a.active_customers.toLocaleString('id-ID')} / {a.customers.toLocaleString('id-ID')}</dd></div>
+                <div><dt className="text-slate-500">Siap cair</dt><dd className={`mt-1 font-semibold wrap-anywhere tabular-nums ${a.available < 0 ? 'text-red-700' : 'text-slate-800'}`}>{formatMoney(a.available)}</dd></div>
+              </dl>
+            </Link>
+          )
+        })}
+      </div>
+
+      <div className="card hidden overflow-hidden md:block">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-slate-50 border-b border-slate-200">

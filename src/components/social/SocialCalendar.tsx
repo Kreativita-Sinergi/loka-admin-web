@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import Badge from '../ui/Badge'
 import type { SocialPost } from '../../api/social'
 import { POST_STATUS, mediaPoster, monthGrid, wibDateKey, wibParts } from '../../lib/social'
 
@@ -23,6 +24,9 @@ export default function SocialCalendar({ year, month, posts, onMonth, today }: {
     byDay.set(k, [...(byDay.get(k) ?? []), p])
   }
   const title = new Intl.DateTimeFormat('id-ID', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(Date.UTC(year, month - 1, 1)))
+  const cells = monthGrid(year, month)
+  const scheduledDays = cells.filter((cell) => cell.inMonth && byDay.has(cell.key))
+  const dayLabel = new Intl.DateTimeFormat('id-ID', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' })
   const shift = (d: number) => {
     const t = new Date(Date.UTC(year, month - 1 + d, 1))
     onMonth(t.getUTCFullYear(), t.getUTCMonth() + 1)
@@ -33,14 +37,38 @@ export default function SocialCalendar({ year, month, posts, onMonth, today }: {
       <div className="mb-4 flex items-center justify-between gap-3">
         <h3 className="text-sm font-semibold text-slate-800 capitalize">{title}</h3>
         <div className="flex items-center gap-1">
-          <button type="button" onClick={() => shift(-1)} aria-label="Bulan sebelumnya" className="h-8 w-8 rounded-lg text-slate-500 hover:bg-slate-100 inline-flex items-center justify-center"><ChevronLeft size={16} aria-hidden /></button>
-          <button type="button" onClick={() => { const p = wibParts(new Date()); onMonth(p.y, p.m) }} className="h-8 px-2.5 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100">Hari ini</button>
-          <button type="button" onClick={() => shift(1)} aria-label="Bulan berikutnya" className="h-8 w-8 rounded-lg text-slate-500 hover:bg-slate-100 inline-flex items-center justify-center"><ChevronRight size={16} aria-hidden /></button>
+          <button type="button" onClick={() => shift(-1)} aria-label="Bulan sebelumnya" className="size-11 sm:size-8 rounded-lg text-slate-500 hover:bg-slate-100 inline-flex items-center justify-center"><ChevronLeft size={16} aria-hidden /></button>
+          <button type="button" onClick={() => { const p = wibParts(new Date()); onMonth(p.y, p.m) }} className="min-h-11 sm:min-h-8 px-2.5 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100">Hari ini</button>
+          <button type="button" onClick={() => shift(1)} aria-label="Bulan berikutnya" className="size-11 sm:size-8 rounded-lg text-slate-500 hover:bg-slate-100 inline-flex items-center justify-center"><ChevronRight size={16} aria-hidden /></button>
         </div>
       </div>
-      <div className="grid grid-cols-7 gap-px overflow-hidden rounded-xl border border-slate-200 bg-slate-200 text-xs">
+      <div className="divide-y divide-slate-200 md:hidden">
+        {scheduledDays.length === 0 && <p className="py-4 text-sm text-slate-500">Belum ada jadwal bulan ini.</p>}
+        {scheduledDays.map((cell) => (
+          <div key={cell.key} className="py-3 first:pt-0 last:pb-0">
+            <h4 className="mb-1 text-xs font-semibold text-slate-500">
+              {dayLabel.format(new Date(cell.key + 'T00:00:00Z'))}{cell.key === today ? ' · Hari ini' : ''}
+            </h4>
+            {(byDay.get(cell.key) ?? []).slice().sort((a, b) => a.scheduled_at!.localeCompare(b.scheduled_at!)).map((p) => {
+              const t = wibParts(p.scheduled_at!)
+              const status = POST_STATUS[p.status]
+              return (
+                <Link key={p.id} to={`/social/${p.id}`} className="flex min-h-11 min-w-0 items-center gap-2.5 rounded-lg px-2 py-2 hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-indigo-600">
+                  {p.media[0] && <img src={mediaPoster(p.media[0].url)} alt="" className="size-9 shrink-0 rounded-lg object-cover" />}
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-slate-800">{p.caption.trim() || 'Posting sosial'}</p>
+                    <p className="text-xs text-slate-500 tabular-nums">{String(t.hh).padStart(2, '0')}:{String(t.mm).padStart(2, '0')} WIB</p>
+                  </div>
+                  <Badge variant={status.variant}>{status.label}</Badge>
+                </Link>
+              )
+            })}
+          </div>
+        ))}
+      </div>
+      <div className="hidden md:grid grid-cols-7 gap-px overflow-hidden rounded-xl border border-slate-200 bg-slate-200 text-xs">
         {WEEKDAYS.map((d) => <div key={d} className="bg-slate-50 px-2 py-1.5 text-center font-medium text-slate-500">{d}</div>)}
-        {monthGrid(year, month).map((cell) => {
+        {cells.map((cell) => {
           const items = byDay.get(cell.key) ?? []
           return (
             <div key={cell.key} className={`min-h-24 bg-white p-1.5 ${cell.inMonth ? '' : 'opacity-50'}`}>

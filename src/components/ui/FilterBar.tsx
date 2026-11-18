@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Search } from 'lucide-react'
 
 /** Kelas kontrol filter: tinggi 40px, sama untuk input dan Select. */
-export const filterControl = 'h-10 rounded-lg border border-slate-200 px-3 text-sm'
+export const filterControl = 'h-11 lg:h-10 rounded-lg border border-slate-200 px-3 text-sm'
 
 /**
  * Baris filter standar di atas tabel. Di layar lebar satu baris rapat kiri
@@ -24,7 +24,7 @@ export function FilterBar({ search, children, controls, summary }: {
       {/* Cari dibatasi 384px: kontrol tetap berdekatan di layar lebar. */}
       {search && <div className="min-w-0 lg:w-96 lg:flex-none">{search}</div>}
       {children}
-      {controls && <div className="grid grid-cols-2 gap-2 lg:flex [&>*]:w-full lg:[&>*]:w-auto">{controls}</div>}
+      {controls && <div className="grid grid-cols-2 gap-2 lg:flex [&>*]:min-w-0 [&>*]:w-full lg:[&>*]:w-auto">{controls}</div>}
       {summary != null && <p className="text-sm text-slate-500 tabular-nums lg:ml-auto lg:pl-3 lg:whitespace-nowrap">{summary}</p>}
     </div>
   )

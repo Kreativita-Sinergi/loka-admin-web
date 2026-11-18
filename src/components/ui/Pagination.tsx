@@ -15,11 +15,11 @@ export default function Pagination({ page, total, limit, onChange }: PaginationP
       <span>
         Menampilkan {(page - 1) * limit + 1}–{Math.min(page * limit, total)} dari {total} data
       </span>
-      <div className="flex gap-1 max-w-full overflow-x-auto pb-1">
+      <div className="flex flex-wrap gap-1">
         <button
           disabled={page <= 1}
           onClick={() => onChange(page - 1)}
-          className="px-3 py-1.5 rounded border border-slate-200 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed"
+          className="grid size-11 place-items-center rounded-lg border border-slate-200 sm:size-9 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed"
           aria-label="Halaman sebelumnya"
         >
           <ChevronLeft size={16} aria-hidden />
@@ -30,7 +30,8 @@ export default function Pagination({ page, total, limit, onChange }: PaginationP
             <button
               key={p}
               onClick={() => onChange(p)}
-              className={`px-3 py-1.5 rounded border text-sm ${
+              aria-current={p === page ? "page" : undefined}
+              className={`size-11 rounded-lg border text-sm sm:size-9 ${
                 p === page
                   ? 'bg-indigo-600 text-white border-indigo-600'
                   : 'border-slate-200 hover:bg-slate-100'
@@ -43,7 +44,7 @@ export default function Pagination({ page, total, limit, onChange }: PaginationP
         <button
           disabled={page >= totalPages}
           onClick={() => onChange(page + 1)}
-          className="px-3 py-1.5 rounded border border-slate-200 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed"
+          className="grid size-11 place-items-center rounded-lg border border-slate-200 sm:size-9 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed"
           aria-label="Halaman berikutnya"
         >
           <ChevronRight size={16} aria-hidden />

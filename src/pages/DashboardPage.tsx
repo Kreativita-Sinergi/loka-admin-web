@@ -124,14 +124,14 @@ export default function DashboardPage() {
   const monthly = monthlySeries(growth?.subscription_monthly, 6)
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {header}
       <AnalyticsState loading={false} error={statsQuery.error} hasData />
 
       {/* 1. Perlu tindakan */}
       <div className="space-y-3">
         <SectionLabel hint="Dari skor Kesehatan Merchant">Perlu tindakan</SectionLabel>
-        <div className="grid grid-cols-1 min-[420px]:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           <StatCard
             to="/merchant-health"
             label="Trial berisiko berhenti"
@@ -159,7 +159,7 @@ export default function DashboardPage() {
       {/* 2. Hari ini */}
       <div className="space-y-3">
         <SectionLabel hint="Pengguna & jam: tanggal UTC · transaksi: bulan berjalan WIB">Pemakaian</SectionLabel>
-        <div className="grid grid-cols-1 min-[420px]:grid-cols-2 xl:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 gap-2.5 sm:gap-3 xl:grid-cols-4">
           <StatCard
             to="/usage"
             label="Pengguna aktif hari ini"
@@ -191,7 +191,7 @@ export default function DashboardPage() {
       {/* 3. Pertumbuhan */}
       <div className="space-y-3">
         <SectionLabel hint="30 hari terakhir">Pertumbuhan</SectionLabel>
-        <div className="grid grid-cols-1 min-[420px]:grid-cols-2 xl:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 gap-2.5 sm:gap-3 xl:grid-cols-4">
           <StatCard
             label="MRR"
             value={growth?.mrr != null ? formatMoneyShort(growth.mrr) : '—'}

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import {
   Activity,
@@ -24,6 +24,7 @@ import {
 } from 'lucide-react'
 import { useAuthStore } from '../../store/authStore'
 import { ThemeIconButton } from './ThemeToggle'
+import InstallAppButton from './InstallAppButton'
 import LokaLogo from '../ui/LokaLogo'
 import Modal from '../ui/Modal'
 
@@ -98,6 +99,13 @@ export function BrandMark() {
 export default function Sidebar({ open, onClose }: SidebarProps) {
   const logout = useAuthStore((s) => s.logout)
   const navigate = useNavigate()
+  const drawer = useRef<HTMLDialogElement>(null)
+
+  useEffect(() => {
+    const dialog = drawer.current
+    if (open && !dialog?.open) dialog?.showModal()
+    if (!open && dialog?.open) dialog.close()
+  }, [open])
 
   const [confirmLogout, setConfirmLogout] = useState(false)
 
@@ -107,25 +115,22 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
     navigate('/login')
   }
 
-  return (
+  const content = (mobile: boolean) => (
     <>
-    <aside
-      className={`w-72 lg:w-64 h-dvh bg-white border-r border-slate-200 flex flex-col fixed top-0 left-0 z-50 transition-transform duration-200 ease-out lg:translate-x-0 ${open ? 'translate-x-0' : '-translate-x-full'}`}
-      aria-label="Navigasi utama"
-    >
-      <div className="h-16 px-4 flex items-center justify-between border-b border-slate-200">
+      <div className="sidebar-header flex min-h-16 shrink-0 items-center justify-between border-b border-slate-200 px-4">
         <BrandMark />
-        <button
-          type="button"
-          onClick={onClose}
-          className="lg:hidden w-9 h-9 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-slate-900"
-          aria-label="Tutup menu navigasi"
-        >
-          <X size={20} aria-hidden />
-        </button>
+        {mobile && (
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex size-11 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-indigo-600"
+            aria-label="Tutup menu navigasi"
+          >
+            <X size={20} aria-hidden />
+          </button>
+        )}
       </div>
-
-      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-5">
+      <nav className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain px-3 py-4">
         {navGroups.map((group) => (
           <div key={group.title}>
             <p className="px-3 mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
@@ -139,7 +144,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
                   end={to === '/'}
                   onClick={onClose}
                   className={({ isActive }) =>
-                    `group relative flex items-center gap-3 h-9 px-3 rounded-lg text-sm transition-colors ${
+                    `group relative flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-indigo-600 lg:min-h-9 ${
                       isActive
                         ? 'bg-indigo-50 text-indigo-700 font-semibold'
                         : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
@@ -167,20 +172,39 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
         ))}
       </nav>
 
-      <div className="px-3 py-3 border-t border-slate-200 flex items-center gap-1">
-        <button
-          type="button"
-          onClick={() => setConfirmLogout(true)}
-          className="flex-1 flex items-center gap-3 h-9 px-3 rounded-lg text-sm text-slate-600 hover:bg-red-50 hover:text-red-600 transition-colors"
-        >
-          <LogOut size={18} strokeWidth={1.8} aria-hidden />
-          Keluar
-        </button>
-        <ThemeIconButton />
+      <div className="sidebar-footer shrink-0 border-t border-slate-200 px-3 pt-2">
+        {!mobile && <div className="px-1"><InstallAppButton /></div>}
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => { onClose(); setConfirmLogout(true) }}
+            className="flex min-h-11 flex-1 items-center gap-3 rounded-lg px-3 text-sm text-slate-600 transition-colors hover:bg-red-50 hover:text-red-600"
+          >
+            <LogOut size={18} strokeWidth={1.8} aria-hidden />
+            Keluar
+          </button>
+          <ThemeIconButton />
+        </div>
       </div>
-    </aside>
+    </>
+  )
 
-    {/* Di luar <aside>: aside memakai transform, sehingga elemen fixed di dalamnya ikut terpotong. */}
+  return (
+    <>
+      <aside aria-label="Navigasi utama" className="fixed top-0 left-0 z-40 hidden h-dvh w-64 flex-col border-r border-slate-200 bg-white lg:flex">
+        {content(false)}
+      </aside>
+      <dialog
+        id="admin-mobile-menu"
+        ref={drawer}
+        aria-label="Menu navigasi"
+        onCancel={(event) => { event.preventDefault(); onClose() }}
+        onClick={(event) => { if (event.target === event.currentTarget) onClose() }}
+        className="mobile-menu fixed inset-y-0 inset-e-0 inset-s-auto m-0 h-dvh max-h-dvh w-[min(340px,calc(100vw-36px))] max-w-none rounded-s-2xl border-s border-slate-200 bg-white p-0 text-slate-800 shadow-xl open:flex open:flex-col backdrop:bg-black/55 lg:hidden"
+      >
+        {content(true)}
+      </dialog>
+
     <Modal title="Keluar dari Loka Admin?" open={confirmLogout} onClose={() => setConfirmLogout(false)}>
       <p className="text-sm text-slate-600">Sesi di perangkat ini akan diakhiri. Kamu perlu masuk lagi untuk membuka panel.</p>
       <div className="mt-6 flex justify-end gap-2">

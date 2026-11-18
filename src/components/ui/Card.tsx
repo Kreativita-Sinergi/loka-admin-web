@@ -74,12 +74,12 @@ export function StatCard({ label, value, detail, footer, to, onClick, tone = 'de
         <p className="text-xs font-medium text-slate-500">{label}</p>
         {(to || onClick) && <ChevronRight size={16} className="shrink-0 text-slate-300 transition-colors group-hover:text-slate-500" aria-hidden />}
       </div>
-      <p className={`mt-1.5 text-2xl font-semibold tabular-nums tracking-tight break-words ${valueTone}`}>{value}</p>
+      <p className={`mt-1.5 text-xl font-semibold tabular-nums tracking-tight wrap-anywhere sm:text-2xl ${valueTone}`}>{value}</p>
       {detail && <p className="mt-1 text-xs leading-5 text-slate-500">{detail}</p>}
       {footer && <div className="mt-2">{footer}</div>}
     </>
   )
-  const base = 'group block min-w-0 card p-4'
+  const base = 'group block min-w-0 card p-3 sm:p-4'
   return to ? (
     <Link to={to} className={`${base} transition-colors hover:border-slate-300 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500`}>
       {body}

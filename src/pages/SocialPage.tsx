@@ -92,8 +92,8 @@ export default function SocialPage() {
       {status && <AccountsPanel status={status} onChange={setStatus} />}
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-        <div className="xl:col-span-2 min-w-0 overflow-x-auto">
-          <div className="min-w-[640px]">
+        <div className="xl:col-span-2 min-w-0 md:overflow-x-auto">
+          <div className="md:min-w-[640px]">
             <SocialCalendar year={ym.y} month={ym.m} posts={posts} today={wibDateKey(new Date())} onMonth={(y, m) => { setLoading(true); setYm({ y, m }) }} />
           </div>
         </div>
