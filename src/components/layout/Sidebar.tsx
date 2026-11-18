@@ -38,7 +38,6 @@ const navGroups: { title: string; items: NavItem[] }[] = [
     title: 'Ringkasan',
     items: [
       { to: '/', label: 'Dashboard', icon: LayoutDashboard },
-      { to: '/growth', label: 'Pertumbuhan & Aktivasi', icon: TrendingUp },
       { to: '/usage', label: 'Aktivitas & Pemakaian', icon: Activity },
       { to: '/merchant-health', label: 'Kesehatan Merchant', icon: HeartPulse },
     ],
